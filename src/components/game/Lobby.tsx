@@ -59,7 +59,7 @@ export function Lobby({ room, players, session, code }: { room: RoomRow; players
 
       <section className="mt-8">
         <h2 className="text-lg text-gold">Escolha sua civilização</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div className="mx-auto mt-5 flex max-w-4xl flex-col gap-5">
           {CIVILIZATIONS.map((civ) => {
             const owner = players.find((p) => p.civ_id === civ.id);
             const mine = owner?.id === session.playerId;
@@ -67,23 +67,23 @@ export function Lobby({ room, players, session, code }: { room: RoomRow; players
             return (
               <button key={civ.id} disabled={taken || busy}
                 onClick={() => run(() => choose({ data: { code, ...session, civId: mine ? null : civ.id } }))}
-                className={cn("panel-stone relative flex min-w-0 flex-col items-center gap-3 overflow-hidden p-3 text-left transition", mine && "ring-2 ring-gold glow-gold", taken ? "opacity-40" : "hover:-translate-y-1")}>
+                className={cn("group relative flex w-full min-w-0 flex-col items-center gap-2 rounded-xl border border-transparent bg-transparent px-2 py-3 text-left transition-all duration-200", mine && "border-gold/70 bg-gold/5", taken ? "opacity-40" : "hover:-translate-y-0.5 hover:bg-gold/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold")}>
                 {civ.id === "aurelia" ? (
                   <>
                     <img
                       src="/aurelia-bandeja.webp"
                       alt="Bandeja da civilização Aurélia — Colosso do Sol Nascente"
-                      className="block h-auto w-full max-w-full object-contain"
+                      className="block h-auto w-full max-w-[760px] object-contain drop-shadow-[0_12px_14px_rgba(0,0,0,0.4)]"
                       decoding="async"
                     />
-                    <span className="self-start px-2 pb-1 text-xs text-gold">
+                    <span className="block w-full max-w-[760px] px-2 pb-1 text-center text-sm font-semibold text-gold">
                       {mine ? "Sua escolha" : taken ? `Escolhida por ${owner!.nickname}` : "Disponível"}
                     </span>
                   </>
                 ) : (
                   <>
                     <div className="flex h-28 items-end"><Wonder civ={civ} built={5} /></div>
-                    <div className="w-full">
+                    <div className="w-full max-w-[760px] text-center">
                       <div className="font-display text-lg text-gold">{civ.name}</div>
                       <div className="text-sm">{civ.wonder}</div>
                       <div className="text-xs text-muted-foreground">{civ.style}</div>

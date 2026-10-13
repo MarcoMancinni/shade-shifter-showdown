@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { CIVILIZATIONS } from "./game/data";
-import { setupGame, pickCard, RuleError, type PublicState, type HiddenState } from "./game/engine";
+import { setupGame, pickCard, buildAvailableStage, RuleError, type PublicState, type HiddenState } from "./game/engine";
 
 type Ok<T> = { ok: true } & T;
 type Err = { ok: false; error: string };
@@ -169,4 +169,38 @@ export const getPrivateView = createServerFn({ method: "POST" })
     const v = await verify(data);
     if ("error" in v) return { centralTop: null };
     return { centralTop: null as null };
+  });
+
+/** Evolução explícita da maravilha, validada e persistida no servidor. */
+export const evolveWonder = createServerFn({ method: "POST" })
+  .inputValidator((d) => auth.extend({ version: z.number().int() }).parse(d))
+  .handler(async ({ data }): Promise<Ok<{ stage: number }> | Err> => {
+    const v = await verify(data);
+    if ("error" in v) return { ok: false, error: v.error! };
+    const room = v.room;
+    if (room.status !== "playing") return { ok: false, error: "A partida não está em andamento." };
+    if (room.version !== data.version) return { ok: false, error: "A partida mudou. Tente novamente." };
+    const pub = room.public_state as unknown as PublicState;
+    const area = pub.areas[v.player.id];
+    if (!area) return { ok: false, error: "Jogador não encontrado na partida." };
+    if (area.stages >= 5) return { ok: false, error: "Maravilha já concluída." };
+    const result = buildAvailableStage(area, pub.civIds?.[v.player.id] ?? v.player.civ_id ?? undefined);
+    if (!result.build) return { ok: false, error: "Recursos insuficientes para evoluir." };
+    const next: PublicState = {
+      ...pub,
+      areas: { ...pub.areas, [v.player.id]: result.area },
+      lastBuild: { playerId: v.player.id, ...result.build },
+    };
+    const { data: sec, error: secretError } = await v.db.from("room_secrets")
+      .select("hidden_state").eq("room_id", room.id).single();
+    if (secretError || !sec) return { ok: false, error: "Não foi possível carregar a partida." };
+    const { data: ok, error } = await v.db.rpc("commit_room_state", {
+      _room_id: room.id, _expected_version: room.version,
+      _status: result.area.stages >= 5 ? "finished" : "playing",
+      _current_seat: room.current_seat, _turn_number: room.turn_number,
+      _public_state: next as never, _hidden_state: sec.hidden_state as never,
+      _events: [{ type: "construcao", payload: next.lastBuild }] as never,
+    });
+    if (error || !ok) return { ok: false, error: "A partida mudou. Tente novamente." };
+    return { ok: true, stage: result.area.stages };
   });

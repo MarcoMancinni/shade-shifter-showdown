@@ -48,6 +48,9 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   if (card.cat === "recurso" && (card.resource === "pedra" || card.resource === "argila" || card.resource === "madeira" || card.resource === "vidro")) {
     return <IllustratedResourceCard size={size} resource={card.resource} title={cardTitle(card)} />;
   }
+  if (card.cat === "militar" && (card.shields ?? 0) === 1 && !card.conflict) {
+    return <IllustratedResourceCard size={size} resource="carta-militar-sem-conflito" title={cardTitle(card)} />;
+  }
   if (size === "sm") {
     return (
       <div title={cardTitle(card)} className={cn(dims, CAT_BG[card.cat], "flex items-center justify-center rounded-md border border-background/40 text-background shadow-card")}>
@@ -70,7 +73,7 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   );
 }
 
-function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" }) {
+function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" | "carta-militar-sem-conflito" }) {
   const [imageFailed, setImageFailed] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [position, setPosition] = useState({ left: 0, top: 0, below: false });
@@ -112,7 +115,7 @@ function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" 
   if (imageFailed) {
     return (
       <div title={title} className={cn(dims, "flex items-center justify-center rounded-md border border-gold/60 bg-cat-recurso text-background shadow-card")}>
-        {resource === "moeda" ? <Coins className={size === "sm" ? "size-5" : "size-8"} /> : resource === "pedra" ? <Mountain className={size === "sm" ? "size-5" : "size-8"} /> : <Layers className={size === "sm" ? "size-5" : "size-8"} />}
+        {resource === "carta-militar-sem-conflito" ? <Shield className={size === "sm" ? "size-5" : "size-8"} /> : resource === "moeda" ? <Coins className={size === "sm" ? "size-5" : "size-8"} /> : resource === "pedra" ? <Mountain className={size === "sm" ? "size-5" : "size-8"} /> : <Layers className={size === "sm" ? "size-5" : "size-8"} />}
       </div>
     );
   }

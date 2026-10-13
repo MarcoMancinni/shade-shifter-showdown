@@ -42,7 +42,10 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
     );
   }
   // Recursos ilustrados usam suas artes próprias, com alternativa caso a imagem falhe.
-  if (card.cat === "recurso" && (card.resource === "pedra" || card.resource === "argila" || card.resource === "madeira")) {
+  if (card.cat === "comercio") {
+    return <IllustratedResourceCard size={size} resource="moeda" title={cardTitle(card)} />;
+  }
+  if (card.cat === "recurso" && (card.resource === "pedra" || card.resource === "argila" || card.resource === "madeira" || card.resource === "vidro")) {
     return <IllustratedResourceCard size={size} resource={card.resource} title={cardTitle(card)} />;
   }
   if (size === "sm") {
@@ -67,7 +70,7 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   );
 }
 
-function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" }) {
+function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" }) {
   const [imageFailed, setImageFailed] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [position, setPosition] = useState({ left: 0, top: 0, below: false });
@@ -109,7 +112,7 @@ function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" 
   if (imageFailed) {
     return (
       <div title={title} className={cn(dims, "flex items-center justify-center rounded-md border border-gold/60 bg-cat-recurso text-background shadow-card")}>
-        {resource === "pedra" ? <Mountain className={size === "sm" ? "size-5" : "size-8"} /> : <Layers className={size === "sm" ? "size-5" : "size-8"} />}
+        {resource === "moeda" ? <Coins className={size === "sm" ? "size-5" : "size-8"} /> : resource === "pedra" ? <Mountain className={size === "sm" ? "size-5" : "size-8"} /> : <Layers className={size === "sm" ? "size-5" : "size-8"} />}
       </div>
     );
   }
@@ -130,7 +133,7 @@ function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" 
     >
       <img
         src={`/cartas/${resource}.webp`}
-        alt={`Carta de recurso ${title}`}
+        alt={`Carta ${title}`}
         className="h-full w-full object-fill"
         loading="lazy"
         onError={() => setImageFailed(true)}

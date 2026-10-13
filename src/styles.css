@@ -482,3 +482,28 @@
 .wonder-artwork { position:absolute; z-index:2; left:0; top:0; width:100%; height:93%; object-fit:contain; object-position:center bottom; pointer-events:none; user-select:none; transform-origin:center bottom; }
 .arena-monument .wonder-artwork { height:100%; }
 .arena-v2-monument .wonder-artwork { height:100%; }
+
+/* Arena composition refinement: emphasize illustrated wonders without blocking cards */
+@media (min-width: 901px) {
+  .arena-v2 .arena-v2-table { width: min(94vw, 1120px); }
+  .arena-v2 .arena-monument { opacity: 1; z-index: 1; }
+  .arena-v2 .arena-monument-left { left: 0; }
+  .arena-v2 .arena-monument-right { right: 0; }
+  .arena-v2 .arena-monument .wonder-scene {
+    width: clamp(190px, 19vw, 265px);
+    height: clamp(175px, 18vw, 250px);
+  }
+  .arena-v2 .arena-v2-empire {
+    min-height: 122px;
+    padding: 10px 18px;
+    gap: 14px;
+  }
+  .arena-v2 .arena-v2-monument .wonder-medium {
+    transform: scale(1.05);
+    margin: 0 6px 0 0;
+  }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  .arena-v2 .arena-monument { opacity: .85; }
+  .arena-v2 .arena-monument .wonder-scene { width: 145px; height: 145px; }
+}

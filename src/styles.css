@@ -1557,3 +1557,45 @@
     border-top: 1px solid rgba(235,186,100,.4) !important;
   }
 }
+
+/* HUD v12: reserve a safe bottom inset above the illustrated golden frame.
+   Previous notebook-height rules compressed the panel to 116-132px. */
+.arena-v2 .empire-hud-wrap .arena-v2-empire {
+  height: auto !important;
+  min-height: 206px !important;
+  padding-top: 30px !important;
+  padding-bottom: 46px !important;
+  align-content: center !important;
+}
+.arena-v2 .empire-hud-wrap .wonder-requirements {
+  align-self: center;
+  padding-bottom: 0 !important;
+}
+.arena-v2 .empire-hud-wrap .wonder-evolve-button {
+  position: relative;
+  margin-top: 12px !important;
+  margin-bottom: 0 !important;
+  min-height: 42px !important;
+  flex-shrink: 0;
+}
+@media (min-width: 1100px) and (max-height: 850px) {
+  .arena-v2 .empire-hud-wrap .arena-v2-empire {
+    min-height: 190px !important;
+    padding-top: 24px !important;
+    padding-bottom: 42px !important;
+  }
+}
+@media (min-width: 1100px) and (max-height: 650px) {
+  .arena-v2 .empire-hud-wrap .arena-v2-empire {
+    min-height: 184px !important;
+    padding-top: 20px !important;
+    padding-bottom: 40px !important;
+  }
+}
+@media (max-width: 760px) {
+  .arena-v2 .empire-hud-wrap .arena-v2-empire {
+    min-height: 0 !important;
+    padding-top: 32px !important;
+    padding-bottom: 45px !important;
+  }
+}

@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
+import { useState } from "react";
 import type { Civilization } from "@/lib/game/data";
 
 /** Monumento 2.5D progressivo. As cinco etapas refletem apenas o estado do servidor. */
@@ -7,6 +8,8 @@ export function Wonder({ civ, built, size = "md" }: { civ: Civilization; built: 
   const reducedMotion = useReducedMotion();
   const completed = Math.max(0, Math.min(civ.stages.length, built));
   const kind = civ.id;
+  const [assetFailed, setAssetFailed] = useState(false);
+  const useAureliaImage = kind === "aurelia" && !assetFailed;
   return (
     <div
       className={`wonder-scene wonder-${kind} ${compact ? "wonder-small" : "wonder-medium"}`}
@@ -16,7 +19,24 @@ export function Wonder({ civ, built, size = "md" }: { civ: Civilization; built: 
       title={`${civ.wonder} — ${completed}/${civ.stages.length} etapas`}
     >
       <div className="wonder-aura" aria-hidden="true" />
-      <MonumentSilhouette civId={civ.id} built={completed} />
+      {useAureliaImage ? (
+        <motion.img
+          className="wonder-artwork"
+          src="/maravilhas/aurelia-colosso.webp"
+          alt=""
+          draggable={false}
+          onError={() => setAssetFailed(true)}
+          initial={false}
+          animate={{
+            opacity: completed === 0 ? 0.3 : 0.48 + completed * 0.104,
+            filter: completed === 0 ? "grayscale(0.7) brightness(0.7)" : "none",
+            scale: completed === 0 ? 0.93 : 1,
+          }}
+          transition={reducedMotion ? { duration: 0 } : { duration: 0.7, ease: "easeOut" }}
+        />
+      ) : (
+        <MonumentSilhouette civId={civ.id} built={completed} />
+      )}
       <div className="wonder-ground" aria-hidden="true" />
       <div className="wonder-architecture" aria-hidden="true">
         {civ.stages.map((stage, i) => {

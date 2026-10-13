@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Mountain, Layers, TreePine, Gem, Coins, Landmark, Cat, Orbit, Cog, ScrollText, Shield, Swords, HelpCircle } from "lucide-react";
 import type { Card } from "@/lib/game/data";
 import { CATEGORY_LABEL, RESOURCE_LABEL, SCIENCE_LABEL } from "@/lib/game/data";
@@ -39,6 +40,11 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
       </div>
     );
   }
+  // Arte ilustrada de Pedra; mantém o cartão tradicional como alternativa
+  // enquanto o arquivo /public/cartas/pedra.webp não estiver disponível.
+  if (card.cat === "recurso" && card.resource === "pedra") {
+    return <StoneCard size={size} title={cardTitle(card)} />;
+  }
   if (size === "sm") {
     return (
       <div title={cardTitle(card)} className={cn(dims, CAT_BG[card.cat], "flex items-center justify-center rounded-md border border-background/40 text-background shadow-card")}>
@@ -57,6 +63,29 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
         </div>
       </div>
       <div className="px-1 pb-2 text-center text-xs font-medium text-foreground">{cardTitle(card)}</div>
+    </div>
+  );
+}
+
+function StoneCard({ size, title }: { size: "sm" | "md" | "lg"; title: string }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const dims = size === "lg" ? "w-36 h-52" : size === "md" ? "w-24 h-36" : "w-10 h-14";
+  if (imageFailed) {
+    return (
+      <div title={title} className={cn(dims, "flex items-center justify-center rounded-md border border-gold/60 bg-cat-recurso text-background shadow-card")}>
+        <Mountain className={size === "sm" ? "size-5" : "size-8"} />
+      </div>
+    );
+  }
+  return (
+    <div title={title} className={cn(dims, "relative overflow-hidden rounded-md shadow-card")}>
+      <img
+        src="/cartas/pedra.webp"
+        alt="Carta de recurso Pedra"
+        className="h-full w-full object-fill"
+        loading="lazy"
+        onError={() => setImageFailed(true)}
+      />
     </div>
   );
 }

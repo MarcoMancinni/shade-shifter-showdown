@@ -702,3 +702,53 @@
     margin-right: auto;
   }
 }
+
+/* Wonder requirements integrated into the illustrated bottom HUD */
+.arena-v2 .wonder-requirements {
+  flex: 1 1 240px;
+  min-width: 210px;
+  max-width: 370px;
+  padding: 8px 12px;
+  border: 1px solid rgba(228, 177, 91, .38);
+  border-radius: 8px;
+  background: rgba(19, 13, 12, .48);
+  backdrop-filter: blur(3px);
+}
+.wonder-requirements-toggle {
+  flex-shrink: 0;
+  border: 1px solid rgba(228, 177, 91, .45);
+  border-radius: 5px;
+  padding: 4px 7px;
+  font-size: 11px;
+  color: #eac17b;
+  background: rgba(30, 19, 13, .75);
+}
+.wonder-requirements-toggle:hover, .wonder-requirements-toggle:focus-visible {
+  background: rgba(109, 74, 34, .6);
+  outline-color: #f2cc78;
+}
+.wonder-requirements-track { display: flex; gap: 4px; flex: 1; }
+.wonder-requirements-track span {
+  height: 8px;
+  flex: 1;
+  border-radius: 3px;
+  border: 1px solid rgba(211, 166, 90, .45);
+  background: rgba(18, 14, 12, .7);
+}
+.wonder-requirements-track span.is-ready {
+  background: linear-gradient(90deg, #a37a3c, #f5d38c);
+  box-shadow: 0 0 7px rgba(244, 190, 94, .3);
+}
+.wonder-requirements-list { margin-top: 9px; display: grid; gap: 4px; }
+.wonder-requirements-list li {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  gap: 6px;
+  font-size: 11px;
+  color: #c7b6a2;
+}
+.wonder-requirements-list li.is-complete { color: #8fc4a2; }
+.wonder-requirements-list li.is-current { color: #f1cc83; font-weight: 700; }
+@media (max-width: 760px) {
+  .arena-v2 .wonder-requirements { flex-basis: 100%; max-width: none; min-width: 0; }
+}

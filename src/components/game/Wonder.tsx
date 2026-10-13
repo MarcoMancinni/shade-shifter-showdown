@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Civilization } from "@/lib/game/data";
 
 /** Monumento 2.5D progressivo. As cinco etapas refletem apenas o estado do servidor. */
@@ -10,6 +10,8 @@ export function Wonder({ civ, built, size = "md" }: { civ: Civilization; built: 
   const kind = civ.id;
   const [assetFailed, setAssetFailed] = useState(false);
   const useAureliaImage = kind === "aurelia" && !assetFailed;
+  const aureliaSrc = `/aurelia/etapa-${completed}.webp`;
+  useEffect(() => { setAssetFailed(false); }, [aureliaSrc]);
   return (
     <div
       className={`wonder-scene wonder-${kind} ${compact ? "wonder-small" : "wonder-medium"}`}
@@ -22,15 +24,15 @@ export function Wonder({ civ, built, size = "md" }: { civ: Civilization; built: 
       {useAureliaImage ? (
         <motion.img
           className="wonder-artwork"
-          src="/aurelia-colosso.webp"
+          key={aureliaSrc}
+          src={aureliaSrc}
           alt=""
           draggable={false}
           onError={() => setAssetFailed(true)}
-          initial={false}
+          initial={reducedMotion ? false : { opacity: 0.65, scale: 0.96 }}
           animate={{
-            opacity: completed === 0 ? 0.3 : 0.48 + completed * 0.104,
-            filter: completed === 0 ? "grayscale(0.7) brightness(0.7)" : "none",
-            scale: completed === 0 ? 0.93 : 1,
+            opacity: 1,
+            scale: 1,
           }}
           transition={reducedMotion ? { duration: 0 } : { duration: 0.7, ease: "easeOut" }}
         />

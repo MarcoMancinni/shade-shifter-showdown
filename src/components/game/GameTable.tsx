@@ -132,9 +132,10 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       {me && myCiv && (
         <section className="arena-my-empire arena-v2-empire panel-stone relative z-20 mx-4 mb-4 flex flex-wrap items-center gap-6 p-4">
           <div className="empire-identity">
+            <div className="empire-eyebrow">SUA CIVILIZAÇÃO</div>
             <div className="font-display text-gold">{myCiv.name}</div>
-            <div className="text-sm">{myCiv.wonder}</div>
-            <div className="text-xs text-muted-foreground">Construção {me.stages}/5</div>
+            <div className="empire-wonder-name">{myCiv.wonder}</div>
+            <div className="empire-stage-count">Maravilha · {me.stages}/5 etapas</div>
             <div className="empire-stats">
               <span className="flex items-center gap-1"><Shield className="size-4 text-cat-militar" />{me.shields} escudos</span>
               <span className="flex items-center gap-1"><Star className="size-4 text-gold" />{publicPoints(me)} pontos</span>
@@ -143,7 +144,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
           <WonderRequirements civ={myCiv} built={me.stages} cards={me.cards}
             onEvolve={buildWonder} evolving={evolving} canPlay={room.status === "playing"} />
           <div className="empire-hand">
-            <div className="empire-hand-title">Suas cartas · {me.cards.length}</div>
+            <div className="empire-hand-title">INVENTÁRIO <span>{me.cards.length} cartas</span></div>
             <div className="empire-hand-cards">
               <AnimatePresence>
                 {me.cards.map((c) => (
@@ -215,12 +216,12 @@ function WonderRequirements({ civ, built, cards, onEvolve, evolving, canPlay }: 
   const ready = !!progress && progress.current >= progress.required && canPlay;
   return (
     <div className="wonder-requirements">
-      <div className="flex items-center justify-between gap-3">
+      <div className="wonder-requirements-header">
         <div>
           <div className="font-display text-xs uppercase tracking-wider text-gold">
             {next ? `Próxima etapa · ${built + 1}/5` : "Maravilha concluída"}
           </div>
-          <div className="text-xs text-foreground/90">
+          <div className="wonder-cost-label">
             {next ? COST_LABEL[next.cost] : "Todas as cinco etapas foram erguidas"}
           </div>
         </div>
@@ -231,16 +232,16 @@ function WonderRequirements({ civ, built, cards, onEvolve, evolving, canPlay }: 
       </div>
       {next && progress && (
         <>
-          <div className="mt-2 flex items-center gap-2">
+          <div className="wonder-progress-row">
             <div className="wonder-requirements-track" aria-label={`${progress.current} de ${progress.required} recursos`}>
               {Array.from({ length: progress.required }, (_, i) => (
                 <span key={i} className={i < progress.current ? "is-ready" : ""} />
               ))}
             </div>
-            <span className="text-xs text-gold">{progress.current}/{progress.required}</span>
-            <span className="text-xs text-muted-foreground">+{next.points} pontos</span>
+            <span className="wonder-progress-count">{progress.current}/{progress.required}</span>
+            <span className="wonder-stage-points">+{next.points} pts</span>
           </div>
-          <div className="mt-1 text-xs text-muted-foreground">
+          <div className="wonder-resources-caption">
             {progress.resources.length
               ? `Disponíveis: ${progress.resources.map((r) => RESOURCE_LABEL[r]).join(", ")}`
               : "Colete cartas de recurso para construir"}
@@ -249,7 +250,8 @@ function WonderRequirements({ civ, built, cards, onEvolve, evolving, canPlay }: 
       )}
       <button type="button" className="wonder-evolve-button" onClick={onEvolve}
         disabled={!ready || evolving} aria-label="Evoluir maravilha para a próxima etapa">
-        {evolving ? "EVOLUINDO..." : built >= 5 ? "MARAVILHA COMPLETA" : ready ? "✦ EVOLUIR MARAVILHA" : "REÚNA OS RECURSOS"}
+        <span className="wonder-evolve-symbol" aria-hidden="true">✦</span>
+        {evolving ? "EVOLUINDO..." : built >= 5 ? "MARAVILHA COMPLETA" : ready ? "EVOLUIR MARAVILHA" : "EVOLUÇÃO BLOQUEADA"}
       </button>
       {expanded && (
         <ol className="wonder-requirements-list">

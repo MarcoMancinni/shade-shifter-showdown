@@ -25,7 +25,7 @@ export function shuffle<T>(arr: T[], rnd: RandomFn): T[] {
   return a;
 }
 
-const RES: Resource[] = ["pedra", "argila", "madeira"];
+const RES: Resource[] = ["pedra", "argila", "madeira", "vidro"];
 const SCI: Science[] = ["astro", "engenho", "escrita"];
 
 /** Composição fixa de um baralho lateral (24 cartas). */
@@ -33,8 +33,9 @@ export function buildDeck(prefix: string): Card[] {
   const cards: Card[] = [];
   let n = 0;
   const add = (c: Omit<Card, "id">) => cards.push({ id: `${prefix}-${n++}`, ...c });
-  for (const r of RES) for (let i = 0; i < 3; i++) add({ cat: "recurso", resource: r });
-  for (let i = 0; i < 3; i++) add({ cat: "comercio" });
+  for (const r of RES) for (let i = 0; i < (r === "vidro" ? 2 : 3); i++) add({ cat: "recurso", resource: r });
+  // Mantém 24 cartas por baralho: duas cartas de vidro substituem duas de comércio.
+  add({ cat: "comercio" });
   add({ cat: "cultura", points: 3 }); add({ cat: "cultura", points: 3 });
   add({ cat: "cultura", points: 2, mascot: true }); add({ cat: "cultura", points: 2, mascot: true });
   for (const s of SCI) add({ cat: "ciencia", science: s });

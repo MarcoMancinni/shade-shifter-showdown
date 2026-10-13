@@ -116,12 +116,12 @@ export function pickCard(
     cards: [...area.cards, card],
     shields: area.shields + (card.shields ?? 0),
   };
-  const construction = buildAvailableStage(newArea, pub.civIds?.[playerId]);
-  const finished = construction.area.stages === 5 || (h.central.length === 0 && h.decks.every((d) => d.length === 0));
+  // A evolução é uma ação explícita do jogador, nunca automática na compra.
+  const finished = h.central.length === 0 && h.decks.every((d) => d.length === 0);
   const next: PublicState = {
     ...pub,
-    areas: { ...pub.areas, [playerId]: construction.area },
-    lastBuild: construction.build ? { playerId, ...construction.build } : undefined,
+    areas: { ...pub.areas, [playerId]: newArea },
+    lastBuild: undefined,
     decks: projectDecks(h),
     central: { count: h.central.length },
     conflictTokens: Math.min(6, pub.conflictTokens + (card.conflict ?? 0)),

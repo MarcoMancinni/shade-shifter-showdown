@@ -15,6 +15,7 @@ export function Lobby({ room, players, session, code }: { room: RoomRow; players
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [aureliaImageLoaded, setAureliaImageLoaded] = useState(false);
   const me = players.find((p) => p.id === session.playerId);
   const isHost = room.host_player_id === session.playerId;
   const ready = players.length >= 2 && players.every((p) => p.civ_id);
@@ -59,7 +60,7 @@ export function Lobby({ room, players, session, code }: { room: RoomRow; players
 
       <section className="mt-8">
         <h2 className="text-lg text-gold">Escolha sua civilização</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {CIVILIZATIONS.map((civ) => {
             const owner = players.find((p) => p.civ_id === civ.id);
             const mine = owner?.id === session.playerId;
@@ -67,15 +68,34 @@ export function Lobby({ room, players, session, code }: { room: RoomRow; players
             return (
               <button key={civ.id} disabled={taken || busy}
                 onClick={() => run(() => choose({ data: { code, ...session, civId: mine ? null : civ.id } }))}
-                className={cn("panel-stone flex flex-col items-center gap-3 p-4 text-left transition", mine && "ring-2 ring-gold glow-gold", taken ? "opacity-40" : "hover:-translate-y-1")}>
-                <div className="flex h-28 items-end"><Wonder civ={civ} built={5} /></div>
-                <div className="w-full">
+                className={cn("panel-stone relative flex min-w-0 flex-col items-center gap-3 overflow-hidden p-3 text-left transition", mine && "ring-2 ring-gold glow-gold", taken ? "opacity-40" : "hover:-translate-y-1")}>
+                {civ.id === "aurelia" && (
+                  <img
+                    src="/aurelia-bandeja.webp"
+                    alt="Aurélia — Colosso do Sol Nascente. Compra uma carta adicional de um baralho lateral."
+                    loading="lazy"
+                    onLoad={() => setAureliaImageLoaded(true)}
+                    onError={() => setAureliaImageLoaded(false)}
+                    className={cn("h-auto w-full object-contain", !aureliaImageLoaded && "hidden")}
+                  />
+                )}
+                {(civ.id !== "aurelia" || !aureliaImageLoaded) && (
+                  <>
+                    <div className="flex h-28 items-end"><Wonder civ={civ} built={5} /></div>
+                    <div className="w-full">
                   <div className="font-display text-lg text-gold">{civ.name}</div>
                   <div className="text-sm">{civ.wonder}</div>
                   <div className="text-xs text-muted-foreground">{civ.style}</div>
                   <p className="mt-2 text-xs">{civ.ability}</p>
                   <p className="mt-2 text-xs text-gold">{mine ? "Sua escolha" : taken ? `Escolhida por ${owner!.nickname}` : "Disponível"}</p>
-                </div>
+                    </div>
+                  </>
+                )}
+                {civ.id === "aurelia" && aureliaImageLoaded && (
+                  <span className="self-start px-2 pb-1 text-xs text-gold">
+                    {mine ? "Sua escolha" : taken ? `Escolhida por ${owner!.nickname}` : "Disponível"}
+                  </span>
+                )}
               </button>
             );
           })}

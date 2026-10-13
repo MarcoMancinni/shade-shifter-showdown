@@ -1,6 +1,6 @@
 // Dados estáticos do jogo (seguros para o navegador).
 
-export type Resource = "pedra" | "argila" | "madeira";
+export type Resource = "pedra" | "argila" | "madeira" | "vidro";
 export type Science = "astro" | "engenho" | "escrita";
 export type Category = "recurso" | "comercio" | "cultura" | "ciencia" | "militar";
 
@@ -85,7 +85,7 @@ export const CIVILIZATIONS: Civilization[] = [
 
 export const civById = (id: string | null | undefined) => CIVILIZATIONS.find((c) => c.id === id);
 
-export const RESOURCE_LABEL: Record<Resource, string> = { pedra: "Pedra", argila: "Argila", madeira: "Madeira" };
+export const RESOURCE_LABEL: Record<Resource, string> = { pedra: "Pedra", argila: "Argila", madeira: "Madeira", vidro: "Vidro" };
 export const SCIENCE_LABEL: Record<Science, string> = { astro: "Astrolábio", engenho: "Engrenagem", escrita: "Tábua" };
 export const CATEGORY_LABEL: Record<Category, string> = {
   recurso: "Recurso", comercio: "Comércio", cultura: "Cultura", ciencia: "Ciência", militar: "Militar",

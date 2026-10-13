@@ -14,7 +14,7 @@ export function CardIcon({ card, className }: { card: Card; className?: string }
   if (card.cat === "recurso") {
     if (card.resource === "pedra") return <Mountain className={c} />;
     if (card.resource === "argila") return <Layers className={c} />;
-    if (card.resource === "madeira") return <TreePine className={c} />;
+    if (card.resource === "madeira" || card.resource === "vidro") return <TreePine className={c} />;
     return <Gem className={c} />;
   }
   if (card.cat === "comercio") return <Coins className={c} />;
@@ -67,7 +67,7 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   );
 }
 
-function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" }) {
+function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" }) {
   const [imageFailed, setImageFailed] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [position, setPosition] = useState({ left: 0, top: 0, below: false });

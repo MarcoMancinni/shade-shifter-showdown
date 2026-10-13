@@ -688,3 +688,17 @@
   }
   .arena-v2 .arena-v2-empire::before { inset: -7px -9px; }
 }
+
+/* Center the illustrated player HUD horizontally in the viewport. */
+@media (min-width: 1100px) {
+  .arena-v2 .arena-v2-empire {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+@media (min-width: 761px) and (max-width: 1099px) {
+  .arena-v2 .arena-v2-empire {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

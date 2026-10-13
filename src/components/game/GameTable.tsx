@@ -41,9 +41,6 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   const opponents = st.seats.map((id, i) => ({ id, i })).filter((o) => o.id !== session.playerId);
   const me = st.areas[session.playerId];
   const myCiv = civById(byId[session.playerId]?.civ_id);
-  const featuredOpponent = opponents.find((o) => o.id === activeId) ?? opponents[0];
-  const featuredCiv = featuredOpponent ? civById(byId[featuredOpponent.id]?.civ_id) : undefined;
-  const featuredArea = featuredOpponent ? st.areas[featuredOpponent.id] : undefined;
   const inspected = inspect && st.areas[inspect] ? { p: byId[inspect], a: st.areas[inspect]! } : null;
 
   return (
@@ -85,12 +82,6 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       {/* Mesa central */}
       <section className="arena-stage arena-v2-stage relative flex flex-1 items-center justify-center px-4 py-6">
         <div className="arena-table arena-v2-table table-wood relative flex w-full flex-col items-center justify-center gap-5 p-8">
-          <div className="arena-monument arena-monument-left" aria-hidden="true">
-            {myCiv && me && <Wonder civ={myCiv} built={me.stages} />}
-          </div>
-          <div className="arena-monument arena-monument-right" aria-hidden="true">
-            {featuredCiv && featuredArea && <Wonder civ={featuredCiv} built={featuredArea.stages} />}
-          </div>
           {room.status === "finished" ? (
             <div className="text-center">
               <h2 className="text-3xl text-gold-grad">Baralhos esgotados</h2>
@@ -118,11 +109,17 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
         </div>
       </section>
 
+      {/* Maravilha pessoal destacada no canto, fora da área das cartas */}
+      {me && myCiv && (
+        <div className="arena-corner-wonder" aria-label={`Maravilha ${myCiv.wonder}, etapa ${me.stages} de 5`}>
+          <Wonder civ={myCiv} built={me.stages} />
+        </div>
+      )}
+
       {/* Área do jogador */}
       {me && myCiv && (
         <section className="arena-my-empire arena-v2-empire panel-stone relative z-20 mx-4 mb-4 flex flex-wrap items-center gap-6 p-4">
           <div className="arena-v2-monument flex items-end gap-3">
-            <Wonder civ={myCiv} built={me.stages} />
             <div>
               <div className="font-display text-gold">{myCiv.name}</div>
               <div className="text-sm">{myCiv.wonder}</div>

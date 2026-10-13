@@ -477,3 +477,8 @@
   .imperios-arena.arena-v2 { background-attachment: scroll; background-position: center top; }
   .arena-v2 .arena-v2-table { border: 0; }
 }
+
+/* Aurélia illustrated monument */
+.wonder-artwork { position:absolute; z-index:2; left:0; top:0; width:100%; height:93%; object-fit:contain; object-position:center bottom; pointer-events:none; user-select:none; transform-origin:center bottom; }
+.arena-monument .wonder-artwork { height:100%; }
+.arena-v2-monument .wonder-artwork { height:100%; }

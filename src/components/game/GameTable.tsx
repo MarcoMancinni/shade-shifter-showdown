@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Shield, Star, Swords } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { takeCard } from "@/lib/game.functions";
-import { civById } from "@/lib/game/data";
+import { civById, COST_LABEL, RESOURCE_LABEL, type CostKind, type Card, type Civilization, type Resource } from "@/lib/game/data";
 import { deckIndexFor, publicPoints, type PublicState, type Source } from "@/lib/game/engine";
 import type { Session } from "@/lib/session";
 import type { PlayerRow, RoomRow } from "@/hooks/use-room";
@@ -130,6 +130,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
             <span className="flex items-center gap-1"><Shield className="size-4 text-cat-militar" />{me.shields} escudos</span>
             <span className="flex items-center gap-1"><Star className="size-4 text-gold" />{publicPoints(me)} pontos</span>
           </div>
+          <WonderRequirements civ={myCiv} built={me.stages} cards={me.cards} />
           <div className="flex flex-1 flex-wrap gap-1.5">
             <AnimatePresence>
               {me.cards.map((c) => (
@@ -172,5 +173,75 @@ function DeckSlot({ label, count, enabled, onClick, children }: { label: string;
       <span className="font-display text-xs uppercase tracking-widest text-gold">{label}</span>
       <span className="text-xs text-muted-foreground">{count} cartas</span>
     </button>
+  );
+}
+
+const RESOURCE_ORDER: Resource[] = ["pedra", "argila", "madeira", "vidro"];
+
+function requirementProgress(cards: Card[], cost: CostKind): { current: number; required: number; resources: Resource[] } {
+  const required = Number(cost[0]);
+  const available = cards.filter((card) => card.cat === "recurso" && card.resource);
+  const counts = RESOURCE_ORDER.map((resource) => ({
+    resource,
+    count: available.filter((card) => card.resource === resource).length,
+  }));
+  if (cost.endsWith("ig")) {
+    const best = counts.reduce((a, b) => b.count > a.count ? b : a);
+    return { current: Math.min(best.count, required), required, resources: best.count ? [best.resource] : [] };
+  }
+  const distinct = counts.filter((item) => item.count > 0).map((item) => item.resource);
+  return { current: Math.min(distinct.length, required), required, resources: distinct };
+}
+
+function WonderRequirements({ civ, built, cards }: { civ: Civilization; built: number; cards: Card[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const next = civ.stages[built];
+  const progress = next ? requirementProgress(cards, next.cost) : null;
+  return (
+    <div className="wonder-requirements">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <div className="font-display text-xs uppercase tracking-wider text-gold">
+            {next ? `Próxima etapa · ${built + 1}/5` : "Maravilha concluída"}
+          </div>
+          <div className="text-xs text-foreground/90">
+            {next ? COST_LABEL[next.cost] : "Todas as cinco etapas foram erguidas"}
+          </div>
+        </div>
+        <button type="button" className="wonder-requirements-toggle" onClick={() => setExpanded(!expanded)}
+          aria-expanded={expanded} aria-label={expanded ? "Ocultar requisitos" : "Ver todas as etapas"}>
+          {expanded ? "Ocultar" : "Ver 5 etapas"}
+        </button>
+      </div>
+      {next && progress && (
+        <>
+          <div className="mt-2 flex items-center gap-2">
+            <div className="wonder-requirements-track" aria-label={`${progress.current} de ${progress.required} recursos`}>
+              {Array.from({ length: progress.required }, (_, i) => (
+                <span key={i} className={i < progress.current ? "is-ready" : ""} />
+              ))}
+            </div>
+            <span className="text-xs text-gold">{progress.current}/{progress.required}</span>
+            <span className="text-xs text-muted-foreground">+{next.points} pontos</span>
+          </div>
+          <div className="mt-1 text-xs text-muted-foreground">
+            {progress.resources.length
+              ? `Disponíveis: ${progress.resources.map((r) => RESOURCE_LABEL[r]).join(", ")}`
+              : "Colete cartas de recurso para construir"}
+          </div>
+        </>
+      )}
+      {expanded && (
+        <ol className="wonder-requirements-list">
+          {civ.stages.map((stage, i) => (
+            <li key={i} className={i < built ? "is-complete" : i === built ? "is-current" : ""}>
+              <span>{i < built ? "✓" : i + 1}</span>
+              <span>{COST_LABEL[stage.cost]}</span>
+              <span>+{stage.points} pts</span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
   );
 }

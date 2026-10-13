@@ -130,17 +130,19 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
 
       {/* Área do jogador */}
       {me && myCiv && (
-        <section className="arena-my-empire arena-v2-empire panel-stone relative z-20 mx-4 mb-4 flex flex-wrap items-center gap-6 p-4">
-          <div className="empire-identity">
-            <div className="empire-eyebrow">SUA CIVILIZAÇÃO</div>
-            <div className="font-display text-gold">{myCiv.name}</div>
-            <div className="empire-wonder-name">{myCiv.wonder}</div>
-            <div className="empire-stage-count">Maravilha · {me.stages}/5 etapas</div>
-            <div className="empire-stats">
-              <span className="flex items-center gap-1"><Shield className="size-4 text-cat-militar" />{me.shields} escudos</span>
-              <span className="flex items-center gap-1"><Star className="size-4 text-gold" />{publicPoints(me)} pontos</span>
+        <div className="empire-hud-wrap">
+          <header className="empire-overhead" aria-label="Informações da sua maravilha">
+            <div className="empire-overhead-name">
+              <span className="empire-overhead-civ">{myCiv.name}</span>
+              <h2 className="empire-overhead-title">{myCiv.wonder}</h2>
+              <span className="empire-overhead-stage">Etapas construídas: {me.stages}/5</span>
             </div>
-          </div>
+            <div className="empire-overhead-stats">
+              <span><Shield className="size-4 text-cat-militar" /> {me.shields} escudos</span>
+              <span><Star className="size-4 text-gold" /> {publicPoints(me)} pontos</span>
+            </div>
+          </header>
+        <section className="arena-my-empire arena-v2-empire panel-stone relative z-20 mx-4 mb-4 flex flex-wrap items-center gap-6 p-4">
           <WonderRequirements civ={myCiv} built={me.stages} cards={me.cards}
             onEvolve={buildWonder} evolving={evolving} canPlay={room.status === "playing"} />
           <div className="empire-hand">
@@ -158,6 +160,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
           </div>
           {error && <p role="alert" className="empire-action-error text-xs text-destructive">{error}</p>}
         </section>
+        </div>
       )}
 
       {inspected?.p && (

@@ -1,15 +1,17 @@
 // Motor de regras puro (sem banco). Executado apenas no servidor.
-import type { Card, Resource, Science } from "./data";
+import { civById, type Card, type CostKind, type Resource, type Science } from "./data";
 
 export interface PublicDeck { top: Card | null; count: number }
 export interface PlayerArea { cards: Card[]; stages: number; shields: number }
 export interface PublicState {
+  civIds?: Record<string, string>;
   seats: string[]; // player ids por assento
   decks: PublicDeck[]; // deck i fica entre assento i (sua esquerda) e assento i-1
   central: { count: number };
   areas: Record<string, PlayerArea>;
   conflictTokens: number;
   lastPick?: { playerId: string; source: Source; card: Card | null };
+  lastBuild?: { playerId: string; stage: number; used: string[]; points: number; effect?: string };
 }
 export interface HiddenState { decks: Card[][]; central: Card[] }
 export type Source = "esquerda" | "direita" | "centro";
@@ -45,14 +47,14 @@ export function buildDeck(prefix: string): Card[] {
   return cards;
 }
 
-export function setupGame(playerIds: string[], rnd: RandomFn): { pub: PublicState; hidden: HiddenState } {
+export function setupGame(playerIds: string[], rnd: RandomFn, civIds: Record<string, string> = {}): { pub: PublicState; hidden: HiddenState } {
   const seats = shuffle(playerIds, rnd);
   const hiddenDecks = seats.map((_, i) => shuffle(buildDeck(`d${i}`), rnd));
   const central = shuffle([...buildDeck("c0"), ...buildDeck("c1")].slice(0, 30), rnd);
   const hidden: HiddenState = { decks: hiddenDecks, central };
   const areas: Record<string, PlayerArea> = {};
   for (const id of seats) areas[id] = { cards: [], stages: 0, shields: 0 };
-  return { pub: { seats, decks: projectDecks(hidden), central: { count: central.length }, areas, conflictTokens: 0 }, hidden };
+  return { pub: { seats, civIds, decks: projectDecks(hidden), central: { count: central.length }, areas, conflictTokens: 0 }, hidden };
 }
 
 function projectDecks(h: HiddenState): PublicDeck[] {
@@ -65,6 +67,35 @@ export function deckIndexFor(seat: number, nSeats: number, source: "esquerda" | 
 }
 
 export class RuleError extends Error {}
+
+
+export function resourcesForCost(cards: Card[], cost: CostKind): string[] | null {
+  const available = cards.filter((c) => c.cat === "recurso" && c.resource);
+  const amount = Number(cost[0]);
+  if (cost.endsWith("ig")) {
+    for (const resource of RES) {
+      const found = available.filter((c) => c.resource === resource);
+      if (found.length >= amount) return found.slice(0, amount).map((c) => c.id);
+    }
+  } else {
+    const found = RES.map((resource) => available.find((c) => c.resource === resource)).filter((c): c is Card => !!c);
+    if (found.length >= amount) return found.slice(0, amount).map((c) => c.id);
+  }
+  return null;
+}
+export function buildAvailableStage(area: PlayerArea, civId?: string) {
+  const civ = civById(civId);
+  if (!civ || area.stages >= civ.stages.length) return { area };
+  const stage = civ.stages[area.stages]!;
+  const used = resourcesForCost(area.cards, stage.cost);
+  if (!used) return { area };
+  const ids = new Set(used);
+  return {
+    area: { ...area, stages: area.stages + 1, cards: area.cards.filter((c) => !ids.has(c.id)),
+      shields: area.shields + (stage.effect === "+1 escudo" ? 1 : stage.effect === "+2 escudos" ? 2 : 0) },
+    build: { stage: area.stages + 1, used, points: stage.points, ...(stage.effect ? { effect: stage.effect } : {}) },
+  };
+}
 
 export interface PickResult { pub: PublicState; hidden: HiddenState; nextSeat: number; finished: boolean; card: Card }
 
@@ -85,10 +116,12 @@ export function pickCard(
     cards: [...area.cards, card],
     shields: area.shields + (card.shields ?? 0),
   };
-  const finished = h.central.length === 0 && h.decks.every((d) => d.length === 0);
+  const construction = buildAvailableStage(newArea, pub.civIds?.[playerId]);
+  const finished = construction.area.stages === 5 || (h.central.length === 0 && h.decks.every((d) => d.length === 0));
   const next: PublicState = {
     ...pub,
-    areas: { ...pub.areas, [playerId]: newArea },
+    areas: { ...pub.areas, [playerId]: construction.area },
+    lastBuild: construction.build ? { playerId, ...construction.build } : undefined,
     decks: projectDecks(h),
     central: { count: h.central.length },
     conflictTokens: Math.min(6, pub.conflictTokens + (card.conflict ?? 0)),

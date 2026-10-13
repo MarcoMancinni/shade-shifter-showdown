@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { setupGame, pickCard, RuleError, buildDeck } from "./engine";
+import { setupGame, pickCard, RuleError, buildDeck, resourcesForCost, buildAvailableStage } from "./engine";
 
 const rnd = (m: number) => Math.floor(Math.random() * m);
 
@@ -34,5 +34,28 @@ describe("motor de regras", () => {
     const r = pickCard(pub, hidden, pub.seats[0]!, 0, "centro");
     expect(r.pub.lastPick?.card).toBeNull();
     expect(r.pub.central.count).toBe(hidden.central.length - 1);
+  });
+});
+
+describe("construção automática", () => {
+  const r = (id: string, resource: "pedra" | "argila" | "madeira" | "vidro") => ({ id, cat: "recurso" as const, resource });
+  it("consome dois recursos diferentes na etapa inicial", () => {
+    const area = { cards: [r("p", "pedra"), r("v", "vidro")], stages: 0, shields: 0 };
+    const result = buildAvailableStage(area, "aurelia");
+    expect(result.area.stages).toBe(1);
+    expect(result.area.cards).toHaveLength(0);
+    expect(area.stages).toBe(0);
+  });
+  it("requer iguais na segunda etapa", () => {
+    expect(resourcesForCost([r("p", "pedra"), r("v", "vidro")], "2ig")).toBeNull();
+    expect(resourcesForCost([r("a", "vidro"), r("b", "vidro")], "2ig")).toEqual(["a", "b"]);
+  });
+  it("requer quatro recursos diferentes no quinto estágio", () => {
+    const area = { cards: [r("p", "pedra"), r("a", "argila"), r("m", "madeira"), r("v", "vidro")], stages: 4, shields: 0 };
+    expect(buildAvailableStage(area, "vaelis").area.stages).toBe(5);
+  });
+  it("aplica o escudo de Draknor", () => {
+    const area = { cards: [r("p", "pedra"), r("v", "vidro")], stages: 0, shields: 0 };
+    expect(buildAvailableStage(area, "draknor").area.shields).toBe(1);
   });
 });

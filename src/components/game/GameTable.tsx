@@ -191,7 +191,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
 
 function DeckSlot({ label, count, enabled, onClick, children }: { label: string; count: number; enabled: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button disabled={!enabled} onClick={onClick} className={cn("arena-deck group flex min-w-0 flex-col items-center gap-2 transition", enabled ? "arena-deck-enabled" : "cursor-default")}>
+    <button disabled={!enabled} onClick={onClick} className={cn("arena-deck group flex min-w-0 flex-col items-center gap-2 transition", label !== "Centro" && "translate-y-4 sm:translate-y-6", enabled ? "arena-deck-enabled" : "cursor-default")}>
       <div className={cn("rounded-lg", enabled && "glow-gold")}>{count > 0 ? children : <div className="h-36 w-24 rounded-lg border-2 border-dashed border-muted-foreground/40" />}</div>
       <div className="flex min-w-[88px] flex-col items-center gap-0.5 rounded-lg border border-amber-400/50 bg-[#1b130c]/90 px-3 py-2 text-center shadow-[0_4px_14px_rgba(0,0,0,0.55)] backdrop-blur-sm">
         <span className="font-display text-sm font-bold uppercase tracking-[0.08em] text-[#f5ce75] sm:text-base">{label}</span>

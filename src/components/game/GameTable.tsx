@@ -23,10 +23,11 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   const mySeat = st.seats.indexOf(session.playerId);
   const activeId = st.seats[room.current_seat];
   const nextId = st.seats[(room.current_seat + 1) % n];
+  const EMPTY = { top: null, count: 0 };
   const myTurn = activeId === session.playerId && room.status === "playing";
   const viewSeat = mySeat >= 0 ? mySeat : room.current_seat;
-  const leftDeck = st.decks[deckIndexFor(viewSeat, n, "esquerda")];
-  const rightDeck = st.decks[deckIndexFor(viewSeat, n, "direita")];
+  const leftDeck = st.decks[deckIndexFor(viewSeat, n, "esquerda")] ?? EMPTY;
+  const rightDeck = st.decks[deckIndexFor(viewSeat, n, "direita")] ?? EMPTY;
 
   async function pick(source: Source) {
     if (!myTurn || busy) return;
@@ -40,7 +41,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   const opponents = st.seats.map((id, i) => ({ id, i })).filter((o) => o.id !== session.playerId);
   const me = st.areas[session.playerId];
   const myCiv = civById(byId[session.playerId]?.civ_id);
-  const inspected = inspect ? { p: byId[inspect], a: st.areas[inspect] } : null;
+  const inspected = inspect && st.areas[inspect] ? { p: byId[inspect], a: st.areas[inspect]! } : null;
 
   return (
     <main className="flex min-h-screen flex-col">
@@ -55,7 +56,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       {/* Adversários ao redor da mesa */}
       <section className="flex flex-wrap justify-center gap-3 px-4">
         {opponents.map(({ id, i }) => {
-          const p = byId[id]; const a = st.areas[id]; const civ = civById(p?.civ_id);
+          const p = byId[id]; const a = st.areas[id]!; const civ = civById(p?.civ_id);
           const active = id === activeId;
           return (
             <button key={id} onClick={() => setInspect(id)}
@@ -89,7 +90,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
           ) : (
             <>
               <p className={cn("font-display text-lg", myTurn ? "text-gold" : "text-foreground")}>
-                {myTurn ? "Sua vez: escolha uma carta" : `Vez de ${byId[activeId]?.nickname ?? "…"}`}
+                {myTurn ? "Sua vez: escolha uma carta" : `Vez de ${(activeId ? byId[activeId]?.nickname : undefined) ?? "…"}`}
               </p>
               <div className="flex items-end gap-4">
                 <DeckSlot label="Esquerda" count={leftDeck.count} enabled={myTurn && !busy && leftDeck.count > 0} onClick={() => pick("esquerda")}>

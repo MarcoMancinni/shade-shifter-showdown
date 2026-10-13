@@ -11,8 +11,8 @@ const admin = async () => (await import("@/integrations/supabase/client.server")
 function randomInt(max: number) {
   const buf = new Uint32Array(1);
   const limit = Math.floor(0xffffffff / max) * max;
-  do crypto.getRandomValues(buf); while (buf[0] >= limit);
-  return buf[0] % max;
+  do crypto.getRandomValues(buf); while (buf[0]! >= limit);
+  return buf[0]! % max;
 }
 function newToken() {
   const b = new Uint8Array(32);

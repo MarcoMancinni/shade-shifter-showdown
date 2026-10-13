@@ -20,7 +20,7 @@ export type CostKind = "2dif" | "2ig" | "3dif" | "3ig" | "4dif";
 export interface WonderStage {
   cost: CostKind;
   points: number;
-  effect?: string;
+  effect?: string | undefined;
 }
 
 export interface Civilization {
@@ -43,7 +43,7 @@ export const COST_LABEL: Record<CostKind, string> = {
 
 const base: CostKind[] = ["2dif", "2ig", "3dif", "3ig", "4dif"];
 const mk = (pts: number[], fx: (string | undefined)[]): WonderStage[] =>
-  base.map((cost, i) => ({ cost, points: pts[i], effect: fx[i] }));
+  base.map((cost, i) => ({ cost, points: pts[i]!, effect: fx[i] }));
 
 export const CIVILIZATIONS: Civilization[] = [
   {

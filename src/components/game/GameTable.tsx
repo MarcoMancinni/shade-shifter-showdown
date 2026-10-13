@@ -1,7 +1,7 @@
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Shield, Star, Swords } from "lucide-react";
+import { Shield, Star, Swords, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { takeCard } from "@/lib/game.functions";
 import { civById } from "@/lib/game/data";
@@ -44,8 +44,8 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   const inspected = inspect && st.areas[inspect] ? { p: byId[inspect], a: st.areas[inspect]! } : null;
 
   return (
-    <main className="flex min-h-screen flex-col">
-      <header className="flex items-center justify-between px-4 py-3">
+    <main className="imperios-arena flex min-h-screen flex-col overflow-hidden">
+      <header className="arena-hud relative z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-3">
         <Link to="/" className="font-display text-gold">Impérios</Link>
         <div className="flex items-center gap-4 text-sm">
           <span className="flex items-center gap-1"><Swords className="size-4 text-cat-militar" /> Conflito {st.conflictTokens}/6</span>
@@ -54,13 +54,13 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       </header>
 
       {/* Adversários ao redor da mesa */}
-      <section className="flex flex-wrap justify-center gap-3 px-4">
+      <section className="arena-opponents relative z-10 flex flex-wrap justify-center gap-3 px-4">
         {opponents.map(({ id, i }) => {
           const p = byId[id]; const a = st.areas[id]!; const civ = civById(p?.civ_id);
           const active = id === activeId;
           return (
             <button key={id} onClick={() => setInspect(id)}
-              className={cn("panel-stone flex items-center gap-3 px-3 py-2 text-left transition", active && "ring-2 ring-gold glow-gold")}>
+              className={cn("arena-player panel-stone flex items-center gap-3 px-3 py-2 text-left transition", active && "arena-player-active ring-2 ring-gold glow-gold")}>
               {civ && <Wonder civ={civ} built={a.stages} size="sm" />}
               <div>
                 <div className="font-medium">{p?.nickname ?? "?"} <span className="text-xs text-muted-foreground">· {civ?.name}</span></div>
@@ -80,8 +80,8 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       </section>
 
       {/* Mesa central */}
-      <section className="flex flex-1 items-center justify-center px-4 py-8">
-        <div className="table-wood flex aspect-square w-full max-w-xl flex-col items-center justify-center gap-6 rounded-full p-8">
+      <section className="arena-stage relative flex flex-1 items-center justify-center px-4 py-10">
+        <div className="arena-table table-wood relative flex aspect-square w-full max-w-2xl flex-col items-center justify-center gap-6 rounded-full p-8">
           {room.status === "finished" ? (
             <div className="text-center">
               <h2 className="text-3xl text-gold-grad">Baralhos esgotados</h2>
@@ -111,7 +111,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
 
       {/* Área do jogador */}
       {me && myCiv && (
-        <section className="panel-stone mx-4 mb-4 flex flex-wrap items-center gap-6 p-4">
+        <section className="arena-my-empire panel-stone relative z-20 mx-4 mb-4 flex flex-wrap items-center gap-6 p-4">
           <div className="flex items-end gap-3">
             <Wonder civ={myCiv} built={me.stages} />
             <div>
@@ -161,7 +161,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
 
 function DeckSlot({ label, count, enabled, onClick, children }: { label: string; count: number; enabled: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button disabled={!enabled} onClick={onClick} className={cn("flex flex-col items-center gap-1 transition", enabled ? "hover:-translate-y-2" : "cursor-default opacity-80")}>
+    <button disabled={!enabled} onClick={onClick} className={cn("arena-deck flex flex-col items-center gap-1 transition", enabled ? "arena-deck-enabled" : "cursor-default opacity-80")}>
       <div className={cn("rounded-lg", enabled && "glow-gold")}>{count > 0 ? children : <div className="h-36 w-24 rounded-lg border-2 border-dashed border-muted-foreground/40" />}</div>
       <span className="font-display text-xs uppercase tracking-widest text-gold">{label}</span>
       <span className="text-xs text-muted-foreground">{count} cartas</span>

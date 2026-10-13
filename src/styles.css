@@ -1060,3 +1060,70 @@
     padding: 18px 25px;
   }
 }
+
+/* HUD v6 — wider frame, safe text margins and centered evolution module. */
+@media (min-width: 1100px) {
+  .arena-v2 .arena-v2-empire {
+    width: min(1080px, calc(100vw - 410px));
+    min-height: 184px;
+    margin-left: auto;
+    margin-right: auto;
+    transform: translateX(135px);
+    display: grid !important;
+    grid-template-columns: minmax(175px, .92fr) minmax(330px, 1.65fr) minmax(115px, .68fr);
+    align-items: center;
+    align-content: center;
+    gap: 18px;
+    padding: 20px 58px 20px 62px;
+  }
+  .arena-v2 .arena-v2-empire::before {
+    inset: -7px -8px;
+    background-size: 100% 100%;
+  }
+  .arena-v2 .empire-identity { padding-left: 12px; }
+}
+.arena-v2 .empire-identity {
+  justify-content: center;
+  align-self: center;
+  gap: 5px;
+  min-width: 0;
+}
+.arena-v2 .empire-identity .font-display { line-height: 1.2; }
+.arena-v2 .empire-stats { margin-top: 9px; }
+.arena-v2 .wonder-requirements {
+  align-self: center;
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+  padding: 11px 14px;
+}
+.arena-v2 .wonder-requirements-header { gap: 8px; }
+.arena-v2 .wonder-requirements-toggle { flex-shrink: 0; }
+.arena-v2 .wonder-evolve-button { min-height: 42px; margin-top: 10px; }
+.arena-v2 .empire-hand {
+  align-self: center;
+  min-width: 0;
+  padding-left: 14px;
+}
+.arena-v2 .empire-hand-title { font-size: 11px; }
+@media (min-width: 761px) and (max-width: 1099px) {
+  .arena-v2 .arena-v2-empire {
+    transform: none;
+    width: min(94vw, 850px);
+    display: grid !important;
+    grid-template-columns: minmax(125px, .8fr) minmax(235px, 1.5fr) minmax(105px, .7fr);
+    padding: 20px 32px;
+    gap: 12px;
+  }
+}
+@media (max-width: 760px) {
+  .arena-v2 .arena-v2-empire {
+    transform: none;
+    width: calc(100% - 24px);
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 24px 28px;
+  }
+  .arena-v2 .empire-identity { padding-left: 0; }
+}

@@ -120,7 +120,7 @@ export const startGame = createServerFn({ method: "POST" })
     const list = players ?? [];
     if (list.length < 2) return { ok: false, error: "São necessários pelo menos 2 jogadores." };
     if (list.some((p) => !p.civ_id)) return { ok: false, error: "Todos precisam escolher uma civilização." };
-    const { pub, hidden } = setupGame(list.map((p) => p.id), randomInt);
+    const { pub, hidden } = setupGame(list.map((p) => p.id), randomInt, Object.fromEntries(list.map((p) => [p.id, p.civ_id!])));
     // grava assento final conforme a mesa sorteada
     for (const p of list) await v.db.from("room_players").update({ seat: 100 + pub.seats.indexOf(p.id) }).eq("id", p.id);
     for (const p of list) await v.db.from("room_players").update({ seat: pub.seats.indexOf(p.id) }).eq("id", p.id);
@@ -149,7 +149,10 @@ export const takeCard = createServerFn({ method: "POST" })
         _room_id: room.id, _expected_version: room.version, _status: r.finished ? "finished" : "playing",
         _current_seat: r.nextSeat, _turn_number: room.turn_number + 1,
         _public_state: r.pub as never, _hidden_state: r.hidden as never,
-        _events: [{ type: "carta", payload: { playerId: v.player.id, source: data.source, card: r.card } }] as never,
+        _events: [
+          { type: "carta", payload: { playerId: v.player.id, source: data.source, card: r.card } },
+          ...(r.pub.lastBuild ? [{ type: "construcao", payload: r.pub.lastBuild }] : []),
+        ] as never,
       });
       if (!ok) return { ok: false, error: "Jogada já processada." };
       return { ok: true };

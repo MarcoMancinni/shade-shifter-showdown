@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Mountain, Layers, TreePine, Gem, Coins, Landmark, Cat, Orbit, Cog, ScrollText, Shield, Swords, HelpCircle } from "lucide-react";
 import type { Card } from "@/lib/game/data";
@@ -70,14 +70,42 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
 function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" }) {
   const [imageFailed, setImageFailed] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [touchTimer, setTouchTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const [position, setPosition] = useState({ left: 0, top: 0, below: false });
+  const longPress = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dims = size === "lg" ? "w-36 h-52" : size === "md" ? "w-24 h-36" : "w-10 h-14";
+
+  const showPreview = (element: HTMLElement) => {
+    const rect = element.getBoundingClientRect();
+    const previewWidth = size === "sm" ? 112 : size === "lg" ? 210 : 165;
+    const previewHeight = previewWidth * (3 / 2);
+    const left = Math.max(8, Math.min(window.innerWidth - previewWidth - 8, rect.left + rect.width / 2 - previewWidth / 2));
+    const below = rect.top < previewHeight + 12;
+    const top = below ? Math.min(window.innerHeight - previewHeight - 8, rect.bottom + 8) : rect.top - previewHeight - 8;
+    setPosition({ left, top, below });
+    setPreviewOpen(true);
+  };
+
+  const clearLongPress = () => {
+    if (longPress.current) clearTimeout(longPress.current);
+    longPress.current = null;
+  };
+
   useEffect(() => {
     if (!previewOpen) return;
-    const onEscape = (event: KeyboardEvent) => { if (event.key === "Escape") setPreviewOpen(false); };
+    const close = () => setPreviewOpen(false);
+    const onEscape = (event: KeyboardEvent) => { if (event.key === "Escape") close(); };
     window.addEventListener("keydown", onEscape);
-    return () => window.removeEventListener("keydown", onEscape);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    return () => {
+      window.removeEventListener("keydown", onEscape);
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
   }, [previewOpen]);
-  const dims = size === "lg" ? "w-36 h-52" : size === "md" ? "w-24 h-36" : "w-10 h-14";
+
+  useEffect(() => () => clearLongPress(), []);
+
   if (imageFailed) {
     return (
       <div title={title} className={cn(dims, "flex items-center justify-center rounded-md border border-gold/60 bg-cat-recurso text-background shadow-card")}>
@@ -85,16 +113,20 @@ function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" 
       </div>
     );
   }
+
   return (
     <div
-      title={title}
-      className={cn(dims, "relative overflow-hidden rounded-md shadow-card cursor-zoom-in transition-transform duration-200 hover:scale-105")}
-      onMouseEnter={(event) => { if (event.pointerType !== "touch") setPreviewOpen(true); }}
+      className={cn(dims, "relative overflow-hidden rounded-md shadow-card cursor-zoom-in")}
+      onMouseEnter={(event) => showPreview(event.currentTarget)}
       onMouseLeave={() => setPreviewOpen(false)}
-      onTouchStart={() => { setTouchTimer(setTimeout(() => setPreviewOpen(true), 450)); }}
-      onTouchEnd={() => { if (touchTimer) clearTimeout(touchTimer); setTouchTimer(null); }}
-      onTouchCancel={() => { if (touchTimer) clearTimeout(touchTimer); setTouchTimer(null); }}
-      onClick={(event) => { if (event.detail === 0) setPreviewOpen(true); }}
+      onTouchStart={(event) => {
+        const element = event.currentTarget;
+        clearLongPress();
+        longPress.current = setTimeout(() => showPreview(element), 450);
+      }}
+      onTouchEnd={() => { clearLongPress(); setPreviewOpen(false); }}
+      onTouchCancel={() => { clearLongPress(); setPreviewOpen(false); }}
+      onContextMenu={(event) => event.preventDefault()}
     >
       <img
         src={`/cartas/${resource}.webp`}
@@ -102,11 +134,17 @@ function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" 
         className="h-full w-full object-fill"
         loading="lazy"
         onError={() => setImageFailed(true)}
+        draggable={false}
       />
       {previewOpen && typeof document !== "undefined" && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4" onClick={(event) => { event.stopPropagation(); setPreviewOpen(false); }} onMouseLeave={() => setPreviewOpen(false)} role="presentation">
-          <img src={`/cartas/${resource}.webp`} alt={`Visualização ampliada: ${title}`} className="max-h-[82dvh] max-w-[min(85vw,440px)] w-auto rounded-xl object-contain shadow-2xl pointer-events-none" />
-        </div>, document.body
+        <div
+          className="pointer-events-none fixed z-[9999] overflow-hidden rounded-lg border border-amber-400/70 shadow-[0_10px_30px_rgba(0,0,0,0.65)]"
+          style={{ left: position.left, top: position.top, width: size === "sm" ? 112 : size === "lg" ? 210 : 165, aspectRatio: "2 / 3" }}
+          aria-hidden="true"
+        >
+          <img src={`/cartas/${resource}.webp`} alt="" className="h-full w-full object-fill" />
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -329,3 +329,87 @@
 @media (prefers-reduced-motion: reduce) {
   .wonder-scene *, .wonder-scene *::before, .wonder-scene *::after { animation: none !important; transition: none !important; }
 }
+
+
+/* Arena v2: compact cinematic framing, avoiding clipped opponents and empty table. */
+.arena-v2 { min-height: 100vh; overflow-x: clip; }
+.arena-v2-opponents {
+  width: min(100%, 1160px);
+  margin: 8px auto 0;
+  align-items: stretch;
+  gap: 12px;
+}
+.arena-v2-opponents .arena-player {
+  flex: 0 1 225px;
+  min-width: 175px;
+  justify-content: flex-start;
+}
+.arena-v2-stage {
+  min-height: 370px;
+  max-height: 570px;
+  perspective: 1300px;
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+.arena-v2-stage::before {
+  width: min(92vw, 1050px);
+  aspect-ratio: 2 / 1;
+  border-radius: 50%;
+  transform: rotateX(35deg);
+}
+.arena-v2-table {
+  width: min(92vw, 930px);
+  height: clamp(315px, 36vw, 455px);
+  aspect-ratio: auto;
+  border-radius: 48% / 45%;
+  transform: rotateX(24deg);
+  background:
+    radial-gradient(ellipse at 50% 50%,rgba(199,144,72,.13),transparent 56%),
+    radial-gradient(ellipse at center,transparent 0 30%,rgba(223,169,81,.2) 30.5%,transparent 31%,transparent 66%,rgba(223,169,81,.14) 66.5%,transparent 67%),
+    repeating-conic-gradient(from 0deg,rgba(229,181,92,.04) 0 2deg,transparent 2deg 30deg),
+    var(--gradient-table);
+}
+.arena-v2-table > p { text-align: center; }
+.arena-v2-decks {
+  position: relative;
+  z-index: 1;
+  gap: clamp(12px,3vw,34px);
+  transform: translateZ(36px) rotateX(-10deg);
+}
+.arena-v2-decks .arena-deck { transform-origin: bottom center; }
+.arena-v2-decks .arena-deck-enabled:hover,
+.arena-v2-decks .arena-deck-enabled:focus-visible {
+  transform: translateY(-14px) translateZ(30px) scale(1.06);
+}
+.arena-v2-empire {
+  width: min(calc(100% - 32px), 1160px);
+  margin-left: auto;
+  margin-right: auto;
+  min-height: 165px;
+  padding: 16px 24px;
+}
+.arena-v2-monument .wonder-medium {
+  transform: scale(1.16);
+  transform-origin: center bottom;
+  margin: 0 10px 6px;
+}
+@media (max-width: 760px) {
+  .arena-v2-opponents { gap: 7px; padding-inline: 10px; }
+  .arena-v2-opponents .arena-player { flex: 1 1 145px; min-width: 0; max-width: 48%; }
+  .arena-v2-stage { min-height: 300px; max-height: none; padding: 16px 6px; }
+  .arena-v2-table {
+    width: min(98vw, 580px);
+    height: 305px;
+    padding: 12px;
+    border-width: 5px;
+    transform: rotateX(9deg);
+  }
+  .arena-v2-decks { gap: 8px; transform: translateZ(12px); }
+  .arena-v2-empire { padding: 12px; gap: 12px; }
+  .arena-v2-monument .wonder-medium { transform: scale(.88); margin: 0; }
+}
+@media (max-width: 390px) {
+  .arena-v2-table { height: 280px; }
+  .arena-v2-table .arena-deck { transform: scale(.85); margin-inline: -6px; }
+  .arena-v2-table .arena-deck-enabled:hover { transform: scale(.89) translateY(-8px); }
+}

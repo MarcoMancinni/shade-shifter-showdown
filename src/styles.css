@@ -413,3 +413,44 @@
   .arena-v2-table .arena-deck { transform: scale(.85); margin-inline: -6px; }
   .arena-v2-table .arena-deck-enabled:hover { transform: scale(.89) translateY(-8px); }
 }
+
+
+/* Individual vector landmarks replace the old generic stacked tiers. */
+.wonder-architecture { display: none; }
+.wonder-identity {
+  position: absolute;
+  inset: 0 0 7%;
+  width: 100%;
+  height: 90%;
+  overflow: visible;
+  filter: drop-shadow(0 6px 4px #000a) drop-shadow(0 0 9px oklch(.67 .12 var(--wonder-hue) / .16));
+}
+.wonder-scene .wonder-ground { bottom: 8%; }
+.wonder-scene .wonder-foundation { bottom: 9%; }
+.arena-monument {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  transform: translateY(-38%) translateZ(20px);
+  pointer-events: none;
+  opacity: .88;
+  filter: drop-shadow(0 10px 15px #0008);
+}
+.arena-monument-left { left: 3%; }
+.arena-monument-right { right: 3%; }
+.arena-monument .wonder-scene {
+  width: clamp(130px, 17vw, 205px);
+  height: clamp(130px, 17vw, 200px);
+}
+.arena-v2-table > p, .arena-v2-table > .arena-v2-decks { position: relative; z-index: 2; }
+.arena-v2-table .arena-decks { background: radial-gradient(ellipse,rgba(35,19,12,.28),transparent 72%); }
+@media (max-width: 900px) {
+  .arena-monument { opacity: .4; }
+  .arena-monument-left { left: 0; }
+  .arena-monument-right { right: 0; }
+  .arena-monument .wonder-scene { width: 120px; height: 120px; }
+}
+@media (max-width: 600px) {
+  .arena-monument { display: none; }
+  .wonder-identity { filter: drop-shadow(0 3px 3px #0009); }
+}

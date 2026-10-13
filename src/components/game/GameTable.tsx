@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Shield, Star, Swords } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { takeCard } from "@/lib/game.functions";
+import { takeCard, evolveWonder } from "@/lib/game.functions";
 import { civById, COST_LABEL, RESOURCE_LABEL, type CostKind, type Card, type Civilization, type Resource } from "@/lib/game/data";
 import { deckIndexFor, publicPoints, type PublicState, type Source } from "@/lib/game/engine";
 import type { Session } from "@/lib/session";
@@ -14,9 +14,11 @@ import { cn } from "@/lib/utils";
 
 export function GameTable({ room, players, session, code }: { room: RoomRow; players: PlayerRow[]; session: Session; code: string }) {
   const take = useServerFn(takeCard);
+  const evolve = useServerFn(evolveWonder);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [inspect, setInspect] = useState<string | null>(null);
+  const [evolving, setEvolving] = useState(false);
   const st = room.public_state as unknown as PublicState;
   const n = st.seats.length;
   const byId = Object.fromEntries(players.map((p) => [p.id, p]));
@@ -36,6 +38,16 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       const r = await take({ data: { code, ...session, source, turn: room.turn_number } });
       if (!r.ok) setError(r.error);
     } catch { setError("Falha de conexão. Tente novamente."); } finally { setBusy(false); }
+  }
+
+  async function buildWonder() {
+    if (evolving || room.status !== "playing") return;
+    setEvolving(true); setError(null);
+    try {
+      const result = await evolve({ data: { code, ...session, version: room.version } });
+      if (!result.ok) setError(result.error);
+    } catch { setError("Falha ao evoluir. Tente novamente."); }
+    finally { setEvolving(false); }
   }
 
   const opponents = st.seats.map((id, i) => ({ id, i })).filter((o) => o.id !== session.playerId);
@@ -119,28 +131,31 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       {/* Área do jogador */}
       {me && myCiv && (
         <section className="arena-my-empire arena-v2-empire panel-stone relative z-20 mx-4 mb-4 flex flex-wrap items-center gap-6 p-4">
-          <div className="arena-v2-monument flex items-end gap-3">
-            <div>
-              <div className="font-display text-gold">{myCiv.name}</div>
-              <div className="text-sm">{myCiv.wonder}</div>
-              <div className="text-xs text-muted-foreground">Etapas {me.stages}/5</div>
+          <div className="empire-identity">
+            <div className="font-display text-gold">{myCiv.name}</div>
+            <div className="text-sm">{myCiv.wonder}</div>
+            <div className="text-xs text-muted-foreground">Construção {me.stages}/5</div>
+            <div className="empire-stats">
+              <span className="flex items-center gap-1"><Shield className="size-4 text-cat-militar" />{me.shields} escudos</span>
+              <span className="flex items-center gap-1"><Star className="size-4 text-gold" />{publicPoints(me)} pontos</span>
             </div>
           </div>
-          <div className="flex gap-4 text-sm">
-            <span className="flex items-center gap-1"><Shield className="size-4 text-cat-militar" />{me.shields} escudos</span>
-            <span className="flex items-center gap-1"><Star className="size-4 text-gold" />{publicPoints(me)} pontos</span>
+          <WonderRequirements civ={myCiv} built={me.stages} cards={me.cards}
+            onEvolve={buildWonder} evolving={evolving} canPlay={room.status === "playing"} />
+          <div className="empire-hand">
+            <div className="empire-hand-title">Suas cartas · {me.cards.length}</div>
+            <div className="empire-hand-cards">
+              <AnimatePresence>
+                {me.cards.map((c) => (
+                  <motion.div key={c.id} initial={{ y: -30, opacity: 0, scale: 1.4 }} animate={{ y: 0, opacity: 1, scale: 1 }}>
+                    <GameCard card={c} size="sm" />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+              {me.cards.length === 0 && <span className="text-xs text-muted-foreground">Nenhuma carta ainda.</span>}
+            </div>
           </div>
-          <WonderRequirements civ={myCiv} built={me.stages} cards={me.cards} />
-          <div className="flex flex-1 flex-wrap gap-1.5">
-            <AnimatePresence>
-              {me.cards.map((c) => (
-                <motion.div key={c.id} initial={{ y: -30, opacity: 0, scale: 1.4 }} animate={{ y: 0, opacity: 1, scale: 1 }}>
-                  <GameCard card={c} size="sm" />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-            {me.cards.length === 0 && <span className="text-sm text-muted-foreground">Nenhuma carta ainda.</span>}
-          </div>
+          {error && <p role="alert" className="empire-action-error text-xs text-destructive">{error}</p>}
         </section>
       )}
 
@@ -193,10 +208,11 @@ function requirementProgress(cards: Card[], cost: CostKind): { current: number; 
   return { current: Math.min(distinct.length, required), required, resources: distinct };
 }
 
-function WonderRequirements({ civ, built, cards }: { civ: Civilization; built: number; cards: Card[] }) {
+function WonderRequirements({ civ, built, cards, onEvolve, evolving, canPlay }: { civ: Civilization; built: number; cards: Card[]; onEvolve: () => void; evolving: boolean; canPlay: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const next = civ.stages[built];
   const progress = next ? requirementProgress(cards, next.cost) : null;
+  const ready = !!progress && progress.current >= progress.required && canPlay;
   return (
     <div className="wonder-requirements">
       <div className="flex items-center justify-between gap-3">
@@ -231,6 +247,10 @@ function WonderRequirements({ civ, built, cards }: { civ: Civilization; built: n
           </div>
         </>
       )}
+      <button type="button" className="wonder-evolve-button" onClick={onEvolve}
+        disabled={!ready || evolving} aria-label="Evoluir maravilha para a próxima etapa">
+        {evolving ? "EVOLUINDO..." : built >= 5 ? "MARAVILHA COMPLETA" : ready ? "✦ EVOLUIR MARAVILHA" : "REÚNA OS RECURSOS"}
+      </button>
       {expanded && (
         <ol className="wonder-requirements-list">
           {civ.stages.map((stage, i) => (

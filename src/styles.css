@@ -586,3 +586,16 @@
   }
   .arena-v2 .arena-corner-wonder .wonder-artwork { height: 100%; }
 }
+
+/* Slightly larger showcase wonder, preserving the card play area */
+@media (min-width: 761px) {
+  .arena-v2 .arena-corner-wonder {
+    width: clamp(395px, 29vw, 510px);
+    height: clamp(355px, 28vw, 465px);
+    left: clamp(0px, .6vw, 12px);
+    bottom: clamp(72px, 10vh, 110px);
+  }
+  .arena-v2 .arena-v2-empire {
+    padding-left: clamp(175px, 17vw, 260px);
+  }
+}

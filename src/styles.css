@@ -454,3 +454,26 @@
   .arena-monument { display: none; }
   .wonder-identity { filter: drop-shadow(0 3px 3px #0009); }
 }
+
+
+/* Background scene asset uploaded to public/cenario-imperios.webp */
+.imperios-arena.arena-v2 {
+  background-color: #1b1511;
+  background-image: linear-gradient(180deg,rgba(12,9,8,.24),rgba(12,9,8,.1) 52%,rgba(12,9,8,.42)),url("/cenario-imperios.webp");
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+.imperios-arena.arena-v2::before { display: none; }
+.arena-v2 .arena-v2-stage::before { display: none; }
+.arena-v2 .arena-v2-table {
+  background: transparent;
+  border-color: rgba(218,174,108,.12);
+  outline: none;
+  box-shadow: none;
+}
+@media (max-width: 760px) {
+  .imperios-arena.arena-v2 { background-attachment: scroll; background-position: center top; }
+  .arena-v2 .arena-v2-table { border: 0; }
+}

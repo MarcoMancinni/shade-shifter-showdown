@@ -1498,3 +1498,62 @@
     font-size: clamp(18px, 2vw, 25px) !important;
   }
 }
+
+/* HUD v11: keep evolution and inventory inside the illustrated frame.
+   The civilization header remains above the frame. */
+.arena-v2 .empire-hud-wrap .arena-v2-empire {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, .85fr) !important;
+  align-items: center !important;
+  overflow: visible;
+}
+.arena-v2 .empire-hud-wrap .arena-v2-empire > div:first-child {
+  min-width: 0;
+  width: 100%;
+}
+.arena-v2 .empire-hud-wrap .wonder-requirements {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.arena-v2 .empire-hud-wrap .wonder-requirements-header,
+.arena-v2 .empire-hud-wrap .wonder-progress-row,
+.arena-v2 .empire-hud-wrap .wonder-resources-caption {
+  max-width: 100%;
+}
+.arena-v2 .empire-hud-wrap .wonder-evolve-button {
+  max-width: 100%;
+}
+.arena-v2 .empire-hud-wrap .empire-hand {
+  min-width: 0 !important;
+  grid-column: 2 !important;
+  padding-left: 16px !important;
+  border-left: 1px solid rgba(235,186,100,.4) !important;
+  border-top: 0 !important;
+}
+@media (min-width: 1100px) {
+  .arena-v2 .empire-hud-wrap .arena-v2-empire {
+    padding-left: clamp(82px, 9vw, 112px) !important;
+    padding-right: clamp(72px, 8vw, 102px) !important;
+    column-gap: 18px !important;
+  }
+}
+@media (min-width: 761px) and (max-width: 1099px) {
+  .arena-v2 .empire-hud-wrap .arena-v2-empire {
+    padding-left: 68px !important;
+    padding-right: 55px !important;
+    column-gap: 14px !important;
+  }
+}
+@media (max-width: 760px) {
+  .arena-v2 .empire-hud-wrap .arena-v2-empire {
+    grid-template-columns: minmax(0, 1fr) !important;
+    padding: 30px clamp(30px, 9vw, 46px) !important;
+  }
+  .arena-v2 .empire-hud-wrap .empire-hand {
+    grid-column: 1 !important;
+    padding: 14px 0 0 !important;
+    border-left: 0 !important;
+    border-top: 1px solid rgba(235,186,100,.4) !important;
+  }
+}

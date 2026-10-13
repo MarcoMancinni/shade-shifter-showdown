@@ -623,3 +623,31 @@
   35% { filter: drop-shadow(0 0 28px rgba(255, 199, 93, .75)); }
   100% { filter: drop-shadow(0 0 14px rgba(255, 199, 93, .36)); }
 }
+
+/* Illustrated empire HUD: decorative artwork behind live game data.
+   The original panel remains visible if the asset has not been uploaded. */
+.arena-v2 .arena-v2-empire {
+  isolation: isolate;
+  background-color: rgba(27, 19, 16, .91);
+  border-color: transparent;
+  box-shadow: none;
+}
+.arena-v2 .arena-v2-empire::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -14px -10px;
+  background-image: url("/box-imperios.webp");
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+.arena-v2 .arena-v2-empire .arena-v2-monument,
+.arena-v2 .arena-v2-empire > div {
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 760px) {
+  .arena-v2 .arena-v2-empire::before { inset: -8px -5px; }
+}

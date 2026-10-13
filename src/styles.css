@@ -752,3 +752,70 @@
 @media (max-width: 760px) {
   .arena-v2 .wonder-requirements { flex-basis: 100%; max-width: none; min-width: 0; }
 }
+
+/* Empire HUD v3: three clean areas with a deliberate evolution action. */
+.arena-v2 .arena-v2-empire {
+  display: grid !important;
+  grid-template-columns: minmax(130px, .85fr) minmax(210px, 1.3fr) minmax(120px, .75fr);
+  align-items: center;
+  align-content: center;
+  column-gap: clamp(12px, 2vw, 24px);
+  row-gap: 8px;
+  min-height: 160px;
+}
+.arena-v2 .empire-identity { min-width: 0; }
+.arena-v2 .empire-identity .font-display { font-size: 16px; }
+.arena-v2 .empire-stats {
+  display: flex; flex-wrap: wrap; gap: 6px 14px;
+  margin-top: 10px; font-size: 12px;
+}
+.arena-v2 .wonder-requirements {
+  width: 100%; max-width: none; min-width: 0;
+  padding: 10px 12px; flex: initial;
+}
+.arena-v2 .wonder-requirements > div:first-child { align-items: flex-start; }
+.arena-v2 .wonder-requirements .font-display { font-size: 12px; }
+.arena-v2 .wonder-requirements-toggle { white-space: nowrap; }
+.arena-v2 .wonder-evolve-button {
+  display: block; width: 100%; margin-top: 10px;
+  border: 1px solid #f2d18b; border-radius: 5px;
+  padding: 9px 8px;
+  font-family: "Cinzel", serif; font-size: 12px; font-weight: 700;
+  letter-spacing: .04em; color: #291b0f;
+  background: linear-gradient(180deg, #f9dfa0, #c48a35);
+  box-shadow: 0 3px 11px rgba(237, 170, 61, .2);
+  cursor: pointer;
+}
+.arena-v2 .wonder-evolve-button:hover:not(:disabled) { filter: brightness(1.12); }
+.arena-v2 .wonder-evolve-button:focus-visible { outline: 2px solid #fff0bd; outline-offset: 3px; }
+.arena-v2 .wonder-evolve-button:disabled {
+  cursor: not-allowed; opacity: .65; color: #c8b9a1;
+  background: linear-gradient(180deg, #4d3c2a, #30251e);
+  border-color: #7e6647; box-shadow: none;
+}
+.arena-v2 .empire-hand { min-width: 0; align-self: center; }
+.arena-v2 .empire-hand-title { color: #f0c980; font-size: 11px; margin-bottom: 6px; }
+.arena-v2 .empire-hand-cards {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  max-height: 130px; overflow-y: auto;
+}
+.arena-v2 .empire-action-error { grid-column: 1 / -1; }
+@media (min-width: 1100px) {
+  .arena-v2 .arena-v2-empire {
+    width: min(850px, calc(100vw - 470px));
+    padding: 24px 36px;
+    padding-left: 36px;
+    min-height: 178px;
+  }
+}
+@media (max-width: 1099px) {
+  .arena-v2 .arena-v2-empire { grid-template-columns: minmax(120px, 1fr) minmax(210px, 1.6fr); }
+  .arena-v2 .empire-hand { grid-column: 1 / -1; }
+}
+@media (max-width: 600px) {
+  .arena-v2 .arena-v2-empire {
+    grid-template-columns: 1fr; padding: 14px 16px;
+    gap: 12px; min-height: 0;
+  }
+  .arena-v2 .empire-hand { grid-column: auto; }
+}

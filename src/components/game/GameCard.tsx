@@ -42,7 +42,7 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
     );
   }
   // Recursos ilustrados usam suas artes próprias, com alternativa caso a imagem falhe.
-  if (card.cat === "recurso" && (card.resource === "pedra" || card.resource === "argila")) {
+  if (card.cat === "recurso" && (card.resource === "pedra" || card.resource === "argila" || card.resource === "madeira")) {
     return <IllustratedResourceCard size={size} resource={card.resource} title={cardTitle(card)} />;
   }
   if (size === "sm") {
@@ -67,7 +67,7 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   );
 }
 
-function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" }) {
+function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" }) {
   const [imageFailed, setImageFailed] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [position, setPosition] = useState({ left: 0, top: 0, below: false });

@@ -22,7 +22,7 @@ export function Wonder({ civ, built, size = "md" }: { civ: Civilization; built: 
       {useAureliaImage ? (
         <motion.img
           className="wonder-artwork"
-          src="/maravilhas/aurelia-colosso.webp"
+          src="/aurelia-colosso.webp"
           alt=""
           draggable={false}
           onError={() => setAssetFailed(true)}

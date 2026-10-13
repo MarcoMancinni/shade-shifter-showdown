@@ -123,3 +123,97 @@
 @utility glow-gold { box-shadow: var(--shadow-gold); }
 @utility text-gold-grad { background: var(--gradient-gold); -webkit-background-clip: text; background-clip: text; color: transparent; }
 @utility shadow-card { box-shadow: var(--shadow-card); }
+
+
+/* IMPERIOS — cinematic 2.5D arena. Gameplay stays in the React components. */
+.imperios-arena {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 50% 36%, rgba(173,118,48,.19), transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(78,46,23,.34), transparent 62%),
+    linear-gradient(165deg,#211c19 0%,#100f12 55%,#21180f 100%);
+}
+.imperios-arena::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .24;
+  background-image: repeating-linear-gradient(90deg,transparent 0 95px,rgba(227,181,105,.12) 96px,transparent 97px),
+    repeating-linear-gradient(0deg,transparent 0 95px,rgba(227,181,105,.09) 96px,transparent 97px);
+  mask-image: linear-gradient(to bottom,transparent,#000 20%,#000 78%,transparent);
+}
+.arena-hud { background: linear-gradient(180deg,rgba(8,8,9,.8),transparent); }
+.arena-stage { perspective: 1200px; min-height: 480px; }
+.arena-stage::before {
+  content: "";
+  position: absolute;
+  width: min(92vw,780px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(226,181,91,.16);
+  border-radius: 50%;
+  box-shadow: 0 0 0 24px rgba(160,110,52,.025), 0 0 100px rgba(206,144,59,.12);
+  pointer-events: none;
+}
+.arena-table {
+  transform: rotateX(13deg);
+  transform-style: preserve-3d;
+  border: 8px solid #7b5534;
+  outline: 2px solid rgba(230,180,91,.42);
+  outline-offset: 4px;
+  background:
+    radial-gradient(circle at center,transparent 0 23%,rgba(223,169,81,.18) 23.3%,transparent 24%,transparent 47%,rgba(223,169,81,.2) 47.3%,transparent 48%),
+    repeating-conic-gradient(from 0deg,rgba(229,181,92,.045) 0 2deg,transparent 2deg 30deg),
+    var(--gradient-table);
+  box-shadow: inset 0 0 65px rgba(0,0,0,.65), 0 15px 0 #392519,0 23px 0 #1c1310,0 42px 65px rgba(0,0,0,.75);
+  transition: transform .5s ease;
+}
+.arena-table > * { transform: translateZ(22px); }
+.arena-decks { transform-style: preserve-3d; }
+.arena-deck { position: relative; transform-style: preserve-3d; transition: transform .22s ease, filter .22s ease; }
+.arena-deck::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 12px; left: 6px; right: 6px;
+  height: 140px;
+  border-radius: 8px;
+  background: #21160e;
+  box-shadow: 0 8px 0 #4b3423,0 12px 0 #2d1d16,0 19px 20px rgba(0,0,0,.55);
+}
+.arena-deck-enabled:hover, .arena-deck-enabled:focus-visible {
+  transform: translateY(-12px) translateZ(24px) scale(1.045);
+  filter: drop-shadow(0 0 14px rgba(245,193,86,.7));
+}
+.arena-deck-enabled:focus-visible { outline: 2px solid #f4cc77; outline-offset: 8px; }
+.arena-player {
+  border-color: rgba(196,145,77,.5);
+  background: linear-gradient(155deg,rgba(71,50,35,.95),rgba(24,22,21,.97));
+  box-shadow: 0 10px 22px rgba(0,0,0,.4),inset 0 1px rgba(255,220,160,.12);
+}
+.arena-player-active { animation: empire-active-pulse 2.5s ease-in-out infinite; }
+.arena-my-empire {
+  border-color: rgba(224,172,86,.6);
+  background: linear-gradient(125deg,rgba(72,47,30,.98),rgba(24,22,21,.97));
+  box-shadow: 0 -6px 45px rgba(209,139,53,.09),0 12px 28px rgba(0,0,0,.35);
+}
+@keyframes empire-active-pulse {
+  0%,100% { box-shadow: 0 0 8px rgba(231,182,85,.3); }
+  50% { box-shadow: 0 0 26px rgba(231,182,85,.68); }
+}
+@media (max-width: 640px) {
+  .arena-stage { min-height: 340px; padding-inline: 8px; }
+  .arena-table { transform: rotateX(7deg); border-width: 5px; padding: 12px; gap: 12px; }
+  .arena-table > p { font-size: .8rem; text-align: center; }
+  .arena-decks { gap: 9px; }
+  .arena-deck::before { height: 120px; }
+  .arena-opponents { gap: 6px; }
+  .arena-player { min-width: 0; max-width: 46vw; padding: 7px; }
+  .arena-player .text-xs { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .arena-player-active { animation: none; }
+  .arena-deck, .arena-table { transition: none; }
+}

@@ -651,3 +651,40 @@
 @media (max-width: 760px) {
   .arena-v2 .arena-v2-empire::before { inset: -8px -5px; }
 }
+
+/* Empire HUD: balanced frame beside the large wonder, no stretched ornaments */
+@media (min-width: 1100px) {
+  .arena-v2 .arena-v2-empire {
+    align-self: flex-end;
+    box-sizing: border-box;
+    width: min(790px, calc(100vw - 485px));
+    min-height: 190px;
+    margin-left: 0;
+    margin-right: clamp(18px, 7vw, 140px);
+    padding: 30px 46px;
+    gap: 12px 20px;
+    align-content: center;
+    background: transparent;
+  }
+  .arena-v2 .arena-v2-empire::before {
+    inset: -8px -12px;
+    background-size: 100% 100%;
+  }
+  .arena-v2 .arena-v2-empire .arena-v2-monument {
+    flex: 0 0 auto;
+  }
+  .arena-v2 .arena-corner-wonder {
+    bottom: clamp(70px, 10vh, 108px);
+  }
+}
+@media (min-width: 761px) and (max-width: 1099px) {
+  .arena-v2 .arena-v2-empire {
+    width: min(65vw, 690px);
+    min-height: 155px;
+    margin-left: auto;
+    margin-right: 18px;
+    padding: 22px 28px;
+    background: transparent;
+  }
+  .arena-v2 .arena-v2-empire::before { inset: -7px -9px; }
+}

@@ -109,7 +109,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
                   <GameCard card={leftDeck.top} />
                 </DeckSlot>
                 <DeckSlot label="Centro" count={st.central.count} enabled={myTurn && !busy && st.central.count > 0} onClick={() => pick("centro")}>
-                  <GameCard card={null} hidden />
+                  <div className="relative h-36 w-24" aria-label="Verso do baralho central">\n                    <div className="absolute inset-0 translate-x-[3px] translate-y-[5px] rounded-lg border border-amber-700/70 bg-[#21170f] shadow-lg" />\n                    <div className="absolute inset-0 translate-x-[1px] translate-y-[2px] rounded-lg border border-amber-600/60 bg-[#302012]" />\n                    <img src="/cartas/verso-centro.webp" alt="Verso das cartas do baralho central" draggable={false} className="relative z-10 h-full w-full rounded-lg object-fill drop-shadow-lg transition-transform duration-200 group-hover:-translate-y-1" />\n                  </div>
                 </DeckSlot>
                 <DeckSlot label="Direita" count={rightDeck.count} enabled={myTurn && !busy && rightDeck.count > 0} onClick={() => pick("direita")}>
                   <GameCard card={rightDeck.top} />

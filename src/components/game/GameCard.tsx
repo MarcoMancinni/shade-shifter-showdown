@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Mountain, Layers, TreePine, Gem, Coins, Landmark, Cat, Orbit, Cog, ScrollText, Shield, Swords, HelpCircle } from "lucide-react";
 import type { Card } from "@/lib/game/data";
 import { CATEGORY_LABEL, RESOURCE_LABEL, SCIENCE_LABEL } from "@/lib/game/data";
@@ -68,6 +69,14 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
 
 function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" }) {
   const [imageFailed, setImageFailed] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [touchTimer, setTouchTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!previewOpen) return;
+    const onEscape = (event: KeyboardEvent) => { if (event.key === "Escape") setPreviewOpen(false); };
+    window.addEventListener("keydown", onEscape);
+    return () => window.removeEventListener("keydown", onEscape);
+  }, [previewOpen]);
   const dims = size === "lg" ? "w-36 h-52" : size === "md" ? "w-24 h-36" : "w-10 h-14";
   if (imageFailed) {
     return (
@@ -77,7 +86,16 @@ function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" 
     );
   }
   return (
-    <div title={title} className={cn(dims, "relative overflow-hidden rounded-md shadow-card")}>
+    <div
+      title={title}
+      className={cn(dims, "relative overflow-hidden rounded-md shadow-card cursor-zoom-in transition-transform duration-200 hover:scale-105")}
+      onMouseEnter={(event) => { if (event.pointerType !== "touch") setPreviewOpen(true); }}
+      onMouseLeave={() => setPreviewOpen(false)}
+      onTouchStart={() => { setTouchTimer(setTimeout(() => setPreviewOpen(true), 450)); }}
+      onTouchEnd={() => { if (touchTimer) clearTimeout(touchTimer); setTouchTimer(null); }}
+      onTouchCancel={() => { if (touchTimer) clearTimeout(touchTimer); setTouchTimer(null); }}
+      onClick={(event) => { if (event.detail === 0) setPreviewOpen(true); }}
+    >
       <img
         src={`/cartas/${resource}.webp`}
         alt={`Carta de recurso ${title}`}
@@ -85,6 +103,11 @@ function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" 
         loading="lazy"
         onError={() => setImageFailed(true)}
       />
+      {previewOpen && typeof document !== "undefined" && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4" onClick={(event) => { event.stopPropagation(); setPreviewOpen(false); }} onMouseLeave={() => setPreviewOpen(false)} role="presentation">
+          <img src={`/cartas/${resource}.webp`} alt={`Visualização ampliada: ${title}`} className="max-h-[82dvh] max-w-[min(85vw,440px)] w-auto rounded-xl object-contain shadow-2xl pointer-events-none" />
+        </div>, document.body
+      )}
     </div>
   );
 }

@@ -10,6 +10,7 @@ describe("motor de regras", () => {
     expect(new Set(ids).size).toBe(ids.length);
     expect(hidden.decks).toHaveLength(3);
     expect(buildDeck("x")).toHaveLength(24);
+    expect(buildDeck("x").filter((c) => c.resource === "vidro")).toHaveLength(2);
   });
 
   it("recusa jogada fora da vez", () => {

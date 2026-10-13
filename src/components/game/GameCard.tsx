@@ -1,4 +1,4 @@
-import { Mountain, Layers, TreePine, Coins, Landmark, Cat, Orbit, Cog, ScrollText, Shield, Swords, HelpCircle } from "lucide-react";
+import { Mountain, Layers, TreePine, Gem, Coins, Landmark, Cat, Orbit, Cog, ScrollText, Shield, Swords, HelpCircle } from "lucide-react";
 import type { Card } from "@/lib/game/data";
 import { CATEGORY_LABEL, RESOURCE_LABEL, SCIENCE_LABEL } from "@/lib/game/data";
 import { cn } from "@/lib/utils";
@@ -9,7 +9,12 @@ const CAT_BG: Record<Card["cat"], string> = {
 
 export function CardIcon({ card, className }: { card: Card; className?: string }) {
   const c = cn("size-7", className);
-  if (card.cat === "recurso") return card.resource === "pedra" ? <Mountain className={c} /> : card.resource === "argila" ? <Layers className={c} /> : <TreePine className={c} />;
+  if (card.cat === "recurso") {
+    if (card.resource === "pedra") return <Mountain className={c} />;
+    if (card.resource === "argila") return <Layers className={c} />;
+    if (card.resource === "madeira") return <TreePine className={c} />;
+    return <Gem className={c} />;
+  }
   if (card.cat === "comercio") return <Coins className={c} />;
   if (card.cat === "cultura") return card.mascot ? <Cat className={c} /> : <Landmark className={c} />;
   if (card.cat === "ciencia") return card.science === "astro" ? <Orbit className={c} /> : card.science === "engenho" ? <Cog className={c} /> : <ScrollText className={c} />;

@@ -1,7 +1,7 @@
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Shield, Star, Swords, Sparkles } from "lucide-react";
+import { Shield, Star, Swords } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { takeCard } from "@/lib/game.functions";
 import { civById } from "@/lib/game/data";
@@ -44,7 +44,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   const inspected = inspect && st.areas[inspect] ? { p: byId[inspect], a: st.areas[inspect]! } : null;
 
   return (
-    <main className="imperios-arena flex min-h-screen flex-col overflow-hidden">
+    <main className="imperios-arena arena-v2 flex min-h-screen flex-col">
       <header className="arena-hud relative z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-3">
         <Link to="/" className="font-display text-gold">Impérios</Link>
         <div className="flex items-center gap-4 text-sm">
@@ -54,7 +54,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       </header>
 
       {/* Adversários ao redor da mesa */}
-      <section className="arena-opponents relative z-10 flex flex-wrap justify-center gap-3 px-4">
+      <section className="arena-opponents arena-v2-opponents relative z-10 flex flex-wrap justify-center gap-3 px-4">
         {opponents.map(({ id, i }) => {
           const p = byId[id]; const a = st.areas[id]!; const civ = civById(p?.civ_id);
           const active = id === activeId;
@@ -80,8 +80,8 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       </section>
 
       {/* Mesa central */}
-      <section className="arena-stage relative flex flex-1 items-center justify-center px-4 py-10">
-        <div className="arena-table table-wood relative flex aspect-square w-full max-w-2xl flex-col items-center justify-center gap-6 rounded-full p-8">
+      <section className="arena-stage arena-v2-stage relative flex flex-1 items-center justify-center px-4 py-6">
+        <div className="arena-table arena-v2-table table-wood relative flex w-full flex-col items-center justify-center gap-5 p-8">
           {room.status === "finished" ? (
             <div className="text-center">
               <h2 className="text-3xl text-gold-grad">Baralhos esgotados</h2>
@@ -92,7 +92,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
               <p className={cn("font-display text-lg", myTurn ? "text-gold" : "text-foreground")}>
                 {myTurn ? "Sua vez: escolha uma carta" : `Vez de ${(activeId ? byId[activeId]?.nickname : undefined) ?? "…"}`}
               </p>
-              <div className="flex items-end gap-4">
+              <div className="arena-decks arena-v2-decks flex items-end gap-4">
                 <DeckSlot label="Esquerda" count={leftDeck.count} enabled={myTurn && !busy && leftDeck.count > 0} onClick={() => pick("esquerda")}>
                   <GameCard card={leftDeck.top} />
                 </DeckSlot>
@@ -111,8 +111,8 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
 
       {/* Área do jogador */}
       {me && myCiv && (
-        <section className="arena-my-empire panel-stone relative z-20 mx-4 mb-4 flex flex-wrap items-center gap-6 p-4">
-          <div className="flex items-end gap-3">
+        <section className="arena-my-empire arena-v2-empire panel-stone relative z-20 mx-4 mb-4 flex flex-wrap items-center gap-6 p-4">
+          <div className="arena-v2-monument flex items-end gap-3">
             <Wonder civ={myCiv} built={me.stages} />
             <div>
               <div className="font-display text-gold">{myCiv.name}</div>

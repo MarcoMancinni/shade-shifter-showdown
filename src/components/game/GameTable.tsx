@@ -41,6 +41,9 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   const opponents = st.seats.map((id, i) => ({ id, i })).filter((o) => o.id !== session.playerId);
   const me = st.areas[session.playerId];
   const myCiv = civById(byId[session.playerId]?.civ_id);
+  const featuredOpponent = opponents.find((o) => o.id === activeId) ?? opponents[0];
+  const featuredCiv = featuredOpponent ? civById(byId[featuredOpponent.id]?.civ_id) : undefined;
+  const featuredArea = featuredOpponent ? st.areas[featuredOpponent.id] : undefined;
   const inspected = inspect && st.areas[inspect] ? { p: byId[inspect], a: st.areas[inspect]! } : null;
 
   return (
@@ -68,8 +71,8 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
                   <span className="flex items-center gap-1"><Shield className="size-3" />{a.shields}</span>
                   <span className="flex items-center gap-1"><Star className="size-3" />{publicPoints(a)}</span>
                   <span>{a.cards.length} cartas</span>
-                  {i === (viewSeat + n - 1) % n && <span className="text-gold">← vizinho</span>}
-                  {i === (viewSeat + 1) % n && <span className="text-gold">vizinho →</span>}
+                  {i === (viewSeat + n - 1) % n && <span className="text-gold">← esquerda</span>}
+                  {i === (viewSeat + 1) % n && n > 2 && <span className="text-gold">direita →</span>}
                 </div>
                 {active && <div className="text-xs text-gold">Jogando agora</div>}
                 {!active && id === nextId && <div className="text-xs text-muted-foreground">Próximo</div>}
@@ -82,6 +85,12 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       {/* Mesa central */}
       <section className="arena-stage arena-v2-stage relative flex flex-1 items-center justify-center px-4 py-6">
         <div className="arena-table arena-v2-table table-wood relative flex w-full flex-col items-center justify-center gap-5 p-8">
+          <div className="arena-monument arena-monument-left" aria-hidden="true">
+            {myCiv && me && <Wonder civ={myCiv} built={me.stages} />}
+          </div>
+          <div className="arena-monument arena-monument-right" aria-hidden="true">
+            {featuredCiv && featuredArea && <Wonder civ={featuredCiv} built={featuredArea.stages} />}
+          </div>
           {room.status === "finished" ? (
             <div className="text-center">
               <h2 className="text-3xl text-gold-grad">Baralhos esgotados</h2>

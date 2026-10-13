@@ -135,21 +135,21 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       {/* Área do jogador */}
       {me && myCiv && (
         <div className="empire-hud-wrap">
-          <header className="empire-overhead" aria-label="Informações da sua maravilha">
-            <div className="empire-overhead-name">
-              <span className="empire-overhead-civ">{myCiv.name}</span>
-              <h2 className="empire-overhead-title">{myCiv.wonder}</h2>
-              <span className="empire-overhead-stage">Etapas construídas: {me.stages}/5</span>
+        <section className="arena-my-empire arena-v2-empire panel-stone relative z-20 mx-4 mb-4 grid grid-cols-1 items-start gap-5 p-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] xl:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)_minmax(0,0.8fr)]" aria-label="Painel da sua civilização">
+          <div className="min-w-0 space-y-3 border-b border-gold/20 pb-4 md:border-b-0 md:border-r md:pb-0 md:pr-4">
+            <span className="font-display text-xs uppercase tracking-[0.16em] text-gold">Sua civilização · {myCiv.name}</span>
+            <h2 className="font-display text-xl leading-tight text-[#ffe3a1] sm:text-2xl">{myCiv.wonder}</h2>
+            <p className="text-sm text-[#ead9bc]">Etapas construídas: <strong>{me.stages}/5</strong></p>
+            <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-[#f7e8cb]">
+              <span className="flex items-center gap-1.5"><Shield className="size-4 text-cat-militar" /> {me.shields} escudos</span>
+              <span className="flex items-center gap-1.5"><Star className="size-4 text-gold" /> {publicPoints(me)} pontos</span>
             </div>
-            <div className="empire-overhead-stats">
-              <span><Shield className="size-4 text-cat-militar" /> {me.shields} escudos</span>
-              <span><Star className="size-4 text-gold" /> {publicPoints(me)} pontos</span>
-            </div>
-          </header>
-        <section className="arena-my-empire arena-v2-empire panel-stone relative z-20 mx-4 mb-4 flex flex-wrap items-center gap-6 p-4">
+          </div>
+          <div className="min-w-0">
           <WonderRequirements civ={myCiv} built={me.stages} cards={me.cards}
             onEvolve={buildWonder} evolving={evolving} canPlay={room.status === "playing"} />
-          <div className="empire-hand">
+          </div>
+          <div className="empire-hand min-w-0 border-t border-gold/20 pt-4 md:col-span-2 xl:col-span-1 xl:border-l xl:border-t-0 xl:pl-4 xl:pt-0">
             <div className="empire-hand-title">INVENTÁRIO <span>{me.cards.length} cartas</span></div>
             <div className="empire-hand-cards">
               <AnimatePresence>

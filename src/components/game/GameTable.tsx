@@ -104,19 +104,19 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
               <p className={cn("font-display text-lg", myTurn ? "text-gold" : "text-foreground")}>
                 {myTurn ? "Sua vez: escolha uma carta" : `Vez de ${(activeId ? byId[activeId]?.nickname : undefined) ?? "…"}`}
               </p>
-              <div className="arena-decks arena-v2-decks flex items-end gap-4">
+              <div className="arena-decks arena-v2-decks flex w-full max-w-[760px] items-end justify-center gap-5 sm:gap-9 lg:gap-14">
                 <DeckSlot label="Esquerda" count={leftDeck.count} enabled={myTurn && !busy && leftDeck.count > 0} onClick={() => pick("esquerda")}>
-                  <GameCard card={leftDeck.top} />
+                  <GameCard card={leftDeck.top} size="lg" />
                 </DeckSlot>
                 <DeckSlot label="Centro" count={st.central.count} enabled={myTurn && !busy && st.central.count > 0} onClick={() => pick("centro")}>
-                  <div className="relative h-[176px] w-[118px] sm:h-[198px] sm:w-[132px] max-w-[28vw]" aria-label="Verso do baralho central">
+                  <div className="relative h-[180px] w-[120px] sm:h-[216px] sm:w-[144px] max-w-[28vw]" aria-label="Verso do baralho central">
                     <div className="absolute inset-0 translate-x-[4px] translate-y-[6px] rounded-lg border border-amber-700/70 bg-[#21170f] shadow-lg" />
                     <div className="absolute inset-0 translate-x-[2px] translate-y-[3px] rounded-lg border border-amber-600/60 bg-[#302012]" />
                     <img src="/cartas/verso-centro.webp" alt="Verso das cartas do baralho central" draggable={false} className="relative z-10 h-full w-full rounded-lg object-fill drop-shadow-xl transition-transform duration-200 group-hover:-translate-y-1" />
                   </div>
                 </DeckSlot>
                 <DeckSlot label="Direita" count={rightDeck.count} enabled={myTurn && !busy && rightDeck.count > 0} onClick={() => pick("direita")}>
-                  <GameCard card={rightDeck.top} />
+                  <GameCard card={rightDeck.top} size="lg" />
                 </DeckSlot>
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
@@ -191,10 +191,12 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
 
 function DeckSlot({ label, count, enabled, onClick, children }: { label: string; count: number; enabled: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button disabled={!enabled} onClick={onClick} className={cn("arena-deck flex flex-col items-center gap-1 transition", enabled ? "arena-deck-enabled" : "cursor-default opacity-80")}>
+    <button disabled={!enabled} onClick={onClick} className={cn("arena-deck group flex min-w-0 flex-col items-center gap-2 transition", enabled ? "arena-deck-enabled" : "cursor-default")}>
       <div className={cn("rounded-lg", enabled && "glow-gold")}>{count > 0 ? children : <div className="h-36 w-24 rounded-lg border-2 border-dashed border-muted-foreground/40" />}</div>
-      <span className="font-display text-xs uppercase tracking-widest text-gold">{label}</span>
-      <span className="text-xs text-muted-foreground">{count} cartas</span>
+      <div className="flex min-w-[88px] flex-col items-center gap-0.5 rounded-lg border border-amber-400/50 bg-[#1b130c]/90 px-3 py-2 text-center shadow-[0_4px_14px_rgba(0,0,0,0.55)] backdrop-blur-sm">
+        <span className="font-display text-sm font-bold uppercase tracking-[0.08em] text-[#f5ce75] sm:text-base">{label}</span>
+        <span className="text-xs font-semibold text-[#f7e9d0] sm:text-sm">{count} {count === 1 ? "carta" : "cartas"}</span>
+      </div>
     </button>
   );
 }

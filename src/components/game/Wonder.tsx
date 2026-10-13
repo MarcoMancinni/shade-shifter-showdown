@@ -14,7 +14,7 @@ export function Wonder({ civ, built, size = "md" }: { civ: Civilization; built: 
   useEffect(() => { setAssetFailed(false); }, [aureliaSrc]);
   return (
     <div
-      className={`wonder-scene wonder-${kind} ${compact ? "wonder-small" : "wonder-medium"}`}
+      className={`wonder-scene wonder-${kind} ${compact ? "wonder-small" : "wonder-medium"} ${completed === civ.stages.length ? "wonder-complete" : ""}`}
       style={{ "--wonder-hue": civ.hue } as React.CSSProperties}
       role="img"
       aria-label={`${civ.wonder}: ${completed} de ${civ.stages.length} etapas construídas`}
@@ -29,10 +29,9 @@ export function Wonder({ civ, built, size = "md" }: { civ: Civilization; built: 
           alt=""
           draggable={false}
           onError={() => setAssetFailed(true)}
-          initial={reducedMotion ? false : { opacity: 0.65, scale: 0.96 }}
+          initial={reducedMotion ? false : { opacity: 0.65 }}
           animate={{
             opacity: 1,
-            scale: 1,
           }}
           transition={reducedMotion ? { duration: 0 } : { duration: 0.7, ease: "easeOut" }}
         />

@@ -48,6 +48,9 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   if (card.cat === "recurso" && (card.resource === "pedra" || card.resource === "argila" || card.resource === "madeira" || card.resource === "vidro")) {
     return <IllustratedResourceCard size={size} resource={card.resource} title={cardTitle(card)} />;
   }
+  if (card.cat === "militar" && (card.shields ?? 0) === 1 && card.conflict === 2) {
+    return <IllustratedResourceCard size={size} resource="carta-militar-2-conflitos" title={cardTitle(card)} />;
+  }
   if (card.cat === "militar" && (card.shields ?? 0) === 1 && card.conflict === 1) {
     return <IllustratedResourceCard size={size} resource="carta-militar-1-conflito" title={cardTitle(card)} />;
   }
@@ -76,7 +79,7 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   );
 }
 
-function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" | "carta-militar-sem-conflito" | "carta-militar-1-conflito" }) {
+function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" | "carta-militar-sem-conflito" | "carta-militar-1-conflito" | "carta-militar-2-conflitos" }) {
   const [imageFailed, setImageFailed] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [position, setPosition] = useState({ left: 0, top: 0, below: false });
@@ -118,7 +121,7 @@ function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" 
   if (imageFailed) {
     return (
       <div title={title} className={cn(dims, "flex items-center justify-center rounded-md border border-gold/60 bg-cat-recurso text-background shadow-card")}>
-        {(resource === "carta-militar-sem-conflito" || resource === "carta-militar-1-conflito") ? <Shield className={size === "sm" ? "size-5" : "size-8"} /> : resource === "moeda" ? <Coins className={size === "sm" ? "size-5" : "size-8"} /> : resource === "pedra" ? <Mountain className={size === "sm" ? "size-5" : "size-8"} /> : <Layers className={size === "sm" ? "size-5" : "size-8"} />}
+        {(resource === "carta-militar-sem-conflito" || resource === "carta-militar-1-conflito" || resource === "carta-militar-2-conflitos") ? <Shield className={size === "sm" ? "size-5" : "size-8"} /> : resource === "moeda" ? <Coins className={size === "sm" ? "size-5" : "size-8"} /> : resource === "pedra" ? <Mountain className={size === "sm" ? "size-5" : "size-8"} /> : <Layers className={size === "sm" ? "size-5" : "size-8"} />}
       </div>
     );
   }

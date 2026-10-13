@@ -14,13 +14,179 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      game_events: {
+        Row: {
+          created_at: string
+          id: number
+          payload: Json
+          room_id: string
+          turn_number: number
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          payload?: Json
+          room_id: string
+          turn_number: number
+          type: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          payload?: Json
+          room_id?: string
+          turn_number?: number
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_events_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_secrets: {
+        Row: {
+          player_id: string
+          token_hash: string
+        }
+        Insert: {
+          player_id: string
+          token_hash: string
+        }
+        Update: {
+          player_id?: string
+          token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_secrets_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: true
+            referencedRelation: "room_players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_players: {
+        Row: {
+          civ_id: string | null
+          id: string
+          joined_at: string
+          nickname: string
+          room_id: string
+          seat: number
+        }
+        Insert: {
+          civ_id?: string | null
+          id?: string
+          joined_at?: string
+          nickname: string
+          room_id: string
+          seat: number
+        }
+        Update: {
+          civ_id?: string | null
+          id?: string
+          joined_at?: string
+          nickname?: string
+          room_id?: string
+          seat?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_secrets: {
+        Row: {
+          hidden_state: Json
+          room_id: string
+        }
+        Insert: {
+          hidden_state?: Json
+          room_id: string
+        }
+        Update: {
+          hidden_state?: Json
+          room_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_secrets_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: true
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          code: string
+          created_at: string
+          current_seat: number
+          host_player_id: string | null
+          id: string
+          public_state: Json
+          status: string
+          turn_number: number
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          current_seat?: number
+          host_player_id?: string | null
+          id?: string
+          public_state?: Json
+          status?: string
+          turn_number?: number
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          current_seat?: number
+          host_player_id?: string | null
+          id?: string
+          public_state?: Json
+          status?: string
+          turn_number?: number
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      commit_room_state: {
+        Args: {
+          _current_seat: number
+          _events: Json
+          _expected_version: number
+          _hidden_state: Json
+          _public_state: Json
+          _room_id: string
+          _status: string
+          _turn_number: number
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

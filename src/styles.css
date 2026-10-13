@@ -548,3 +548,9 @@
 @media (max-width: 600px) {
   .arena-v2 .arena-monument { display: none; }
 }
+
+/* Player wonder positioned outside the central decks */
+.arena-v2 .arena-corner-wonder { position: fixed; z-index: 19; left: 22px; bottom: 170px; width: 235px; height: 215px; pointer-events: none; filter: drop-shadow(8px 12px 9px rgba(20,12,8,.4)); }
+.arena-v2 .arena-corner-wonder .wonder-scene { width: 100%; height: 100%; }
+.arena-v2 .arena-corner-wonder .wonder-ground, .arena-v2 .arena-corner-wonder .wonder-foundation, .arena-v2 .arena-corner-wonder .wonder-aura { display: none; }
+@media (max-width: 760px) { .arena-v2 .arena-corner-wonder { position: relative; left: 12px; bottom: auto; width: 125px; height: 115px; margin-bottom: -12px; } }

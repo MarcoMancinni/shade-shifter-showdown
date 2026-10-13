@@ -40,10 +40,9 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
       </div>
     );
   }
-  // Arte ilustrada de Pedra; mantém o cartão tradicional como alternativa
-  // enquanto o arquivo /public/cartas/pedra.webp não estiver disponível.
-  if (card.cat === "recurso" && card.resource === "pedra") {
-    return <StoneCard size={size} title={cardTitle(card)} />;
+  // Recursos ilustrados usam suas artes próprias, com alternativa caso a imagem falhe.
+  if (card.cat === "recurso" && (card.resource === "pedra" || card.resource === "argila")) {
+    return <IllustratedResourceCard size={size} resource={card.resource} title={cardTitle(card)} />;
   }
   if (size === "sm") {
     return (
@@ -67,21 +66,21 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   );
 }
 
-function StoneCard({ size, title }: { size: "sm" | "md" | "lg"; title: string }) {
+function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" }) {
   const [imageFailed, setImageFailed] = useState(false);
   const dims = size === "lg" ? "w-36 h-52" : size === "md" ? "w-24 h-36" : "w-10 h-14";
   if (imageFailed) {
     return (
       <div title={title} className={cn(dims, "flex items-center justify-center rounded-md border border-gold/60 bg-cat-recurso text-background shadow-card")}>
-        <Mountain className={size === "sm" ? "size-5" : "size-8"} />
+        {resource === "pedra" ? <Mountain className={size === "sm" ? "size-5" : "size-8"} /> : <Layers className={size === "sm" ? "size-5" : "size-8"} />}
       </div>
     );
   }
   return (
     <div title={title} className={cn(dims, "relative overflow-hidden rounded-md shadow-card")}>
       <img
-        src="/cartas/pedra.webp"
-        alt="Carta de recurso Pedra"
+        src={`/cartas/${resource}.webp`}
+        alt={`Carta de recurso ${title}`}
         className="h-full w-full object-fill"
         loading="lazy"
         onError={() => setImageFailed(true)}

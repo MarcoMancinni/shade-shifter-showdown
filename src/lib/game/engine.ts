@@ -20,7 +20,7 @@ export function shuffle<T>(arr: T[], rnd: RandomFn): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = rnd(i + 1);
-    [a[i], a[j]] = [a[j], a[i]];
+    [a[i], a[j]] = [a[j]!, a[i]!];
   }
   return a;
 }
@@ -40,7 +40,7 @@ export function buildDeck(prefix: string): Card[] {
   for (const s of SCI) add({ cat: "ciencia", science: s });
   add({ cat: "militar", shields: 1 }); add({ cat: "militar", shields: 1, conflict: 1 });
   add({ cat: "militar", shields: 1, conflict: 2 }); add({ cat: "militar", shields: 2 });
-  add({ cat: "ciencia", science: SCI[prefix.length % 3] });
+  add({ cat: "ciencia", science: SCI[prefix.length % 3]! });
   return cards;
 }
 
@@ -75,10 +75,10 @@ export function pickCard(
   const h: HiddenState = { decks: hidden.decks.map((d) => [...d]), central: [...hidden.central] };
   let card: Card | undefined;
   if (source === "centro") card = h.central.shift();
-  else card = h.decks[deckIndexFor(currentSeat, n, source)].shift();
+  else card = h.decks[deckIndexFor(currentSeat, n, source)]!.shift();
   if (!card) throw new RuleError("Este baralho está vazio.");
 
-  const area = pub.areas[playerId];
+  const area = pub.areas[playerId]!;
   const newArea: PlayerArea = {
     ...area,
     cards: [...area.cards, card],

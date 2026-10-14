@@ -89,7 +89,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       <header className="arena-hud relative z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-3">
         <Link to="/" className="font-display text-gold">Impérios</Link>
         <div className="flex items-center gap-4 text-sm">
-          <span className="flex items-center gap-1"><Swords className="size-4 text-cat-militar" /> Conflito {st.conflictTokens}/{conflictTokenLimit(n)}</span>
+          <span className="flex items-center gap-1"><Swords className="size-4 text-cat-militar" /> {Array.from({ length: conflictTokenLimit(n) }, (_, i) => <img key={i} src="/ficha-paz.webp" alt={i < st.conflictTokens ? "Ficha ativada" : "Ficha da paz"} className={cn("conflict-token-image", i < st.conflictTokens && "conflict-token-active")} />)}</span>
           <span className="text-muted-foreground">Sala {code} · Turno {room.turn_number}</span>
         </div>
       </header>

@@ -13,7 +13,7 @@ export interface PublicState {
   conflictRound?: number;
   lastBattle?: { round: number; results: Record<string, { shields: number; wins: number; points: number }> };
   lastPick?: { playerId: string; source: Source; card: Card | null };
-  lastBuild?: { playerId: string; stage: number; used: string[]; points: number; effect?: string };
+  lastBuild?: { playerId: string; stage: number; used: string[]; points: number; effect?: string } | undefined;
 }
 /** Fichas de conflito necessárias conforme a quantidade de jogadores. */
 export function conflictTokenLimit(players: number): number {

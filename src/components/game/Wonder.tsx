@@ -42,7 +42,7 @@ export function Wonder({ civ, built, size = "md" }: { civ: Civilization; built: 
             onError={() => setAssetFailed(true)}
             initial={reducedMotion ? false : { opacity: 0, scale: 0.94, y: 12, filter: "brightness(1.7) blur(5px)" }}
             animate={{ opacity: 1, scale: 1, y: 0, filter: "brightness(1) blur(0px)" }}
-            exit={reducedMotion ? undefined : { opacity: 0, scale: 0.98, filter: "brightness(1.4) blur(3px)" }}
+            exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98, filter: "brightness(1.4) blur(3px)" }}
             transition={{ duration: reducedMotion ? 0 : 1.1, ease: [0.22, 1, 0.36, 1] }}
           />
         </AnimatePresence>
@@ -153,7 +153,7 @@ function MonumentSilhouette({ civId, built }: { civId: string; built: number }) 
   return (
     <svg className="wonder-identity" viewBox="0 -10 200 145" aria-hidden="true" focusable="false">
       <ellipse cx="100" cy="123" rx="91" ry="11" fill="#100e0b" opacity=".7" />
-      {shapes[civId] ?? shapes.aurelia}
+      {shapes[civId] ?? shapes["aurelia"]}
     </svg>
   );
 }

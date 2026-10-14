@@ -1630,3 +1630,35 @@
 @media (prefers-reduced-motion: reduce) {
   .wonder-construction-effect { display: none; }
 }
+
+/* Fullscreen cinematic wonder construction — ~5.2s after a confirmed stage upgrade */
+.wonder-cinema { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; overflow:hidden; isolation:isolate; background:radial-gradient(ellipse at 50% 64%,#59402b 0%,#21170f 48%,#090807 100%); color:#ffdf9a; }
+.wonder-cinema-vignette { position:absolute; inset:0; z-index:6; pointer-events:none; background:radial-gradient(ellipse at center,transparent 22%,rgba(0,0,0,.7) 100%); }
+.wonder-cinema-rays { position:absolute; inset:-60%; z-index:0; background:conic-gradient(from 0deg,transparent 0deg,rgba(252,186,72,.14) 15deg,transparent 35deg,rgba(255,216,126,.12) 75deg,transparent 110deg,rgba(255,202,80,.12) 160deg,transparent 200deg,rgba(255,220,136,.15) 275deg,transparent 310deg); animation:cinema-rays 12s linear infinite; }
+.wonder-cinema-scene { position:absolute; inset:9% 5% 12%; display:flex; justify-content:center; align-items:center; animation:cinema-camera 5.2s ease-in-out both; }
+.wonder-cinema-art { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 25px 35px rgba(0,0,0,.7)); }
+.wonder-cinema-before { animation:cinema-before 5.2s both; }
+.wonder-cinema-after { opacity:0; animation:cinema-after 5.2s both; }
+.wonder-cinema-scaffold { position:absolute; z-index:2; width:min(58vw,600px); height:60%; top:12%; opacity:0; background:repeating-linear-gradient(90deg,transparent 0 11%,rgba(123,76,29,.65) 11.3% 12%,transparent 12.3% 24%),repeating-linear-gradient(0deg,transparent 0 19%,rgba(162,101,41,.65) 19.3% 20%,transparent 20.3% 39%); clip-path:polygon(15% 20%,80% 0,100% 100%,0 100%); animation:cinema-scaffold 5.2s both; }
+.wonder-cinema-flash { position:absolute; z-index:4; inset:-30%; opacity:0; background:radial-gradient(ellipse at center,rgba(255,249,207,.96),rgba(255,191,70,.45) 25%,transparent 63%); animation:cinema-flash 5.2s both; pointer-events:none; }
+.wonder-cinema-dust { position:absolute; z-index:3; inset:10% -20% -15%; opacity:0; background:radial-gradient(ellipse at 30% 75%,rgba(200,149,82,.85),transparent 37%),radial-gradient(ellipse at 67% 75%,rgba(226,175,104,.9),transparent 43%),radial-gradient(ellipse at 50% 90%,rgba(161,111,65,.7),transparent 50%); filter:blur(25px); animation:cinema-dust 5.2s both; }
+.wonder-cinema-sparks { position:absolute; z-index:5; inset:0; opacity:0; background:radial-gradient(circle at 18% 52%,#fff1b7 0 2px,transparent 4px),radial-gradient(circle at 32% 23%,#ffd070 0 2px,transparent 5px),radial-gradient(circle at 70% 35%,#ffefba 0 3px,transparent 5px),radial-gradient(circle at 83% 61%,#ffc55d 0 2px,transparent 4px),radial-gradient(circle at 51% 12%,#fff1b7 0 2px,transparent 4px); filter:drop-shadow(0 0 9px #ffb743); animation:cinema-sparks 5.2s both; }
+.wonder-cinema-copy { position:absolute; z-index:8; bottom:clamp(60px,10vh,130px); left:20px; right:20px; text-align:center; text-shadow:0 3px 12px #080502,0 0 25px #080502; animation:cinema-copy 5.2s both; }
+.wonder-cinema-eyebrow { font-size:clamp(11px,1.2vw,16px); letter-spacing:.3em; font-weight:700; }
+.wonder-cinema-copy h2 { font-family:Georgia,serif; font-size:clamp(26px,4.3vw,64px); font-variant:small-caps; line-height:1.1; margin:10px auto; color:#ffdc8c; }
+.wonder-cinema-copy p { font-size:clamp(13px,1.5vw,20px); letter-spacing:.15em; font-weight:700; }
+.wonder-cinema-reward { display:inline-block; margin-top:12px; padding:7px 22px; border:1px solid #f5c56e; border-radius:30px; background:rgba(30,17,7,.8); font-weight:800; }
+.wonder-cinema-skip { position:absolute; z-index:10; top:24px; right:24px; border:1px solid #d9ad60; border-radius:8px; background:rgba(24,17,12,.88); color:#ffdda0; padding:10px 18px; font-size:14px; cursor:pointer; }
+.wonder-cinema-skip:hover { background:#69461c; }
+.wonder-cinema-other { transform:scale(3); }
+@keyframes cinema-camera { 0% {transform:scale(.85) translateY(4%)} 50% {transform:scale(1.08) translateY(-2%)} 100% {transform:scale(1.02) translateY(0)} }
+@keyframes cinema-rays { to {transform:rotate(360deg)} }
+@keyframes cinema-before { 0%,30% {opacity:1;filter:brightness(.8)} 48% {opacity:.65;filter:brightness(1.8)} 56%,100% {opacity:0} }
+@keyframes cinema-after { 0%,42% {opacity:0;filter:brightness(2) blur(7px);transform:scale(.95)} 58% {opacity:1;filter:brightness(1.55) blur(0);transform:scale(1.02)} 85%,100% {opacity:1;filter:brightness(1);transform:scale(1)} }
+@keyframes cinema-scaffold { 0%,12% {opacity:0;transform:translateY(-12%)} 23%,40% {opacity:.85;transform:translateY(0)} 53%,100% {opacity:0;transform:translateY(10%)} }
+@keyframes cinema-flash { 0%,42% {opacity:0} 52% {opacity:.95} 66%,100% {opacity:0} }
+@keyframes cinema-dust { 0%,22% {opacity:0;transform:translateY(25%)} 39% {opacity:.9;transform:translateY(0)} 75%,100% {opacity:0;transform:translateY(-15%)} }
+@keyframes cinema-sparks { 0%,37% {opacity:0;transform:translateY(20px) scale(.8)} 52% {opacity:1;transform:translateY(0) scale(1.2)} 80%,100% {opacity:0;transform:translateY(-55px) scale(1.5)} }
+@keyframes cinema-copy { 0%,56% {opacity:0;transform:translateY(22px)} 70%,100% {opacity:1;transform:translateY(0)} }
+@media (max-width:600px) { .wonder-cinema-scene { inset:15% 2% 20%; } .wonder-cinema-copy { bottom:11%; } .wonder-cinema-scaffold { width:85vw; } }
+@media (prefers-reduced-motion:reduce) { .wonder-cinema *, .wonder-cinema { animation:none !important; transition:none !important; } .wonder-cinema-before,.wonder-cinema-scaffold,.wonder-cinema-flash,.wonder-cinema-dust,.wonder-cinema-sparks { display:none; } .wonder-cinema-after,.wonder-cinema-copy { opacity:1; } }

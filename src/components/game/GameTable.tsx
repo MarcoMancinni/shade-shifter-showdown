@@ -5,7 +5,7 @@ import { Shield, Star, Swords } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { takeCard, evolveWonder } from "@/lib/game.functions";
 import { civById, COST_LABEL, RESOURCE_LABEL, type CostKind, type Card, type Civilization, type Resource } from "@/lib/game/data";
-import { conflictTokenLimit, deckIndexFor, publicPoints, resourcesForCost, type PublicState, type Source } from "@/lib/game/engine";
+import { conflictTokenLimit, deckIndexFor, publicPoints, scoreBreakdown, resourcesForCost, type PublicState, type Source } from "@/lib/game/engine";
 import type { Session } from "@/lib/session";
 import type { PlayerRow, RoomRow } from "@/hooks/use-room";
 import { GameCard } from "./GameCard";
@@ -70,6 +70,59 @@ function BattleResultCinema({ wins, onClose }: { wins: number; onClose: () => vo
       </>}
       <button className="conflict-cinema-skip" onClick={onClose}>Continuar</button>
     </motion.div>
+  );
+}
+
+function ImperialFinale({ st, players, meId, code }: { st: PublicState; players: PlayerRow[]; meId: string; code: string }) {
+  const reduced = useReducedMotion();
+  const standings = st.seats.map((id) => {
+    const player = players.find((p) => p.id === id);
+    const civ = civById(st.civIds?.[id] ?? player?.civ_id);
+    const area = st.areas[id]!;
+    return { id, name: player?.nickname ?? "Jogador", civ, area,
+      score: scoreBreakdown(area, civ?.id) };
+  }).sort((a, b) => b.score.total - a.score.total || a.name.localeCompare(b.name, "pt-BR"));
+  const highest = standings[0]?.score.total ?? 0;
+  const winners = standings.filter((entry) => entry.score.total === highest);
+  let lastScore: number | undefined;
+  let rank = 0;
+  const ranked = standings.map((entry, index) => {
+    if (lastScore !== entry.score.total) rank = index + 1;
+    lastScore = entry.score.total;
+    return { ...entry, rank };
+  });
+  return (
+    <section className="imperial-finale" aria-label="Placar final da partida">
+      <motion.div className="imperial-finale-header" initial={reduced ? {} : { opacity: 0, y: -35 }}
+        animate={{ opacity: 1, y: 0 }} transition={{ duration: .8 }}>
+        <span className="imperial-finale-eyebrow">IMPÉRIOS · A ERA DAS MARAVILHAS</span>
+        <h1>O LEGADO DOS IMPÉRIOS</h1>
+        <p>{winners.length > 1 ? "OS IMPÉRIOS VENCEDORES" : "O IMPÉRIO VENCEDOR"}</p>
+        <div className="imperial-finale-winner">{winners.map((winner) => winner.name).join(" & ")}</div>
+        <span className="imperial-finale-wonder">{winners.map((winner) => winner.civ?.name ?? "Civilização").join(" · ")}</span>
+        <strong>{highest} PONTOS</strong>
+      </motion.div>
+      <div className="imperial-finale-table-wrap">
+        <table className="imperial-finale-table">
+          <thead><tr><th>Posição</th><th>Império</th><th>Maravilha</th><th>Cultura</th><th>Batalhas</th><th>Total</th></tr></thead>
+          <tbody>{ranked.map((entry, i) => (
+            <motion.tr key={entry.id} className={cn(entry.rank === 1 && "is-champion", entry.id === meId && "is-me")}
+              initial={reduced ? {} : { opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: reduced ? 0 : .5 + i * .17 }}>
+              <td>{entry.rank === 1 ? "♛ 1º" : `${entry.rank}º`}</td>
+              <td><strong>{entry.name}{entry.id === meId ? " (você)" : ""}</strong><small>{entry.civ?.name ?? "Civilização"}</small></td>
+              <td>{entry.score.wonder}</td><td>{entry.score.culture}</td><td>{entry.score.military}</td>
+              <td><strong>{entry.score.total}</strong></td>
+            </motion.tr>
+          ))}</tbody>
+        </table>
+      </div>
+      <p className="imperial-finale-note">Pontuação oficial: maravilhas construídas, cartas culturais e fichas militares de 3 pontos. Empates compartilham a posição.</p>
+      <div className="imperial-finale-actions">
+        <Link to="/" className="btn-gold px-6 py-3">Voltar ao início</Link>
+        <span>Sala {code} · Partida encerrada</span>
+      </div>
+    </section>
   );
 }
 
@@ -216,10 +269,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       <section className="arena-stage arena-v2-stage relative flex flex-1 items-center justify-center px-4 py-6">
         <div className="arena-table arena-v2-table table-wood relative flex w-full flex-col items-center justify-center gap-5 p-8">
           {room.status === "finished" ? (
-            <div className="text-center">
-              <h2 className="text-3xl text-gold-grad">Baralhos esgotados</h2>
-              <p className="mt-2 text-sm text-muted-foreground">A pontuação completa chega na próxima fase.</p>
-            </div>
+            <ImperialFinale st={st} players={players} meId={session.playerId} code={code} />
           ) : (
             <>
               <p className={cn("font-display text-lg", myTurn ? "text-gold" : "text-foreground")}>

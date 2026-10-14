@@ -2050,3 +2050,9 @@ body:has(.imperial-finale-v2) {overflow:hidden;}
   .imperial-finale-v2-hero h1 {font-size:clamp(28px,8vw,46px)!important;}
   .imperial-finale-v2-identity .imperial-finale-winner {font-size:clamp(30px,8vw,48px)!important;}
 }
+
+/* Arte final da maravilha no centro da cerimonia. */
+.imperial-finale-v2-art {display:flex!important;align-items:center!important;justify-content:center!important;min-height:320px!important;overflow:visible!important;}
+.imperial-finale-v2-art>div {display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;width:100%!important;}
+.imperial-finale-v2-wonder-image {display:block;width:min(100%,540px);max-width:540px;max-height:430px;height:auto;object-fit:contain;filter:drop-shadow(0 22px 22px #000b) drop-shadow(0 0 26px #f4bd4933);margin:auto;}
+@media(max-width:760px){.imperial-finale-v2-art{min-height:200px!important}.imperial-finale-v2-wonder-image{max-height:280px;width:min(100%,390px)}}

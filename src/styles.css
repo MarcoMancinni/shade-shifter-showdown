@@ -1802,3 +1802,8 @@
 @keyframes arena-fire-tongue { 0% { transform:rotate(-8deg) scaleY(.9); } 100% { transform:rotate(8deg) scaleY(1.15); } }
 @media (max-width:760px) { .arena-ambient-banner { opacity:.09; } .arena-ambient-fire { opacity:.4; } }
 @media (prefers-reduced-motion:reduce) { .arena-ambient { display:none; } }
+
+/* Conflict chips: responsive row of 3–6 peace-side tokens. */
+.conflict-token-image { width:clamp(22px,2.6vw,38px); height:clamp(22px,2.6vw,38px); object-fit:contain; flex-shrink:0; opacity:.55; filter:grayscale(.45) brightness(.85); transition:opacity .25s,filter .25s,transform .25s; }
+.conflict-token-image.conflict-token-active { opacity:1; filter:drop-shadow(0 0 5px rgba(255,88,40,.8)); transform:translateY(-2px); }
+@media(max-width:700px){ .conflict-token-image { width:22px;height:22px; } }

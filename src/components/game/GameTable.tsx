@@ -12,6 +12,39 @@ import { GameCard } from "./GameCard";
 import { Wonder } from "./Wonder";
 import { cn } from "@/lib/utils";
 
+function ConflictCinematic({ from, to, total, onClose }: { from: number; to: number; total: number; onClose: () => void }) {
+  const reduced = useReducedMotion();
+  const war = to >= total;
+  useEffect(() => {
+    const key = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    window.addEventListener("keydown", key);
+    return () => window.removeEventListener("keydown", key);
+  }, [onClose]);
+  return (
+    <motion.div className={cn("conflict-cinema", reduced && "conflict-cinema-reduced")} role="dialog" aria-modal="true"
+      aria-label={war ? "Todas as fichas viraram: batalha!" : "Fichas de conflito avançaram"}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduced ? 0 : .3 }}>
+      <div className="conflict-cinema-vignette" />
+      <div className="conflict-cinema-heading">{war ? "O CHAMADO DA GUERRA" : "OS TAMBORES DA GUERRA"}</div>
+      <div className="conflict-cinema-tokens" aria-label={`${to} de ${total} fichas em batalha`}>
+        {Array.from({ length: total }, (_, i) => (
+          <div key={i} className={cn("conflict-cinema-token", i >= from && i < to && "conflict-cinema-flipping")}
+            style={{ animationDelay: `${(i - from) * .38}s` }}>
+            <div className="conflict-cinema-token-inner">
+              <img className="conflict-cinema-face conflict-cinema-peace" src="/ficha-paz.webp" alt="" />
+              <img className="conflict-cinema-face conflict-cinema-war" src="/ficha-batalha.webp" alt="" />
+            </div>
+            {i < from && <img className="conflict-cinema-already" src="/ficha-batalha.webp" alt="" />}
+          </div>
+        ))}
+      </div>
+      {war ? <div className="conflict-cinema-horn" aria-label="Som de trombeta de guerra">BRUUUUM!<span>⚔ A BATALHA COMEÇA ⚔</span></div>
+        : <div className="conflict-cinema-count">{to} / {total} FICHAS DE BATALHA</div>}
+      <button className="conflict-cinema-skip" onClick={onClose}>Continuar</button>
+    </motion.div>
+  );
+}
+
 export function GameTable({ room, players, session, code }: { room: RoomRow; players: PlayerRow[]; session: Session; code: string }) {
   const take = useServerFn(takeCard);
   const evolve = useServerFn(evolveWonder);
@@ -55,6 +88,21 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   const myCiv = civById(byId[session.playerId]?.civ_id);
   const inspected = inspect && st.areas[inspect] ? { p: byId[inspect], a: st.areas[inspect]! } : null;
   const [cinematic, setCinematic] = useState<{ from: number; to: number } | null>(null);
+  const [conflictCinema, setConflictCinema] = useState<{ from: number; to: number; total: number } | null>(null);
+  const lastConflict = useRef<number | null>(null);
+  useEffect(() => {
+    const previous = lastConflict.current;
+    lastConflict.current = st.conflictTokens;
+    if (previous !== null && st.conflictTokens > previous) {
+      setConflictCinema({ from: previous, to: st.conflictTokens, total: conflictTokenLimit(n) });
+    }
+  }, [st.conflictTokens, n]);
+  useEffect(() => {
+    if (!conflictCinema) return;
+    const timer = window.setTimeout(() => setConflictCinema(null), conflictCinema.to === conflictCinema.total ? 5700 : 3200);
+    return () => window.clearTimeout(timer);
+  }, [conflictCinema]);
+
   const lastStage = useRef<{ civId: string; stage: number } | null>(null);
   const currentStage = me?.stages ?? 0;
   const currentCivId = myCiv?.id ?? "";
@@ -198,6 +246,11 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
         </div>
       )}
 
+      <AnimatePresence>
+        {conflictCinema && !cinematic && (
+          <ConflictCinematic key={`${conflictCinema.from}-${conflictCinema.to}`} {...conflictCinema} onClose={() => setConflictCinema(null)} />
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {cinematic && myCiv && (
           <WonderConstructionCinema

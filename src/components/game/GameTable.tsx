@@ -5,7 +5,7 @@ import { Shield, Star, Swords } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { takeCard, evolveWonder } from "@/lib/game.functions";
 import { civById, COST_LABEL, RESOURCE_LABEL, type CostKind, type Card, type Civilization, type Resource } from "@/lib/game/data";
-import { deckIndexFor, publicPoints, type PublicState, type Source } from "@/lib/game/engine";
+import { deckIndexFor, publicPoints, resourcesForCost, type PublicState, type Source } from "@/lib/game/engine";
 import type { Session } from "@/lib/session";
 import type { PlayerRow, RoomRow } from "@/hooks/use-room";
 import { GameCard } from "./GameCard";
@@ -287,19 +287,28 @@ function DeckSlot({ label, count, enabled, onClick, children }: { label: string;
 
 const RESOURCE_ORDER: Resource[] = ["pedra", "argila", "madeira", "vidro"];
 
-function requirementProgress(cards: Card[], cost: CostKind): { current: number; required: number; resources: Resource[] } {
+function requirementProgress(cards: Card[], cost: CostKind): { current: number; required: number; resources: Resource[]; coins: number } {
   const required = Number(cost[0]);
   const available = cards.filter((card) => card.cat === "recurso" && card.resource);
+  const coinCards = cards.filter((card) => card.cat === "comercio");
   const counts = RESOURCE_ORDER.map((resource) => ({
     resource,
     count: available.filter((card) => card.resource === resource).length,
   }));
+  const used = resourcesForCost(cards, cost);
+  if (used) {
+    return {
+      current: required, required,
+      resources: available.filter((card) => used.includes(card.id)).map((card) => card.resource!),
+      coins: coinCards.filter((card) => used.includes(card.id)).length,
+    };
+  }
   if (cost.endsWith("ig")) {
     const best = counts.reduce((a, b) => b.count > a.count ? b : a);
-    return { current: Math.min(best.count, required), required, resources: best.count ? [best.resource] : [] };
+    return { current: Math.min(best.count + coinCards.length, required), required, resources: best.count ? [best.resource] : [], coins: Math.min(coinCards.length, Math.max(0, required - best.count)) };
   }
   const distinct = counts.filter((item) => item.count > 0).map((item) => item.resource);
-  return { current: Math.min(distinct.length, required), required, resources: distinct };
+  return { current: Math.min(distinct.length + coinCards.length, required), required, resources: distinct, coins: Math.min(coinCards.length, Math.max(0, required - distinct.length)) };
 }
 
 function WonderRequirements({ civ, built, cards, onEvolve, evolving, canPlay }: { civ: Civilization; built: number; cards: Card[]; onEvolve: () => void; evolving: boolean; canPlay: boolean }) {
@@ -335,9 +344,9 @@ function WonderRequirements({ civ, built, cards, onEvolve, evolving, canPlay }: 
             <span className="wonder-stage-points">+{next.points} pts</span>
           </div>
           <div className="wonder-resources-caption">
-            {progress.resources.length
-              ? `Disponíveis: ${progress.resources.map((r) => RESOURCE_LABEL[r]).join(", ")}`
-              : "Colete cartas de recurso para construir"}
+            {progress.resources.length || progress.coins
+              ? `Disponíveis: ${[...progress.resources.map((r) => RESOURCE_LABEL[r]), ...(progress.coins ? [`${progress.coins} ${progress.coins === 1 ? "moeda curinga" : "moedas curingas"}`] : [])].join(", ")}`
+              : "Colete materiais ou moedas curingas para construir"}
           </div>
         </>
       )}

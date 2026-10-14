@@ -112,57 +112,79 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
     return { ...entry, rank };
   });
   return (
-    <section className="imperial-finale" aria-label="Placar final da partida">
-      <div className="imperial-finale-monument" aria-hidden="true">
-        {featuredWinner?.civ && (
-          <motion.div className="imperial-finale-monument-inner"
-            initial={reduced ? false : { opacity: 0, scale: 1.22, y: 60, filter: "blur(14px)" }}
-            animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
-            transition={{ duration: reduced ? 0 : 2.3, ease: [0.22, 1, 0.36, 1] }}>
-            <Wonder civ={featuredWinner.civ} built={featuredWinner.area.stages} size="md" />
-          </motion.div>
-        )}
-      </div>
-      <motion.div className="imperial-finale-light" aria-hidden="true"
-        initial={reduced ? false : { opacity: 0, scale: .3 }}
-        animate={{ opacity: [.0, .85, .45], scale: [0.3, 1.35, 1] }}
-        transition={{ duration: reduced ? 0 : 2.6, times: [0, .6, 1] }} />
+    <section className="imperial-finale imperial-finale-v2" aria-label="Cerimônia imperial e placar final">
+      <div className="imperial-finale-v2-shade" aria-hidden="true" />
       <div className="imperial-finale-particles" aria-hidden="true">
-        {Array.from({ length: 18 }, (_, i) => <span key={i} style={{ left: `${(i * 37 + 9) % 100}%`, animationDelay: `${i * .23}s`, animationDuration: `${3 + (i % 5)}s` }} />)}
+        {Array.from({ length: 22 }, (_, i) => <span key={i} style={{ left: `${(i * 37 + 9) % 100}%`, animationDelay: `${i * .27}s`, animationDuration: `${4 + (i % 5)}s` }} />)}
       </div>
-      <motion.div className="imperial-finale-header" initial={reduced ? {} : { opacity: 0, y: -35 }}
-        animate={{ opacity: 1, y: 0 }} transition={{ duration: .8 }}>
+      <motion.header className="imperial-finale-v2-hero"
+        initial={reduced ? false : { opacity: 0, y: -32 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: reduced ? 0 : .8 }}>
         <span className="imperial-finale-eyebrow">IMPÉRIOS · A ERA DAS MARAVILHAS</span>
+        <span className="imperial-finale-v2-laurel" aria-hidden="true">✦ ⚜ ✦</span>
         <h1>O LEGADO DOS IMPÉRIOS</h1>
-        <p>{winners.length > 1 ? "OS IMPÉRIOS VENCEDORES" : "O IMPÉRIO VENCEDOR"}</p>
-        <div className="imperial-finale-winner">{winners.map((winner) => winner.name).join(" & ")}</div>
-        <span className="imperial-finale-wonder">{winners.map((winner) => winner.civ?.name ?? "Civilização").join(" · ")}</span>
-        <strong>{highest} PONTOS</strong>
+        <p className="imperial-finale-v2-overline">{winners.length > 1 ? "A GLÓRIA É COMPARTILHADA" : "UM IMPÉRIO ESCREVEU A HISTÓRIA"}</p>
+        <div className="imperial-finale-v2-champion">
+          <div className="imperial-finale-v2-art" aria-hidden="true">
+            {featuredWinner?.civ && <motion.div initial={reduced ? false : { opacity: 0, scale: .8, y: 35 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: reduced ? 0 : 1.5, delay: .35 }}>
+              <Wonder civ={featuredWinner.civ} built={featuredWinner.area.stages} size="md" />
+            </motion.div>}
+          </div>
+          <div className="imperial-finale-v2-identity">
+            <span className="imperial-finale-v2-crown" aria-hidden="true">♛</span>
+            <span className="imperial-finale-v2-label">{winners.length > 1 ? "VENCEDORES DA PARTIDA" : "GRANDE VENCEDOR"}</span>
+            <div className="imperial-finale-winner">{winners.map((winner) => winner.name).join(" & ")}</div>
+            <span className="imperial-finale-wonder">{winners.map((winner) => winner.civ?.name ?? "Civilização").join(" · ")}</span>
+            <div className="imperial-finale-v2-big-score"><strong>{highest}</strong><span>PONTOS DE GLÓRIA</span></div>
+          </div>
+        </div>
+      </motion.header>
+      <motion.div className="imperial-finale-v2-results"
+        initial={reduced ? false : { opacity: 0, y: 40 }}
+        animate={{ opacity: revealComplete ? 1 : 0, y: revealComplete ? 0 : 40 }}
+        transition={{ duration: reduced ? 0 : .8 }}>
+        <div className="imperial-finale-v2-section-title"><span>✦</span><h2>CLASSIFICAÇÃO DOS IMPÉRIOS</h2><span>✦</span></div>
+        <div className="imperial-finale-v2-podium">
+          {ranked.slice(0, 3).map((entry, i) => (
+            <motion.div key={entry.id} className={cn("imperial-finale-v2-podium-card", entry.rank === 1 && "is-gold", entry.rank === 2 && "is-silver", entry.rank === 3 && "is-bronze", entry.id === meId && "is-me")}
+              initial={reduced ? false : { opacity: 0, y: 32, scale: .93 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: reduced ? 0 : 2.5 + i * .2, duration: .55 }}>
+              <span className="imperial-finale-v2-rank">{entry.rank === 1 ? "♛" : "✦"} {entry.rank}º LUGAR</span>
+              <strong className="imperial-finale-v2-podium-name">{entry.name}{entry.id === meId ? " (você)" : ""}</strong>
+              <span className="imperial-finale-v2-podium-civ">{entry.civ?.name ?? "Civilização"}</span>
+              <strong className="imperial-finale-v2-podium-score">{entry.score.total} <small>PTS</small></strong>
+              <span className="imperial-finale-v2-podium-detail">Maravilha {entry.score.wonder} · Cultura {entry.score.culture} · Batalha {entry.score.military}</span>
+            </motion.div>
+          ))}
+        </div>
+        <div className="imperial-finale-v2-table-head"><span>PLACAR FINAL</span><span>{ranked.length} IMPÉRIOS</span></div>
+        <div className="imperial-finale-table-wrap">
+          <table className="imperial-finale-table">
+            <thead><tr><th>Posição</th><th>Jogador / Civilização</th><th>Maravilhas</th><th>Cultura</th><th>Batalhas</th><th>Total</th></tr></thead>
+            <tbody>{ranked.map((entry, i) => (
+              <motion.tr key={entry.id} className={cn(entry.rank === 1 && "is-champion", entry.id === meId && "is-me")}
+                initial={reduced ? false : { opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: reduced ? 0 : 2.8 + i * .12 }}>
+                <td>{entry.rank === 1 ? "♛ 1º" : `${entry.rank}º`}</td>
+                <td><strong>{entry.name}{entry.id === meId ? " (você)" : ""}</strong><small>{entry.civ?.name ?? "Civilização"}</small></td>
+                <td>{entry.score.wonder}</td><td>{entry.score.culture}</td><td>{entry.score.military}</td>
+                <td><strong>{entry.score.total}</strong></td>
+              </motion.tr>
+            ))}</tbody>
+          </table>
+        </div>
+        <p className="imperial-finale-note">Maravilhas construídas + cartas culturais + vitórias militares (3 pontos por ficha). Empates compartilham a posição.</p>
+        <div className="imperial-finale-actions">
+          {isHost && <button type="button" className="btn-gold px-6 py-3" disabled={reopening} onClick={newMatch}>
+            {reopening ? "Reabrindo sala..." : "Nova partida nesta sala"}
+          </button>}
+          <Link to="/" className="btn-gold px-6 py-3">Voltar ao início</Link>
+          <span>Sala {code} · Partida encerrada</span>
+        </div>
+        {reopenError && <p role="alert" className="text-center text-red-300">{reopenError}</p>}
       </motion.div>
-      <motion.div className="imperial-finale-table-wrap" initial={reduced ? false : { opacity: 0, y: 35 }} animate={{ opacity: revealComplete ? 1 : 0, y: revealComplete ? 0 : 35 }} transition={{ duration: .8 }}>
-        <table className="imperial-finale-table">
-          <thead><tr><th>Posição</th><th>Império</th><th>Maravilha</th><th>Cultura</th><th>Batalhas</th><th>Total</th></tr></thead>
-          <tbody>{ranked.map((entry, i) => (
-            <motion.tr key={entry.id} className={cn(entry.rank === 1 && "is-champion", entry.id === meId && "is-me")}
-              initial={reduced ? {} : { opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: reduced ? 0 : .5 + i * .17 }}>
-              <td>{entry.rank === 1 ? "♛ 1º" : `${entry.rank}º`}</td>
-              <td><strong>{entry.name}{entry.id === meId ? " (você)" : ""}</strong><small>{entry.civ?.name ?? "Civilização"}</small></td>
-              <td>{entry.score.wonder}</td><td>{entry.score.culture}</td><td>{entry.score.military}</td>
-              <td><strong>{entry.score.total}</strong></td>
-            </motion.tr>
-          ))}</tbody>
-        </table>
-      </motion.div>
-      <p className="imperial-finale-note">Pontuação oficial: maravilhas construídas, cartas culturais e fichas militares de 3 pontos. Empates compartilham a posição.</p>
-      <div className="imperial-finale-actions">
-        {isHost && <button type="button" className="btn-gold px-6 py-3" disabled={reopening} onClick={newMatch}>
-          {reopening ? "Reabrindo sala..." : "Nova partida nesta sala"}
-        </button>}
-        <Link to="/" className="btn-gold px-6 py-3">Voltar ao início</Link>
-        <span>Sala {code} · Partida encerrada</span>
-      </div>
-      {reopenError && <p role="alert" className="text-center text-red-300">{reopenError}</p>}
     </section>
   );
 }

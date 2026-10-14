@@ -117,7 +117,7 @@ export function buildAvailableStage(area: PlayerArea, civId?: string) {
 }
 
 /** Cada jogador enfrenta apenas seus vizinhos imediatos (esquerda e direita).\n * Em mesas de 2 jogadores, ambos os lados apontam para o mesmo rival: um unico duelo.\n * Resolve o conflito entre vizinhos e descarta soldados com trombeta.
- * Uma vitória contra um vizinho vale 1 ponto; empate não pontua.
+ * Uma vitória contra um vizinho concede uma ficha de vitória de 3 pontos; empate não pontua.
  * Cada par de jogadores é comparado uma única vez.
  */
 export function resolveBattle(pub: PublicState): PublicState {
@@ -139,7 +139,7 @@ export function resolveBattle(pub: PublicState): PublicState {
     const area = pub.areas[id]!;
     const discarded = area.cards.filter((card) => card.cat === "militar" && (card.conflict ?? 0) > 0);
     const removedShields = discarded.reduce((sum, card) => sum + (card.shields ?? 0), 0);
-    const points = results[id]!.wins;
+    const points = results[id]!.wins * 3;
     results[id]!.points = points;
     areas[id] = {
       ...area, cards: area.cards.filter((card) => !discarded.includes(card)),

@@ -1662,3 +1662,37 @@
 @keyframes cinema-copy { 0%,56% {opacity:0;transform:translateY(22px)} 70%,100% {opacity:1;transform:translateY(0)} }
 @media (max-width:600px) { .wonder-cinema-scene { inset:15% 2% 20%; } .wonder-cinema-copy { bottom:11%; } .wonder-cinema-scaffold { width:85vw; } }
 @media (prefers-reduced-motion:reduce) { .wonder-cinema *, .wonder-cinema { animation:none !important; transition:none !important; } .wonder-cinema-before,.wonder-cinema-scaffold,.wonder-cinema-flash,.wonder-cinema-dust,.wonder-cinema-sparks { display:none; } .wonder-cinema-after,.wonder-cinema-copy { opacity:1; } }
+
+/* Cinematic v2: 7.6s multi-plane camera, hoisted stone blocks, staged reveal. */
+.wonder-cinema-scene { perspective:1100px; animation:cinema-camera-v2 7.6s cubic-bezier(.25,.1,.2,1) both; }
+.wonder-cinema-before { animation:cinema-before-v2 7.6s both; }
+.wonder-cinema-after { animation:cinema-after-v2 7.6s both; clip-path:inset(100% 0 0 0); }
+.wonder-cinema-scaffold { animation:cinema-scaffold-v2 7.6s both; }
+.wonder-cinema-flash { animation:cinema-flash-v2 7.6s both; }
+.wonder-cinema-dust { animation:cinema-dust-v2 7.6s both; }
+.wonder-cinema-sparks { animation:cinema-sparks-v2 7.6s both; }
+.wonder-cinema-copy { animation:cinema-copy-v2 7.6s both; }
+.wonder-cinema-crane { position:absolute; z-index:3; top:11%; width:23%; height:53%; opacity:0; transform-origin:top center; animation:cinema-crane 7.6s both; pointer-events:none; }
+.wonder-cinema-crane-left { left:10%; }
+.wonder-cinema-crane-right { right:10%; animation-delay:.12s; }
+.wonder-cinema-crane::before { content:""; position:absolute; left:3%; top:0; width:100%; height:8px; transform:rotate(-9deg); transform-origin:left center; background:linear-gradient(#a8793c,#4d2d13,#d2a25e); box-shadow:0 3px 6px #140d09; }
+.wonder-cinema-crane::after { content:""; position:absolute; left:6%; top:0; width:8px; height:70%; background:repeating-linear-gradient(0deg,#75421c 0 13px,#bb8b4e 14px 18px); }
+.wonder-cinema-rope { position:absolute; left:75%; top:4px; height:63%; width:2px; background:#d7b78a; transform-origin:top; animation:cinema-hoist 7.6s both; }
+.wonder-cinema-stone { position:absolute; left:calc(75% - 20px); top:60%; width:44px; height:31px; background:linear-gradient(130deg,#f1d9a4,#a17a49 75%,#5d4127); border:2px solid #f6dfac; box-shadow:0 8px 20px #120a04; animation:cinema-block 7.6s both; }
+.wonder-cinema-masonry { position:absolute; z-index:4; left:18%; right:18%; bottom:19%; height:14%; opacity:0; background:repeating-linear-gradient(90deg,transparent 0 15%,rgba(255,219,149,.9) 15.2% 16%,transparent 16.3% 32%),linear-gradient(0deg,rgba(165,121,67,.85),rgba(247,212,147,.92)); border-top:5px solid #ffe0a0; filter:drop-shadow(0 5px 12px #140c06); animation:cinema-masonry 7.6s both; }
+.wonder-cinema-foreground { position:absolute; z-index:5; inset:auto -25% -23%; height:35%; background:radial-gradient(ellipse at 50% 90%,rgba(33,20,12,.8),transparent 70%); transform:translateY(15%) scale(1.2); animation:cinema-foreground 7.6s both; pointer-events:none; }
+@keyframes cinema-camera-v2 { 0% {transform:scale(.72) translate(5%,5%) rotateY(-7deg)} 20% {transform:scale(.9) translate(0,0) rotateY(0)} 46% {transform:scale(1.18) translate(-3%,2%) rotateY(5deg)} 68% {transform:scale(1.12) translate(2%,-2%) rotateY(-3deg)} 100% {transform:scale(.96) translate(0,0) rotateY(0)} }
+@keyframes cinema-before-v2 { 0%,32% {opacity:1;filter:brightness(.7)} 46% {opacity:.9;filter:brightness(1.1)} 56%,100% {opacity:0} }
+@keyframes cinema-after-v2 { 0%,35% {opacity:0;clip-path:inset(100% 0 0 0);filter:brightness(1.8)} 44% {opacity:1;clip-path:inset(72% 0 0 0)} 55% {clip-path:inset(37% 0 0 0)} 67%,100% {opacity:1;clip-path:inset(0 0 0 0);filter:brightness(1)} }
+@keyframes cinema-scaffold-v2 { 0%,9% {opacity:0;transform:translateY(-12%)} 20%,48% {opacity:.95;transform:translateY(0)} 60%,100% {opacity:0;transform:translateY(12%)} }
+@keyframes cinema-crane { 0%,10% {opacity:0;transform:translateY(-18%) rotate(-5deg)} 23%,43% {opacity:.9;transform:translateY(0) rotate(0)} 55%,100% {opacity:0;transform:translateY(5%) rotate(4deg)} }
+@keyframes cinema-hoist { 0%,15% {transform:scaleY(1)} 44%,100% {transform:scaleY(.4)} }
+@keyframes cinema-block { 0%,16% {transform:translateY(0)} 44% {transform:translateY(-95px)} 55%,100% {transform:translateY(-65px)} }
+@keyframes cinema-masonry { 0%,28% {opacity:0;transform:translateY(90px) scaleX(.8)} 45% {opacity:.9;transform:translateY(0) scaleX(1)} 60%,100% {opacity:0;transform:translateY(-10px)} }
+@keyframes cinema-flash-v2 { 0%,52% {opacity:0} 61% {opacity:.95} 73%,100% {opacity:0} }
+@keyframes cinema-dust-v2 { 0%,20% {opacity:0;transform:translateY(30%)} 40%,58% {opacity:.95;transform:translateY(0)} 83%,100% {opacity:0;transform:translateY(-20%)} }
+@keyframes cinema-sparks-v2 { 0%,36% {opacity:0;transform:translateY(20px)} 52%,68% {opacity:1;transform:translateY(-25px)} 90%,100% {opacity:0;transform:translateY(-90px)} }
+@keyframes cinema-copy-v2 { 0%,68% {opacity:0;transform:translateY(25px)} 83%,100% {opacity:1;transform:translateY(0)} }
+@keyframes cinema-foreground { 0% {transform:translateY(15%) scale(1.2)} 50% {transform:translateY(0) scale(1.35)} 100% {transform:translateY(10%) scale(1)} }
+@media (max-width:600px) { .wonder-cinema-crane-left { left:-8%; } .wonder-cinema-crane-right { right:-8%; } .wonder-cinema-masonry { left:6%; right:6%; } }
+@media (prefers-reduced-motion:reduce) { .wonder-cinema-crane,.wonder-cinema-masonry,.wonder-cinema-foreground { display:none; } .wonder-cinema-after { opacity:1;clip-path:none; } }

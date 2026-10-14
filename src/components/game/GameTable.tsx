@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Shield, Star, Swords } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { takeCard, evolveWonder } from "@/lib/game.functions";
+import { takeCard, evolveWonder, returnToLobby } from "@/lib/game.functions";
 import { civById, COST_LABEL, RESOURCE_LABEL, type CostKind, type Card, type Civilization, type Resource } from "@/lib/game/data";
 import { conflictTokenLimit, deckIndexFor, publicPoints, scoreBreakdown, resourcesForCost, type PublicState, type Source } from "@/lib/game/engine";
 import type { Session } from "@/lib/session";
@@ -73,7 +73,19 @@ function BattleResultCinema({ wins, onClose }: { wins: number; onClose: () => vo
   );
 }
 
-function ImperialFinale({ st, players, meId, code }: { st: PublicState; players: PlayerRow[]; meId: string; code: string }) {
+function ImperialFinale({ st, players, meId, code, session, version, isHost }: { st: PublicState; players: PlayerRow[]; meId: string; code: string; session: Session; version: number; isHost: boolean }) {
+  const reopen = useServerFn(returnToLobby);
+  const [reopening, setReopening] = useState(false);
+  const [reopenError, setReopenError] = useState<string | null>(null);
+  async function newMatch() {
+    if (reopening) return;
+    setReopening(true); setReopenError(null);
+    try {
+      const result = await reopen({ data: { code, ...session, version } });
+      if (!result.ok) setReopenError(result.error);
+    } catch { setReopenError("Não foi possível voltar ao lobby."); }
+    finally { setReopening(false); }
+  }
   const reduced = useReducedMotion();
   const standings = st.seats.map((id) => {
     const player = players.find((p) => p.id === id);
@@ -119,9 +131,13 @@ function ImperialFinale({ st, players, meId, code }: { st: PublicState; players:
       </div>
       <p className="imperial-finale-note">Pontuação oficial: maravilhas construídas, cartas culturais e fichas militares de 3 pontos. Empates compartilham a posição.</p>
       <div className="imperial-finale-actions">
+        {isHost && <button type="button" className="btn-gold px-6 py-3" disabled={reopening} onClick={newMatch}>
+          {reopening ? "Reabrindo sala..." : "Nova partida nesta sala"}
+        </button>}
         <Link to="/" className="btn-gold px-6 py-3">Voltar ao início</Link>
         <span>Sala {code} · Partida encerrada</span>
       </div>
+      {reopenError && <p role="alert" className="text-center text-red-300">{reopenError}</p>}
     </section>
   );
 }
@@ -269,7 +285,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       <section className="arena-stage arena-v2-stage relative flex flex-1 items-center justify-center px-4 py-6">
         <div className="arena-table arena-v2-table table-wood relative flex w-full flex-col items-center justify-center gap-5 p-8">
           {room.status === "finished" ? (
-            <ImperialFinale st={st} players={players} meId={session.playerId} code={code} />
+            <ImperialFinale st={st} players={players} meId={session.playerId} code={code} session={session} version={room.version} isHost={room.host_player_id === session.playerId} />
           ) : (
             <>
               <p className={cn("font-display text-lg", myTurn ? "text-gold" : "text-foreground")}>

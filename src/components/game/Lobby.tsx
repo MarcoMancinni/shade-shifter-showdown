@@ -68,11 +68,11 @@ export function Lobby({ room, players, session, code }: { room: RoomRow; players
               <button key={civ.id} disabled={taken || busy}
                 onClick={() => run(() => choose({ data: { code, ...session, civId: mine ? null : civ.id } }))}
                 className={cn("group relative flex w-full min-w-0 flex-col items-center gap-2 rounded-xl border border-transparent bg-transparent px-2 py-3 text-left transition-all duration-200", mine && "border-gold/70 bg-gold/5", taken ? "opacity-40" : "hover:-translate-y-0.5 hover:bg-gold/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold")}>
-                {civ.id === "aurelia" ? (
+                {(civ.id === "aurelia" || civ.id === "nihara") ? (
                   <>
                     <img
-                      src="/aurelia-bandeja.webp"
-                      alt="Bandeja da civilização Aurélia — Colosso do Sol Nascente"
+                      src={`/${civ.id}-bandeja.webp`}
+                      alt={`Bandeja da civilização ${civ.name} — ${civ.wonder}`}
                       className="block h-auto w-full max-w-[760px] object-contain drop-shadow-[0_12px_14px_rgba(0,0,0,0.4)]"
                       decoding="async"
                     />

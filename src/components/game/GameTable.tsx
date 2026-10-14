@@ -132,7 +132,7 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
           <div className="imperial-finale-v2-art" aria-hidden="true">
             {featuredWinner?.civ && <motion.div initial={reduced ? false : { opacity: 0, scale: .8, y: 35 }}
               animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: reduced ? 0 : 1.5, delay: .35 }}>
-              <Wonder civ={featuredWinner.civ} built={featuredWinner.area.stages} size="md" />
+              <img className="imperial-finale-v2-wonder-image" src={`/${featuredWinner.civ.id}/etapa-5.webp`} alt={`${featuredWinner.civ.wonder} — maravilha finalizada na etapa 5`} onError={(event) => { event.currentTarget.style.display = "none"; }} />
             </motion.div>}
           </div>
           <div className="imperial-finale-v2-identity">

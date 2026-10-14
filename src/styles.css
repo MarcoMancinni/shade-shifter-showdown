@@ -1934,3 +1934,29 @@
 @keyframes war-lobby-call {0%,100%{box-shadow:0 0 0 rgba(234,179,80,0),0 6px 20px #0008}50%{box-shadow:0 0 20px rgba(234,179,80,.38),0 6px 20px #0008}}
 @media(max-width:720px){.war-lobby-roster-content{grid-template-columns:1fr;gap:12px}.war-lobby-launch{border-left:0;border-top:1px solid #785833;padding:16px 0 4px}.war-lobby-roster-ornament svg{width:75px;height:75px}.war-lobby-header{gap:18px}.war-lobby-ready{font-size:9px}.war-lobby-civ{padding:12px 4px}}
 @media(prefers-reduced-motion:reduce){.war-lobby-start:not(:disabled){animation:none}}
+
+/* Acampamento real: composicao ilustrada e palco da convocacao. */
+.war-lobby {max-width:1200px!important;padding-top:clamp(20px,3vw,42px)!important;}
+.war-lobby-scenery {position:absolute;top:0;left:50%;width:100vw;height:clamp(440px,52vw,660px);transform:translateX(-50%);z-index:-1;pointer-events:none;background-image:linear-gradient(180deg,rgba(14,10,10,.10) 0%,rgba(14,10,10,.04) 35%,rgba(14,10,10,.38) 72%,#120e0b 100%),url('/cenario-acampamento.svg');background-position:center top;background-size:cover;background-repeat:no-repeat;}
+.war-lobby::before {background:radial-gradient(ellipse at 50% 5%,transparent 0%,rgba(12,9,8,.30) 80%),linear-gradient(180deg,transparent 0%,transparent 400px,#110d0b 800px);}
+.war-lobby-header {min-height:175px;align-items:flex-start!important;position:relative;z-index:1;border:0!important;padding:12px clamp(10px,2vw,30px) 28px!important;}
+.war-lobby-header>div {max-width:690px;background:linear-gradient(90deg,rgba(14,10,9,.83),rgba(14,10,9,0));padding:18px 26px 18px 14px;border-left:3px solid #d1a25b;}
+.war-lobby-header h1 {font-family:Georgia,serif!important;font-size:clamp(38px,5vw,64px)!important;text-shadow:0 4px 12px #000,0 0 28px #000;}
+.war-lobby-intro {color:#f1d3a2!important;text-shadow:0 2px 7px #000;font-size:clamp(13px,1.4vw,17px)!important;line-height:1.5;}
+.war-lobby-header>.btn-bronze {margin-top:28px;background:#241810d9;border-color:#d1a05c;backdrop-filter:blur(6px);}
+.war-lobby-battle-caption {position:relative;z-index:1;text-align:center;margin:12px auto -12px;width:max-content;max-width:90%;padding:10px 28px;font-family:Georgia,serif;font-size:clamp(12px,1.3vw,16px);letter-spacing:.25em;color:#f6d7a2;background:linear-gradient(90deg,transparent,#1b110ded 15%,#1b110ded 85%,transparent);text-shadow:0 2px 8px #000;}
+.war-lobby-battle-caption span {color:#dfad61;margin:0 12px;}
+.war-lobby-roster {margin-top:24px!important;padding:clamp(22px,3vw,36px)!important;background:linear-gradient(120deg,rgba(32,22,18,.94),rgba(22,17,14,.96))!important;border:2px solid #a5783b!important;border-radius:4px!important;box-shadow:0 20px 55px #000b,0 0 30px #a76c2b24,inset 0 0 0 5px #1a1410,inset 0 0 0 6px #8e663766!important;backdrop-filter:blur(10px);}
+.war-lobby-roster-heading {display:flex!important;flex-direction:row!important;justify-content:space-between!important;align-items:center!important;margin-bottom:15px;}
+.war-lobby-roster-heading h2 {font-size:clamp(19px,2vw,27px)!important;font-family:Georgia,serif!important;}
+.war-lobby-roster-content {display:grid!important;grid-template-columns:minmax(0,1fr) 280px!important;align-items:stretch!important;gap:26px!important;}
+.war-lobby-players {display:flex!important;flex-wrap:wrap!important;align-items:flex-start!important;gap:12px!important;margin-top:0!important;}
+.war-lobby-player {min-width:180px!important;padding:14px!important;border-radius:3px!important;background:linear-gradient(135deg,#49311f,#241912)!important;border:1px solid #977044!important;}
+.war-lobby-launch {display:flex!important;flex-direction:column!important;justify-content:center!important;gap:12px!important;padding:8px 0 8px 26px!important;border-left:1px solid #ad804f!important;}
+.war-lobby-start {width:100%!important;min-height:66px!important;background:linear-gradient(180deg,#f5d28a,#c28a36)!important;color:#27170c!important;border:2px solid #f8d993!important;border-radius:4px!important;font-weight:900!important;font-size:17px!important;letter-spacing:.08em!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;}
+.war-lobby-start:disabled {filter:saturate(.5);opacity:.65!important;}
+.war-lobby-civilizations {margin-top:50px!important;padding:26px clamp(10px,2vw,30px);background:linear-gradient(180deg,rgba(33,23,18,.80),rgba(19,14,12,.92));border:1px solid #8b613e88;box-shadow:0 18px 45px #0006;}
+.war-lobby-section-heading {display:flex!important;align-items:center!important;gap:14px!important;border-bottom:1px solid #b18a5b88;padding-bottom:16px!important;}
+.war-lobby-civ {background:radial-gradient(ellipse at 50% 75%,rgba(163,112,45,.15),transparent 70%)!important;border:1px solid transparent!important;}
+.war-lobby-civ:hover:not(:disabled),.war-lobby-civ.border-gold\/70 {border-color:#c79c58!important;}
+@media(max-width:760px){.war-lobby-scenery{height:460px;background-position:center top}.war-lobby-header{min-height:195px!important;padding:10px 4px 18px!important}.war-lobby-header>div{padding:12px}.war-lobby-header>.btn-bronze{margin-top:0}.war-lobby-battle-caption{letter-spacing:.1em;padding:8px}.war-lobby-roster-content{grid-template-columns:1fr!important;gap:16px!important}.war-lobby-launch{border-left:0!important;border-top:1px solid #ad804f!important;padding:20px 0 0!important}.war-lobby-roster{padding:22px 16px!important}.war-lobby-civilizations{padding:18px 10px}}

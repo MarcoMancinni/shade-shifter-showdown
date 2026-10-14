@@ -19,9 +19,9 @@ export function Wonder({ civ, built, size = "md" }: { civ: Civilization; built: 
     const timer = window.setTimeout(() => setCelebration(null), 1700);
     return () => window.clearTimeout(timer);
   }, [completed, reducedMotion]);
-  const useAureliaImage = kind === "aurelia" && !assetFailed;
-  const aureliaSrc = `/aurelia/etapa-${completed}.webp`;
-  useEffect(() => { setAssetFailed(false); }, [aureliaSrc]);
+  const useStageImage = (kind === "aurelia" || kind === "nihara") && !assetFailed;
+  const stageSrc = `/${kind}/etapa-${completed}.webp`;
+  useEffect(() => { setAssetFailed(false); }, [stageSrc]);
   return (
     <div
       className={`wonder-scene wonder-${kind} ${compact ? "wonder-small" : "wonder-medium"} ${completed === civ.stages.length ? "wonder-complete" : ""}`}
@@ -31,12 +31,12 @@ export function Wonder({ civ, built, size = "md" }: { civ: Civilization; built: 
       title={`${civ.wonder} — ${completed}/${civ.stages.length} etapas`}
     >
       <div className="wonder-aura" aria-hidden="true" />
-      {useAureliaImage ? (
+      {useStageImage ? (
         <AnimatePresence initial={false} mode="sync">
           <motion.img
             className="wonder-artwork"
-            key={aureliaSrc}
-            src={aureliaSrc}
+            key={stageSrc}
+            src={stageSrc}
             alt=""
             draggable={false}
             onError={() => setAssetFailed(true)}

@@ -13,6 +13,13 @@ export interface PublicState {
   lastPick?: { playerId: string; source: Source; card: Card | null };
   lastBuild?: { playerId: string; stage: number; used: string[]; points: number; effect?: string };
 }
+/** Fichas de conflito necessárias conforme a quantidade de jogadores. */
+export function conflictTokenLimit(players: number): number {
+  if (players <= 3) return 3;
+  if (players === 4) return 4;
+  if (players === 5) return 5;
+  return 6;
+}
 export interface HiddenState { decks: Card[][]; central: Card[] }
 export type Source = "esquerda" | "direita" | "centro";
 
@@ -134,7 +141,7 @@ export function pickCard(
     lastBuild: undefined,
     decks: projectDecks(h),
     central: { count: h.central.length },
-    conflictTokens: Math.min(6, pub.conflictTokens + (card.conflict ?? 0)),
+    conflictTokens: Math.min(conflictTokenLimit(n), pub.conflictTokens + (card.conflict ?? 0)),
     lastPick: { playerId, source, card: source === "centro" ? null : card },
   };
   return { pub: next, hidden: h, nextSeat: (currentSeat + 1) % n, finished, card };

@@ -15,6 +15,7 @@ export function Lobby({ room, players, session, code }: { room: RoomRow; players
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [brokenBandejas, setBrokenBandejas] = useState<Record<string, boolean>>({});
   const me = players.find((p) => p.id === session.playerId);
   const isHost = room.host_player_id === session.playerId;
   const ready = players.length >= 2 && players.every((p) => p.civ_id);
@@ -68,10 +69,11 @@ export function Lobby({ room, players, session, code }: { room: RoomRow; players
               <button key={civ.id} disabled={taken || busy}
                 onClick={() => run(() => choose({ data: { code, ...session, civId: mine ? null : civ.id } }))}
                 className={cn("group relative flex w-full min-w-0 flex-col items-center gap-2 rounded-xl border border-transparent bg-transparent px-2 py-3 text-left transition-all duration-200", mine && "border-gold/70 bg-gold/5", taken ? "opacity-40" : "hover:-translate-y-0.5 hover:bg-gold/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold")}>
-                {(civ.id === "aurelia" || civ.id === "nihara") ? (
+                {(civ.id === "aurelia" || civ.id === "nihara") && !brokenBandejas[civ.id] ? (
                   <>
                     <img
                       src={`/${civ.id}-bandeja.webp`}
+                      onError={() => setBrokenBandejas((previous) => ({ ...previous, [civ.id]: true }))}
                       alt={`Bandeja da civilização ${civ.name} — ${civ.wonder}`}
                       className="block h-auto w-full max-w-[760px] object-contain drop-shadow-[0_12px_14px_rgba(0,0,0,0.4)]"
                       decoding="async"

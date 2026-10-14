@@ -10,7 +10,7 @@ const SOURCE_LABEL = { esquerda: "da esquerda", direita: "da direita", centro: "
 /** Crônica da partida: derivada das mudanças do estado público recebido em tempo real. */
 export function ActionFeed({ st, turn, names, meId }: { st: PublicState; turn: number; names: Record<string, string>; meId: string }) {
   const [entries, setEntries] = useState<Entry[]>([]);
-  const seen = useRef<{ turn: number; build?: string; round: number } | null>(null);
+  const seen = useRef<{ turn: number; build: string | undefined; round: number } | null>(null);
   const name = (id: string) => (id === meId ? "Você" : names[id] ?? "?");
 
   useEffect(() => {

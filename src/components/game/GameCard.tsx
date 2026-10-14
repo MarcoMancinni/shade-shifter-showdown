@@ -42,6 +42,9 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
     );
   }
   // Recursos ilustrados usam suas artes próprias, com alternativa caso a imagem falhe.
+  if (card.cat === "ciencia" && card.science === "escrita") {
+    return <IllustratedResourceCard size={size} resource="carta-verde-escrita" title={cardTitle(card)} />;
+  }
   if (card.cat === "ciencia" && card.science === "engenho") {
     return <IllustratedResourceCard size={size} resource="carta-verde-engrenagem" title={cardTitle(card)} />;
   }
@@ -91,7 +94,7 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   );
 }
 
-function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" | "carta-militar-sem-conflito" | "carta-militar-1-conflito" | "carta-militar-2-conflitos" | "conhecimento-3-pontos" | "conhecimento-gato-2-pontos" | "carta-verde-astrolabio" | "carta-verde-engrenagem" }) {
+function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" | "carta-militar-sem-conflito" | "carta-militar-1-conflito" | "carta-militar-2-conflitos" | "conhecimento-3-pontos" | "conhecimento-gato-2-pontos" | "carta-verde-astrolabio" | "carta-verde-engrenagem" | "carta-verde-escrita" }) {
   const [imageFailed, setImageFailed] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [position, setPosition] = useState({ left: 0, top: 0, below: false });

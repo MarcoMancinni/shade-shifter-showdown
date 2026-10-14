@@ -51,7 +51,7 @@ export function buildDeck(prefix: string): Card[] {
   add({ cat: "cultura", points: 2, mascot: true }); add({ cat: "cultura", points: 2, mascot: true });
   for (const s of SCI) add({ cat: "ciencia", science: s });
   add({ cat: "militar", shields: 1 }); add({ cat: "militar", shields: 1, conflict: 1 });
-  add({ cat: "militar", shields: 1, conflict: 2 }); add({ cat: "militar", shields: 2 });
+  add({ cat: "militar", shields: 1, conflict: 2 }); add({ cat: "militar", shields: 1 });
   add({ cat: "ciencia", science: SCI[prefix.length % 3]! });
   return cards;
 }
@@ -116,7 +116,7 @@ export function buildAvailableStage(area: PlayerArea, civId?: string) {
   };
 }
 
-/** Resolve o conflito entre vizinhos e descarta soldados com trombeta.
+/** Cada jogador enfrenta apenas seus vizinhos imediatos (esquerda e direita).\n * Em mesas de 2 jogadores, ambos os lados apontam para o mesmo rival: um unico duelo.\n * Resolve o conflito entre vizinhos e descarta soldados com trombeta.
  * Uma vitória contra um vizinho vale 1 ponto; empate não pontua.
  * Cada par de jogadores é comparado uma única vez.
  */

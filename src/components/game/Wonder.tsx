@@ -19,7 +19,7 @@ export function Wonder({ civ, built, size = "md" }: { civ: Civilization; built: 
     const timer = window.setTimeout(() => setCelebration(null), 1700);
     return () => window.clearTimeout(timer);
   }, [completed, reducedMotion]);
-  const useStageImage = (kind === "aurelia" || kind === "nihara") && !assetFailed;
+  const useStageImage = (kind === "aurelia" || kind === "nihara" || kind === "thalassa") && !assetFailed;
   const stageSrc = `/${kind}/etapa-${completed}.webp`;
   useEffect(() => { setAssetFailed(false); }, [stageSrc]);
   return (

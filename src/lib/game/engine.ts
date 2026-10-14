@@ -2,7 +2,7 @@
 import { civById, type Card, type CostKind, type Resource, type Science } from "./data";
 
 export interface PublicDeck { top: Card | null; count: number }
-export interface PlayerArea { cards: Card[]; stages: number; shields: number; battlePoints?: number }
+export interface PlayerArea { cards: Card[]; stages: number; shields: number; battlePoints?: number; wonderPoints?: number }
 export interface PublicState {
   civIds?: Record<string, string>;
   seats: string[]; // player ids por assento
@@ -111,7 +111,8 @@ export function buildAvailableStage(area: PlayerArea, civId?: string) {
   const ids = new Set(used);
   return {
     area: { ...area, stages: area.stages + 1, cards: area.cards.filter((c) => !ids.has(c.id)),
-      shields: area.shields + (stage.effect === "+1 escudo" ? 1 : stage.effect === "+2 escudos" ? 2 : 0) },
+      shields: area.shields + (stage.effect === "+1 escudo" ? 1 : stage.effect === "+2 escudos" ? 2 : 0),
+      wonderPoints: (area.wonderPoints ?? civ.stages.slice(0, area.stages).reduce((sum, stage) => sum + stage.points, 0)) + stage.points },
     build: { stage: area.stages + 1, used, points: stage.points, ...(stage.effect ? { effect: stage.effect } : {}) },
   };
 }
@@ -185,6 +186,14 @@ export function pickCard(
   return { pub: resolved, hidden: h, nextSeat: (currentSeat + 1) % n, finished, card };
 }
 
-export function publicPoints(area: PlayerArea): number {
-  return (area.battlePoints ?? 0) + area.cards.reduce((s, c) => s + (c.cat === "cultura" ? c.points ?? 0 : 0), 0);
+export function scoreBreakdown(area: PlayerArea, civId?: string) {
+  const civ = civById(civId);
+  const wonder = area.wonderPoints ?? (civ ? civ.stages.slice(0, area.stages).reduce((sum, stage) => sum + stage.points, 0) : 0);
+  const culture = area.cards.reduce((sum, card) => sum + (card.cat === "cultura" ? card.points ?? 0 : 0), 0);
+  const military = area.battlePoints ?? 0;
+  return { wonder, culture, military, total: wonder + culture + military };
+}
+
+export function publicPoints(area: PlayerArea, civId?: string): number {
+  return scoreBreakdown(area, civId).total;
 }

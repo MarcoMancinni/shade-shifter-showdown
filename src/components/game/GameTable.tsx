@@ -1,6 +1,6 @@
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Shield, Star, Swords } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { takeCard, evolveWonder } from "@/lib/game.functions";
@@ -54,6 +54,24 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   const me = st.areas[session.playerId];
   const myCiv = civById(byId[session.playerId]?.civ_id);
   const inspected = inspect && st.areas[inspect] ? { p: byId[inspect], a: st.areas[inspect]! } : null;
+  const [cinematic, setCinematic] = useState<{ from: number; to: number } | null>(null);
+  const lastStage = useRef<{ civId: string; stage: number } | null>(null);
+  const currentStage = me?.stages ?? 0;
+  const currentCivId = myCiv?.id ?? "";
+  useEffect(() => {
+    if (!currentCivId) return;
+    const previous = lastStage.current;
+    lastStage.current = { civId: currentCivId, stage: currentStage };
+    if (previous?.civId === currentCivId && currentStage > previous.stage) {
+      setCinematic({ from: previous.stage, to: currentStage });
+    }
+  }, [currentCivId, currentStage]);
+  useEffect(() => {
+    if (!cinematic) return;
+    const timeout = window.setTimeout(() => setCinematic(null), 5200);
+    return () => window.clearTimeout(timeout);
+  }, [cinematic]);
+
 
   return (
     <main className="imperios-arena arena-v2 flex min-h-screen flex-col">
@@ -169,6 +187,18 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
         </div>
       )}
 
+      <AnimatePresence>
+        {cinematic && myCiv && (
+          <WonderConstructionCinema
+            key={`${myCiv.id}-${cinematic.to}`}
+            civ={myCiv}
+            from={cinematic.from}
+            to={cinematic.to}
+            onClose={() => setCinematic(null)}
+          />
+        )}
+      </AnimatePresence>
+
       {inspected?.p && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4" onClick={() => setInspect(null)}>
           <div className="panel-stone w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
@@ -188,6 +218,54 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
         </div>
       )}
     </main>
+  );
+}
+
+/** Cinematic presentation only: the authoritative stage was already committed by the server. */
+function WonderConstructionCinema({ civ, from, to, onClose }: { civ: Civilization; from: number; to: number; onClose: () => void }) {
+  const reducedMotion = useReducedMotion();
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) { if (event.key === "Escape") onClose(); }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return (
+    <motion.div
+      className={cn("wonder-cinema", reducedMotion && "wonder-cinema-reduced")}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Construção da maravilha: etapa ${to} de 5`}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: reducedMotion ? 0 : 0.4 }}
+    >
+      <div className="wonder-cinema-vignette" />
+      <div className="wonder-cinema-rays" aria-hidden="true" />
+      <div className="wonder-cinema-scene" aria-hidden="true">
+        {civ.id === "aurelia" ? (
+          <>
+            <img className="wonder-cinema-art wonder-cinema-before" src={`/aurelia/etapa-${from}.webp`} alt="" />
+            <img className="wonder-cinema-art wonder-cinema-after" src={`/aurelia/etapa-${to}.webp`} alt="" />
+          </>
+        ) : (
+          <div className="wonder-cinema-other"><Wonder civ={civ} built={to} /></div>
+        )}
+        <div className="wonder-cinema-scaffold" />
+        <div className="wonder-cinema-flash" />
+        <div className="wonder-cinema-dust" />
+        <div className="wonder-cinema-sparks" />
+      </div>
+      <div className="wonder-cinema-copy">
+        <span className="wonder-cinema-eyebrow">UMA NOVA ERA SE ERGUE</span>
+        <h2>{civ.wonder}</h2>
+        <p>ETAPA {to} DE {civ.stages.length} CONSTRUÍDA</p>
+        <span className="wonder-cinema-reward">+{civ.stages[to - 1]?.points ?? 0} PONTOS</span>
+      </div>
+      <button type="button" className="wonder-cinema-skip" onClick={onClose}>
+        Continuar ›
+      </button>
+    </motion.div>
   );
 }
 

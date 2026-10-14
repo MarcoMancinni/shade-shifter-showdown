@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { setupGame, pickCard, RuleError, buildDeck, resourcesForCost, buildAvailableStage } from "./engine";
+import { setupGame, pickCard, RuleError, buildDeck, resourcesForCost, buildAvailableStage, scienceCombination, claimScienceProgress } from "./engine";
 
 const rnd = (m: number) => Math.floor(Math.random() * m);
 
@@ -79,4 +79,32 @@ describe("construção automática", () => {
     expect(resourcesForCost([r("p", "pedra"), coin("c")], "3dif")).toBeNull();
   });
 
+});
+
+describe("cartas verdes e fichas de progresso", () => {
+  const green = (id: string, science: "astro" | "engenho" | "escrita") =>
+    ({ id, cat: "ciencia" as const, science });
+  it("troca duas cartas iguais por uma ficha", () => {
+    const cards = [green("a", "astro"), green("b", "astro"), green("c", "escrita")];
+    expect(scienceCombination(cards)).toEqual(["a", "b"]);
+    const r = claimScienceProgress({ cards, stages: 0, shields: 0 });
+    expect(r?.tokenCount).toBe(1);
+    expect(r?.area.progressTokens).toBe(1);
+    expect(r?.area.cards.map((c) => c.id)).toEqual(["c"]);
+  });
+  it("troca tres simbolos diferentes por uma ficha", () => {
+    const cards = [green("a", "astro"), green("b", "engenho"), green("c", "escrita")];
+    expect(claimScienceProgress({ cards, stages: 0, shields: 0 })?.tokenCount).toBe(1);
+  });
+  it("nao concede ficha para combinacao incompleta", () => {
+    const cards = [green("a", "astro"), green("b", "escrita")];
+    expect(claimScienceProgress({ cards, stages: 0, shields: 0 })).toBeNull();
+  });
+  it("mantem fichas anteriores e resolve varias combinacoes", () => {
+    const cards = [green("a", "astro"), green("b", "astro"), green("c", "engenho"), green("d", "engenho")];
+    const r = claimScienceProgress({ cards, stages: 0, shields: 0, progressTokens: 2 });
+    expect(r?.tokenCount).toBe(2);
+    expect(r?.area.progressTokens).toBe(4);
+    expect(r?.area.cards).toHaveLength(0);
+  });
 });

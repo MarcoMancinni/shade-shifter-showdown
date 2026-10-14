@@ -96,6 +96,14 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
   }).sort((a, b) => b.score.total - a.score.total || a.name.localeCompare(b.name, "pt-BR"));
   const highest = standings[0]?.score.total ?? 0;
   const winners = standings.filter((entry) => entry.score.total === highest);
+  const featuredWinner = winners[0];
+  const [revealComplete, setRevealComplete] = useState(false);
+  useEffect(() => {
+    if (reduced) { setRevealComplete(true); return; }
+    const timer = window.setTimeout(() => setRevealComplete(true), 2400);
+    return () => window.clearTimeout(timer);
+  }, [reduced]);
+
   let lastScore: number | undefined;
   let rank = 0;
   const ranked = standings.map((entry, index) => {
@@ -105,6 +113,23 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
   });
   return (
     <section className="imperial-finale" aria-label="Placar final da partida">
+      <div className="imperial-finale-monument" aria-hidden="true">
+        {featuredWinner?.civ && (
+          <motion.div className="imperial-finale-monument-inner"
+            initial={reduced ? false : { opacity: 0, scale: 1.22, y: 60, filter: "blur(14px)" }}
+            animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: reduced ? 0 : 2.3, ease: [0.22, 1, 0.36, 1] }}>
+            <Wonder civ={featuredWinner.civ} built={featuredWinner.area.stages} size="md" />
+          </motion.div>
+        )}
+      </div>
+      <motion.div className="imperial-finale-light" aria-hidden="true"
+        initial={reduced ? false : { opacity: 0, scale: .3 }}
+        animate={{ opacity: [.0, .85, .45], scale: [0.3, 1.35, 1] }}
+        transition={{ duration: reduced ? 0 : 2.6, times: [0, .6, 1] }} />
+      <div className="imperial-finale-particles" aria-hidden="true">
+        {Array.from({ length: 18 }, (_, i) => <span key={i} style={{ left: `${(i * 37 + 9) % 100}%`, animationDelay: `${i * .23}s`, animationDuration: `${3 + (i % 5)}s` }} />)}
+      </div>
       <motion.div className="imperial-finale-header" initial={reduced ? {} : { opacity: 0, y: -35 }}
         animate={{ opacity: 1, y: 0 }} transition={{ duration: .8 }}>
         <span className="imperial-finale-eyebrow">IMPÉRIOS · A ERA DAS MARAVILHAS</span>
@@ -114,7 +139,7 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
         <span className="imperial-finale-wonder">{winners.map((winner) => winner.civ?.name ?? "Civilização").join(" · ")}</span>
         <strong>{highest} PONTOS</strong>
       </motion.div>
-      <div className="imperial-finale-table-wrap">
+      <motion.div className="imperial-finale-table-wrap" initial={reduced ? false : { opacity: 0, y: 35 }} animate={{ opacity: revealComplete ? 1 : 0, y: revealComplete ? 0 : 35 }} transition={{ duration: .8 }}>
         <table className="imperial-finale-table">
           <thead><tr><th>Posição</th><th>Império</th><th>Maravilha</th><th>Cultura</th><th>Batalhas</th><th>Total</th></tr></thead>
           <tbody>{ranked.map((entry, i) => (
@@ -128,7 +153,7 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
             </motion.tr>
           ))}</tbody>
         </table>
-      </div>
+      </motion.div>
       <p className="imperial-finale-note">Pontuação oficial: maravilhas construídas, cartas culturais e fichas militares de 3 pontos. Empates compartilham a posição.</p>
       <div className="imperial-finale-actions">
         {isHost && <button type="button" className="btn-gold px-6 py-3" disabled={reopening} onClick={newMatch}>

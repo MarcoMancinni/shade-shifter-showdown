@@ -382,6 +382,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
             </div>
             <div className="empire-overhead-stats">
               <span><Shield className="size-4 text-cat-militar" /> {me.shields} escudos</span>
+              <span title="Fichas de Progresso obtidas por combinações científicas">✦ {me.progressTokens ?? 0} fichas de Progresso</span>
               <span><Star className="size-4 text-gold" /> {publicPoints(me)} pontos</span>
             </div>
           </header>

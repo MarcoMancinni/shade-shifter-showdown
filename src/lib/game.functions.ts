@@ -163,6 +163,40 @@ export const takeCard = createServerFn({ method: "POST" })
     }
   });
 
+/** Escolha de uma ficha após completar uma combinação científica. */
+export const chooseProgress = createServerFn({ method: "POST" })
+  .inputValidator((d) => auth.extend({ version: z.number().int(), choice: z.number().int().min(0).max(3) }).parse(d))
+  .handler(async ({ data }): Promise<Ok<{ token: string }> | Err> => {
+    const v = await verify(data);
+    if ("error" in v) return { ok: false, error: v.error! };
+    const room = v.room;
+    if (room.status !== "playing" || room.version !== data.version) return { ok: false, error: "A partida mudou. Tente novamente." };
+    const pub = room.public_state as unknown as PublicState;
+    const area = pub.areas[v.player.id];
+    if (!area || (area.progressTokens ?? 0) <= (area.progressChosen?.length ?? 0))
+      return { ok: false, error: "Você não possui uma ficha pendente." };
+    const all = ["engenharia", "tatica", "decoracao", "politica", "estrategia", "educacao", "ciencia", "arquitetura", "economia", "cultura", "urbanismo", "manufatura", "joalheria", "propaganda"];
+    const taken = new Set(Object.values(pub.areas).flatMap((a) => a.progressChosen ?? []));
+    const available = all.filter((id) => !taken.has(id));
+    if (!available.length) return { ok: false, error: "Não há mais fichas disponíveis." };
+    const offset = (area.progressChosen?.length ?? 0) % available.length;
+    const ordered = [...available.slice(offset), ...available.slice(0, offset)];
+    const token = data.choice === 3 ? ordered[3] ?? ordered[0]! : ordered[data.choice] ?? ordered[0]!;
+    const nextArea = { ...area, progressChosen: [...(area.progressChosen ?? []), token] };
+    if (token === "tatica") nextArea.shields += 2;
+    const { data: sec } = await v.db.from("room_secrets").select("hidden_state").eq("room_id", room.id).single();
+    if (!sec) return { ok: false, error: "Não foi possível carregar a partida." };
+    const { data: ok } = await v.db.rpc("commit_room_state", {
+      _room_id: room.id, _expected_version: room.version, _status: "playing",
+      _current_seat: room.current_seat, _turn_number: room.turn_number,
+      _public_state: { ...pub, areas: { ...pub.areas, [v.player.id]: nextArea } } as never,
+      _hidden_state: sec.hidden_state as never,
+      _events: [{ type: "progresso", payload: { playerId: v.player.id, token } }] as never,
+    });
+    if (!ok) return { ok: false, error: "A partida mudou. Tente novamente." };
+    return { ok: true, token };
+  });
+
 /** Informação privada do jogador (ex.: dono do mascote vê o topo central — Fase 2). */
 export const getPrivateView = createServerFn({ method: "POST" })
   .inputValidator((d) => auth.parse(d))

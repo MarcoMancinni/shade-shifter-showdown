@@ -69,19 +69,29 @@ export function deckIndexFor(seat: number, nSeats: number, source: "esquerda" | 
 export class RuleError extends Error {}
 
 
+/** Cada carta de comércio (moeda) substitui exatamente um recurso na construção.
+ * O servidor escolhe primeiro materiais reais e só consome moedas quando necessário.
+ */
 export function resourcesForCost(cards: Card[], cost: CostKind): string[] | null {
-  const available = cards.filter((c) => c.cat === "recurso" && c.resource);
+  const materials = cards.filter((c) => c.cat === "recurso" && c.resource);
+  const coins = cards.filter((c) => c.cat === "comercio");
   const amount = Number(cost[0]);
   if (cost.endsWith("ig")) {
+    let best: Card[] = [];
     for (const resource of RES) {
-      const found = available.filter((c) => c.resource === resource);
-      if (found.length >= amount) return found.slice(0, amount).map((c) => c.id);
+      const matching = materials.filter((c) => c.resource === resource);
+      if (matching.length > best.length) best = matching;
+      if (matching.length >= amount) return matching.slice(0, amount).map((c) => c.id);
     }
-  } else {
-    const found = RES.map((resource) => available.find((c) => c.resource === resource)).filter((c): c is Card => !!c);
-    if (found.length >= amount) return found.slice(0, amount).map((c) => c.id);
+    const missing = amount - best.length;
+    if (coins.length < missing) return null;
+    return [...best.map((c) => c.id), ...coins.slice(0, missing).map((c) => c.id)];
   }
-  return null;
+  const distinct = RES.map((resource) => materials.find((c) => c.resource === resource))
+    .filter((c): c is Card => !!c);
+  const missing = amount - distinct.length;
+  if (missing > coins.length) return null;
+  return [...distinct.slice(0, amount).map((c) => c.id), ...coins.slice(0, Math.max(0, missing)).map((c) => c.id)];
 }
 export function buildAvailableStage(area: PlayerArea, civId?: string) {
   const civ = civById(civId);

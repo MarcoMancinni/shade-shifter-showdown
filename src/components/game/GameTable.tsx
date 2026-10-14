@@ -11,6 +11,7 @@ import type { PlayerRow, RoomRow } from "@/hooks/use-room";
 import { GameCard } from "./GameCard";
 import { Wonder } from "./Wonder";
 import { cn } from "@/lib/utils";
+import { ActionFeed, useTurnAlert } from "./ActionFeed";
 
 function ConflictCinematic({ from, to, total, onClose }: { from: number; to: number; total: number; onClose: () => void }) {
   const reduced = useReducedMotion();
@@ -160,10 +161,12 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
     const timeout = window.setTimeout(() => setCinematic(null), 7600);
     return () => window.clearTimeout(timeout);
   }, [cinematic]);
-
+  useTurnAlert(myTurn);
+  const names = Object.fromEntries(players.map((p) => [p.id, p.nickname]));
 
   return (
     <main className="imperios-arena arena-v2 flex min-h-screen flex-col">
+      <ActionFeed st={st} turn={room.turn_number} names={names} meId={session.playerId} />
       {/* Ambientação visual: sobreposições leves sobre as bandeiras e os braseiros do cenário. */}
       <div className="arena-ambient" aria-hidden="true">
         <span className="arena-ambient-banner arena-ambient-banner-left" />

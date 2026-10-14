@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Shield, Star, Swords } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { takeCard, evolveWonder, returnToLobby } from "@/lib/game.functions";
+import { takeCard, evolveWonder, returnToLobby, chooseProgress } from "@/lib/game.functions";
 import { civById, COST_LABEL, RESOURCE_LABEL, type CostKind, type Card, type Civilization, type Resource } from "@/lib/game/data";
 import { conflictTokenLimit, deckIndexFor, publicPoints, scoreBreakdown, resourcesForCost, type PublicState, type Source } from "@/lib/game/engine";
 import type { Session } from "@/lib/session";
@@ -13,6 +13,60 @@ import { GameCard } from "./GameCard";
 import { Wonder } from "./Wonder";
 import { cn } from "@/lib/utils";
 import { ActionFeed, useTurnAlert } from "./ActionFeed";
+
+const PROGRESS_INFO: Record<string, { name: string; effect: string; symbol: string }> = {
+  engenharia: { name: "Engenharia", effect: "Construa etapas com quaisquer recursos, ignorando iguais ou diferentes.", symbol: "⚙" },
+  tatica: { name: "Tática", effect: "Receba imediatamente 2 escudos permanentes.", symbol: "⚔" },
+  decoracao: { name: "Decoração", effect: "No fim: +4 pontos; +6 se a maravilha estiver completa.", symbol: "✦" },
+  politica: { name: "Política", effect: "No fim: +1 ponto por símbolo de gato nas cartas azuis.", symbol: "♜" },
+  estrategia: { name: "Estratégia", effect: "No fim: +1 ponto por ficha de vitória militar.", symbol: "♞" },
+  educacao: { name: "Educação", effect: "No fim: +2 pontos por ficha de Progresso, incluindo esta.", symbol: "✧" },
+  ciencia: { name: "Ciência", effect: "Ao pegar carta verde, pegue outra das 3 disponíveis.", symbol: "☼" },
+  arquitetura: { name: "Arquitetura", effect: "Ao construir etapa, pegue outra carta das 3 disponíveis.", symbol: "⌂" },
+  economia: { name: "Economia", effect: "Uma carta amarela vale 2 moedas ao construir.", symbol: "◈" },
+  cultura: { name: "Cultura", effect: "Ficha cultural de Progresso.", symbol: "❖" },
+  urbanismo: { name: "Urbanismo", effect: "Ao pegar carta cinza, pegue outra das 3 disponíveis.", symbol: "▣" },
+  manufatura: { name: "Manufatura", effect: "Ao pegar carta cinza, pegue outra das 3 disponíveis.", symbol: "⚒" },
+  joalheria: { name: "Joalheria", effect: "Ao pegar carta cinza ou amarela, pegue outra das 3 disponíveis.", symbol: "◇" },
+  propaganda: { name: "Propaganda", effect: "Ao pegar carta vermelha com trombeta, pegue outra das 3 disponíveis.", symbol: "⚑" },
+};
+
+function ProgressBlueprint({ options, onChoose, busy, error }: { options: string[]; onChoose: (index: number) => void; busy: boolean; error: string | null }) {
+  return createPortal(
+    <motion.div role="dialog" aria-modal="true" aria-label="Escolha sua ficha de Progresso"
+      className="fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto bg-[#080b0b]/90 p-3 backdrop-blur-md sm:p-6"
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: .5 }}>
+      <motion.section initial={{ scale: .9, y: 60, rotateX: 12 }} animate={{ scale: 1, y: 0, rotateX: 0 }}
+        transition={{ type: "spring", duration: .85 }} className="relative w-full max-w-5xl overflow-hidden rounded-xl border-[7px] border-[#80603c] p-5 text-[#37271c] shadow-[0_0_120px_#d7a65255,0_25px_100px_#000] sm:p-10"
+        style={{ background: "repeating-linear-gradient(0deg,transparent 0px,transparent 34px,#506e7840 35px,#506e7840 36px),repeating-linear-gradient(90deg,transparent 0px,transparent 34px,#506e7840 35px,#506e7840 36px),radial-gradient(ellipse at center,#f3e5bf,#b99a6b)" }}>
+        <div className="pointer-events-none absolute inset-3 rounded border border-[#775632]/60" />
+        <div className="relative text-center">
+          <p className="text-xs font-bold uppercase tracking-[.4em] text-[#7d552a]">Arquivo imperial · descoberta científica</p>
+          <h2 className="mt-2 font-display text-3xl font-bold uppercase tracking-wider sm:text-5xl">Planta do Progresso</h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm sm:text-base">Sua pesquisa foi concluída. Escolha uma das três fichas reveladas ou arrisque uma ficha misteriosa.</p>
+        </div>
+        <div className="relative mt-7 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
+          {[0,1,2,3].map((index) => {
+            const info = PROGRESS_INFO[options[index] ?? ""] ;
+            const hidden = index === 3;
+            return <motion.button key={index} type="button" disabled={busy || (!info && !hidden)} onClick={() => onChoose(index)}
+              whileHover={{ y: -10, scale: 1.04 }} whileTap={{ scale: .97 }}
+              className="group flex min-h-52 flex-col items-center justify-center rounded-xl border-4 border-[#aa7a32] bg-[#162c2b] px-3 py-5 text-[#f5dfad] shadow-[inset_0_0_0_3px_#e5bd6a,0_14px_22px_#261a1666] transition hover:shadow-[0_0_36px_#f2cc7b99] disabled:opacity-60 sm:min-h-72"
+              style={{ background: hidden ? "repeating-linear-gradient(45deg,#1b2d2d,#1b2d2d 13px,#273d39 14px,#273d39 16px)" : "radial-gradient(circle at 50% 30%,#40625b,#152826 75%)" }}>
+              <span className="text-[10px] uppercase tracking-[.2em] text-[#d5b676]">{hidden ? "Ficha oculta" : "Ficha revelada"}</span>
+              <span className="my-4 flex size-20 items-center justify-center rounded-full border-[5px] border-[#c49b50] bg-[#162927] font-display text-5xl text-[#e9ca7b] shadow-[0_0_0_4px_#513e24,0_0_30px_#e0b75c44] sm:size-24">{hidden ? "?" : info?.symbol}</span>
+              <strong className="font-display text-lg uppercase tracking-wide">{hidden ? "Mistério" : info?.name}</strong>
+              <p className="mt-2 text-center text-xs leading-relaxed text-[#e5d9b9]">{hidden ? "Uma ficha surpresa. Descubra seu efeito após escolher." : info?.effect}</p>
+              <span className="mt-auto pt-5 text-xs font-bold uppercase tracking-widest text-[#ffdd88]">{busy ? "Aguarde..." : "Escolher ficha"}</span>
+            </motion.button>;
+          })}
+        </div>
+        <p className="relative mt-6 text-center text-xs font-semibold text-[#6d4324]">As fichas são registradas no servidor. Efeitos especiais ainda estão sendo integrados às regras.</p>
+        {error && <p role="alert" className="relative mt-2 text-center font-bold text-red-800">{error}</p>}
+      </motion.section>
+    </motion.div>, document.body
+  );
+}
 
 function ConflictCinematic({ from, to, total, onClose }: { from: number; to: number; total: number; onClose: () => void }) {
   const reduced = useReducedMotion();
@@ -196,6 +250,8 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
 
 export function GameTable({ room, players, session, code }: { room: RoomRow; players: PlayerRow[]; session: Session; code: string }) {
   const take = useServerFn(takeCard);
+  const selectProgress = useServerFn(chooseProgress);
+  const [progressBusy, setProgressBusy] = useState(false);
   const evolve = useServerFn(evolveWonder);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -234,6 +290,20 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
 
   const opponents = st.seats.map((id, i) => ({ id, i })).filter((o) => o.id !== session.playerId);
   const me = st.areas[session.playerId];
+  const pendingProgress = (me?.progressTokens ?? 0) - (me?.progressChosen?.length ?? 0);
+  const usedProgress = new Set(Object.values(st.areas).flatMap((a) => a.progressChosen ?? []));
+  const progressAvailable = Object.keys(PROGRESS_INFO).filter((id) => !usedProgress.has(id));
+  const progressOffset = (me?.progressChosen?.length ?? 0) % Math.max(1, progressAvailable.length);
+  const progressOptions = [...progressAvailable.slice(progressOffset), ...progressAvailable.slice(0, progressOffset)].slice(0, 4);
+  async function chooseProgressOption(index: number) {
+    if (progressBusy) return;
+    setProgressBusy(true); setError(null);
+    try {
+      const result = await selectProgress({ data: { code, ...session, version: room.version, choice: index } });
+      if (!result.ok) setError(result.error);
+    } catch { setError("Não foi possível escolher a ficha. Tente novamente."); }
+    finally { setProgressBusy(false); }
+  }
   const myCiv = civById(byId[session.playerId]?.civ_id);
   const inspected = inspect && st.areas[inspect] ? { p: byId[inspect], a: st.areas[inspect]! } : null;
   const [cinematic, setCinematic] = useState<{ from: number; to: number } | null>(null);
@@ -288,6 +358,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   return (
     <main className="imperios-arena arena-v2 flex min-h-screen flex-col">
       <ActionFeed st={st} turn={room.turn_number} names={names} meId={session.playerId} />
+      {pendingProgress > 0 && progressOptions.length > 0 && <ProgressBlueprint options={progressOptions} onChoose={chooseProgressOption} busy={progressBusy} error={error} />}
       {/* Ambientação visual: sobreposições leves sobre as bandeiras e os braseiros do cenário. */}
       <div className="arena-ambient" aria-hidden="true">
         <span className="arena-ambient-banner arena-ambient-banner-left" />

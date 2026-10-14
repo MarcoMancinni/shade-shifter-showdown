@@ -151,6 +151,7 @@ export const takeCard = createServerFn({ method: "POST" })
         _public_state: r.pub as never, _hidden_state: r.hidden as never,
         _events: [
           { type: "carta", payload: { playerId: v.player.id, source: data.source, card: r.card } },
+          ...(r.pub.lastScience ? [{ type: "ciencia", payload: r.pub.lastScience }] : []),
           ...(r.pub.lastBuild ? [{ type: "construcao", payload: r.pub.lastBuild }] : []),
         ] as never,
       });

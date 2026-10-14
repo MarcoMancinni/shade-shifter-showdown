@@ -1599,3 +1599,34 @@
     padding-bottom: 45px !important;
   }
 }
+
+/* Wonder construction: visual-only effect after a server-confirmed stage change. */
+.wonder-construction-effect {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  pointer-events: none;
+  transform-origin: center 70%;
+}
+.wonder-construction-rays {
+  position: absolute;
+  inset: 5% 0 10%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 65%, rgba(255,226,148,.52), rgba(241,173,60,.2) 38%, transparent 73%);
+  filter: blur(9px);
+  mix-blend-mode: screen;
+}
+.wonder-construction-dust {
+  position: absolute;
+  inset: 8%;
+  background:
+    radial-gradient(circle at 18% 62%, #ffe3a0 0 2px, transparent 4px),
+    radial-gradient(circle at 73% 32%, #ffe3a0 0 2px, transparent 4px),
+    radial-gradient(circle at 42% 12%, #fff0bb 0 2px, transparent 4px),
+    radial-gradient(circle at 85% 70%, #e7a43c 0 3px, transparent 6px),
+    radial-gradient(circle at 30% 86%, #e7a43c 0 2px, transparent 5px);
+  filter: drop-shadow(0 0 6px #ffc65d);
+}
+@media (prefers-reduced-motion: reduce) {
+  .wonder-construction-effect { display: none; }
+}

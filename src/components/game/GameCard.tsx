@@ -42,6 +42,9 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
     );
   }
   // Recursos ilustrados usam suas artes próprias, com alternativa caso a imagem falhe.
+  if (card.cat === "ciencia" && card.science === "astro") {
+    return <IllustratedResourceCard size={size} resource="carta-verde-astrolabio" title={cardTitle(card)} />;
+  }
   if (card.cat === "comercio") {
     return <IllustratedResourceCard size={size} resource="moeda" title={cardTitle(card)} />;
   }
@@ -85,7 +88,7 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   );
 }
 
-function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" | "carta-militar-sem-conflito" | "carta-militar-1-conflito" | "carta-militar-2-conflitos" | "conhecimento-3-pontos" | "conhecimento-gato-2-pontos" }) {
+function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" | "carta-militar-sem-conflito" | "carta-militar-1-conflito" | "carta-militar-2-conflitos" | "conhecimento-3-pontos" | "conhecimento-gato-2-pontos" | "carta-verde-astrolabio" }) {
   const [imageFailed, setImageFailed] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [position, setPosition] = useState({ left: 0, top: 0, below: false });

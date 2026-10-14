@@ -5,7 +5,7 @@ import { Shield, Star, Swords } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { takeCard, evolveWonder } from "@/lib/game.functions";
 import { civById, COST_LABEL, RESOURCE_LABEL, type CostKind, type Card, type Civilization, type Resource } from "@/lib/game/data";
-import { deckIndexFor, publicPoints, resourcesForCost, type PublicState, type Source } from "@/lib/game/engine";
+import { conflictTokenLimit, deckIndexFor, publicPoints, resourcesForCost, type PublicState, type Source } from "@/lib/game/engine";
 import type { Session } from "@/lib/session";
 import type { PlayerRow, RoomRow } from "@/hooks/use-room";
 import { GameCard } from "./GameCard";
@@ -89,7 +89,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
       <header className="arena-hud relative z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-3">
         <Link to="/" className="font-display text-gold">Impérios</Link>
         <div className="flex items-center gap-4 text-sm">
-          <span className="flex items-center gap-1"><Swords className="size-4 text-cat-militar" /> Conflito {st.conflictTokens}/6</span>
+          <span className="flex items-center gap-1"><Swords className="size-4 text-cat-militar" /> Conflito {st.conflictTokens}/{conflictTokenLimit(n)}</span>
           <span className="text-muted-foreground">Sala {code} · Turno {room.turn_number}</span>
         </div>
       </header>

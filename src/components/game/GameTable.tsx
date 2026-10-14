@@ -1,5 +1,6 @@
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Shield, Star, Swords } from "lucide-react";
 import { Link } from "@tanstack/react-router";
@@ -87,6 +88,8 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
     finally { setReopening(false); }
   }
   const reduced = useReducedMotion();
+  const [portalReady, setPortalReady] = useState(false);
+  useEffect(() => { setPortalReady(true); }, []);
   const standings = st.seats.map((id) => {
     const player = players.find((p) => p.id === id);
     const civ = civById(st.civIds?.[id] ?? player?.civ_id);
@@ -111,7 +114,8 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
     lastScore = entry.score.total;
     return { ...entry, rank };
   });
-  return (
+  if (!portalReady) return null;
+  return createPortal(
     <section className="imperial-finale imperial-finale-v2" aria-label="Cerimônia imperial e placar final">
       <div className="imperial-finale-v2-shade" aria-hidden="true" />
       <div className="imperial-finale-particles" aria-hidden="true">
@@ -185,7 +189,8 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
         </div>
         {reopenError && <p role="alert" className="text-center text-red-300">{reopenError}</p>}
       </motion.div>
-    </section>
+    </section>,
+    document.body
   );
 }
 
@@ -467,7 +472,7 @@ function WonderConstructionCinema({ civ, from, to, onClose }: { civ: Civilizatio
       <div className="wonder-cinema-vignette" />
       <div className="wonder-cinema-rays" aria-hidden="true" />
       <div className="wonder-cinema-scene" aria-hidden="true">
-        {(civ.id === "aurelia" || civ.id === "nihara") ? (
+        {(civ.id === "aurelia" || civ.id === "nihara" || civ.id === "thalassa") ? (
           <>
             <img className="wonder-cinema-art wonder-cinema-before" src={`/${civ.id}/etapa-${from}.webp`} alt="" />
             <img className="wonder-cinema-art wonder-cinema-after" src={`/${civ.id}/etapa-${to}.webp`} alt="" />

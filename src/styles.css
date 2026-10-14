@@ -1849,3 +1849,11 @@
 .conflict-cinema-heading { color:#5a3017;text-shadow:0 1px 0 #f9e4b5,0 0 18px rgba(255,241,185,.7); }
 .conflict-cinema-count { color:#5b311a;text-shadow:0 1px 0 #f5e0b6; }
 .conflict-cinema-horn { color:#922e17;text-shadow:2px 3px #efcc8a,0 0 25px rgba(130,38,10,.3); }
+
+/* Resultado de batalha personalizado para cada jogador. */
+.battle-result-cinema { gap:clamp(14px,3vh,34px); }
+.battle-result-title { position:relative;z-index:2;margin:0;font:900 clamp(48px,11vw,140px)/1 Georgia,serif;letter-spacing:.1em;color:#80291b;text-shadow:0 3px 0 #e9bc76,0 8px 22px #3a190b55;text-align:center; }
+.battle-result-subtitle { position:relative;z-index:2;margin:0;font:700 clamp(18px,3vw,35px) Georgia,serif;letter-spacing:.13em;color:#563016;text-align:center; }
+.battle-result-tokens { position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:clamp(12px,3vw,45px); }
+.battle-result-tokens img { display:block;width:clamp(115px,22vw,270px);height:auto;max-height:34vh;object-fit:contain;filter:drop-shadow(0 20px 16px #39200c88); }
+.battle-result-points { position:relative;z-index:2;font:900 clamp(25px,5vw,58px) Georgia,serif;letter-spacing:.08em;color:#6e3517;text-shadow:0 2px #f4d29b; }

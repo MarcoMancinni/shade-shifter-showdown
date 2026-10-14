@@ -75,6 +75,17 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
 
   return (
     <main className="imperios-arena arena-v2 flex min-h-screen flex-col">
+      {/* Ambientação visual: sobreposições leves sobre as bandeiras e os braseiros do cenário. */}
+      <div className="arena-ambient" aria-hidden="true">
+        <span className="arena-ambient-banner arena-ambient-banner-left" />
+        <span className="arena-ambient-banner arena-ambient-banner-midleft" />
+        <span className="arena-ambient-banner arena-ambient-banner-midright" />
+        <span className="arena-ambient-banner arena-ambient-banner-right" />
+        <span className="arena-ambient-fire arena-ambient-fire-left" />
+        <span className="arena-ambient-fire arena-ambient-fire-midleft" />
+        <span className="arena-ambient-fire arena-ambient-fire-midright" />
+        <span className="arena-ambient-fire arena-ambient-fire-right" />
+      </div>
       <header className="arena-hud relative z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-3">
         <Link to="/" className="font-display text-gold">Impérios</Link>
         <div className="flex items-center gap-4 text-sm">

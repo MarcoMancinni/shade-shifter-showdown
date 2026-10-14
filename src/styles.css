@@ -1960,3 +1960,42 @@
 .war-lobby-civ {background:radial-gradient(ellipse at 50% 75%,rgba(163,112,45,.15),transparent 70%)!important;border:1px solid transparent!important;}
 .war-lobby-civ:hover:not(:disabled),.war-lobby-civ.border-gold\/70 {border-color:#c79c58!important;}
 @media(max-width:760px){.war-lobby-scenery{height:460px;background-position:center top}.war-lobby-header{min-height:195px!important;padding:10px 4px 18px!important}.war-lobby-header>div{padding:12px}.war-lobby-header>.btn-bronze{margin-top:0}.war-lobby-battle-caption{letter-spacing:.1em;padding:8px}.war-lobby-roster-content{grid-template-columns:1fr!important;gap:16px!important}.war-lobby-launch{border-left:0!important;border-top:1px solid #ad804f!important;padding:20px 0 0!important}.war-lobby-roster{padding:22px 16px!important}.war-lobby-civilizations{padding:18px 10px}}
+
+/* Cerimonia imperial v2: tela completa, revelacao e classificacao. */
+.imperial-finale-v2 {position:fixed!important;inset:0!important;z-index:100!important;width:100vw!important;max-width:none!important;height:100dvh!important;overflow-x:hidden!important;overflow-y:auto!important;padding:clamp(24px,3vw,48px) clamp(18px,5vw,80px) 70px!important;border:0!important;border-radius:0!important;background:radial-gradient(ellipse at 50% 5%,#6b482f 0%,#281d19 36%,#100e0e 76%)!important;color:#f6e2bd!important;box-shadow:inset 0 0 110px #000a!important;isolation:isolate;}
+.imperial-finale-v2-shade {position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(90deg,#0005,transparent 30%,transparent 70%,#0005),repeating-linear-gradient(90deg,transparent 0 110px,#f0bc7222 111px 112px);mask-image:linear-gradient(#0007,transparent 65%);}
+.imperial-finale-v2-hero {position:relative;z-index:2;text-align:center;max-width:1200px;margin:0 auto;}
+.imperial-finale-v2-laurel {display:block;font-family:Georgia,serif;font-size:28px;color:#e8b95f;margin:9px 0;text-shadow:0 0 18px #e6a54a88;}
+.imperial-finale-v2-hero h1 {font-family:Georgia,serif;font-size:clamp(34px,5.6vw,76px);line-height:1.06;letter-spacing:.07em;color:#ffdea0;text-shadow:0 4px 20px #000,0 0 35px #ad7b2d77;}
+.imperial-finale-v2-overline {font-size:12px;letter-spacing:.29em;color:#dab77e;margin:15px 0 6px;}
+.imperial-finale-v2-champion {display:grid;grid-template-columns:minmax(250px,1fr) minmax(300px,1fr);align-items:center;gap:clamp(12px,3vw,50px);margin:10px auto 24px;max-width:1050px;min-height:260px;}
+.imperial-finale-v2-art {min-height:270px;display:flex;align-items:center;justify-content:center;position:relative;background:radial-gradient(ellipse at center,#c7924440,transparent 66%);}
+.imperial-finale-v2-art .wonder-scene {width:min(100%,470px);max-width:470px;min-height:260px;filter:drop-shadow(0 18px 18px #000a);}
+.imperial-finale-v2-identity {display:flex;flex-direction:column;align-items:center;gap:8px;}
+.imperial-finale-v2-crown {font-size:48px;line-height:1;color:#f9d37e;text-shadow:0 0 30px #e4b04c;}
+.imperial-finale-v2-label {font-size:12px;letter-spacing:.26em;color:#d9b575;}
+.imperial-finale-v2-identity .imperial-finale-winner {font-size:clamp(37px,5.3vw,78px);overflow-wrap:anywhere;line-height:1.06;}
+.imperial-finale-v2-big-score {display:flex;flex-direction:column;align-items:center;margin-top:8px;}
+.imperial-finale-v2-big-score strong {font:700 clamp(58px,8vw,112px)/.95 Georgia,serif;color:#ffde9c;text-shadow:0 4px 25px #e9ae3f77;}
+.imperial-finale-v2-big-score span {font-size:12px;letter-spacing:.24em;color:#e7c38c;}
+.imperial-finale-v2-results {position:relative;z-index:2;max-width:1100px;margin:0 auto;}
+.imperial-finale-v2-section-title {display:flex;align-items:center;justify-content:center;gap:24px;margin:20px auto 26px;color:#dfb66c;}
+.imperial-finale-v2-section-title h2 {font-family:Georgia,serif;font-size:clamp(19px,2.6vw,31px);letter-spacing:.12em;text-align:center;}
+.imperial-finale-v2-podium {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-bottom:32px;}
+.imperial-finale-v2-podium-card {min-height:185px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;padding:20px 12px;border:1px solid #89683d;background:linear-gradient(155deg,#403022,#1a1716);box-shadow:0 10px 28px #0006;}
+.imperial-finale-v2-podium-card.is-gold {border:2px solid #f2c56c;background:linear-gradient(160deg,#6c4c2b,#2c2118);box-shadow:0 0 32px #e6b34c44,0 12px 32px #0009;transform-origin:bottom;}
+.imperial-finale-v2-podium-card.is-silver {border-color:#a8aab0;}
+.imperial-finale-v2-podium-card.is-bronze {border-color:#b88050;}
+.imperial-finale-v2-rank {font-size:12px;letter-spacing:.18em;color:#edc982;}
+.imperial-finale-v2-podium-name {font-family:Georgia,serif;font-size:clamp(20px,2.4vw,32px);color:#fff0c7;overflow-wrap:anywhere;}
+.imperial-finale-v2-podium-civ {font-size:13px;color:#d0b389;}
+.imperial-finale-v2-podium-score {font:700 43px Georgia,serif;color:#f5cd75;}
+.imperial-finale-v2-podium-score small {font:12px Georgia,serif;}
+.imperial-finale-v2-podium-detail {font-size:11px;color:#d2b78e;line-height:1.5;}
+.imperial-finale-v2-table-head {display:flex;justify-content:space-between;gap:10px;font-size:12px;letter-spacing:.2em;color:#dfbd83;padding:12px 4px;}
+.imperial-finale-v2 .imperial-finale-table-wrap {background:#110f0ddc;border-color:#a5804a;}
+.imperial-finale-v2 .imperial-finale-table th {background:#684625;}
+.imperial-finale-v2 .imperial-finale-table td {font-size:15px;}
+.imperial-finale-v2 .imperial-finale-actions {padding:12px 0 28px;}
+@media(max-width:720px){.imperial-finale-v2{padding:20px 12px 60px!important}.imperial-finale-v2-champion{grid-template-columns:1fr;gap:0}.imperial-finale-v2-art{min-height:195px}.imperial-finale-v2-art .wonder-scene{min-height:195px}.imperial-finale-v2-podium{grid-template-columns:1fr;gap:10px}.imperial-finale-v2-podium-card{min-height:130px;padding:14px}.imperial-finale-v2-section-title{gap:10px}.imperial-finale-v2-identity .imperial-finale-winner{font-size:42px}}
+@media(prefers-reduced-motion:reduce){.imperial-finale-v2 .imperial-finale-particles span{display:none}}

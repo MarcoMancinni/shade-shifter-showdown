@@ -1865,3 +1865,25 @@
 .action-feed-build { border-left-color: oklch(0.78 0.15 85); }
 .action-feed-battle { border-left-color: var(--destructive); }
 @media (max-width: 640px) { .action-feed { display: none; } }
+
+/* Encerramento imperial: cerimonia e classificacao final. */
+.imperial-finale { width:min(100%,1040px);padding:clamp(18px,4vw,48px);color:#f4ddb0;background:radial-gradient(ellipse at 50% 0%,rgba(173,119,48,.22),transparent 60%),linear-gradient(135deg,rgba(26,21,18,.96),rgba(53,35,25,.97));border:2px solid #987444;border-radius:16px;box-shadow:inset 0 0 0 5px rgba(231,188,105,.08),0 18px 65px #0009; }
+.imperial-finale-header { text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;padding-bottom:30px; }
+.imperial-finale-eyebrow { font-size:11px;letter-spacing:.35em;color:#d3ae6a; }
+.imperial-finale-header h1 { font-family:Georgia,serif;font-size:clamp(27px,5vw,55px);letter-spacing:.07em;line-height:1.12;color:#ffe3a3;text-shadow:0 3px 20px #b78b4e66; }
+.imperial-finale-header p {font-size:13px;letter-spacing:.3em;color:#cda66b;}
+.imperial-finale-winner {font-family:Georgia,serif;font-size:clamp(30px,6vw,66px);color:#fff1bf;text-shadow:0 0 25px #e2b65a80;}
+.imperial-finale-wonder {color:#e0c28b;font-size:15px;}
+.imperial-finale-header>strong {font-family:Georgia,serif;font-size:clamp(21px,3vw,36px);color:#f6c95d;}
+.imperial-finale-table-wrap {overflow-x:auto;border:1px solid #8b683f;border-radius:9px;background:#100f0dcc;}
+.imperial-finale-table {width:100%;border-collapse:collapse;text-align:center;min-width:560px;font-size:14px;}
+.imperial-finale-table th {padding:15px 12px;background:#6b4827;color:#ffdda0;font-size:12px;text-transform:uppercase;letter-spacing:.06em;}
+.imperial-finale-table td {padding:16px 12px;border-top:1px solid #71512d66;}
+.imperial-finale-table td:nth-child(2) {text-align:left;}
+.imperial-finale-table td small {display:block;color:#bca47e;margin-top:4px;}
+.imperial-finale-table .is-champion {background:rgba(214,158,59,.18);color:#ffe7a7;}
+.imperial-finale-table .is-me td:nth-child(2) strong {text-decoration:underline;text-decoration-color:#dcb773;text-underline-offset:4px;}
+.imperial-finale-note {font-size:12px;text-align:center;color:#c5ac86;margin:18px auto;line-height:1.6;}
+.imperial-finale-actions {display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:20px;margin-top:22px;}
+.imperial-finale-actions span {font-size:12px;color:#c8ac83;}
+@media(max-width:650px) {.imperial-finale {padding:14px 10px;} .imperial-finale-header {padding-top:12px;} .imperial-finale-table {font-size:12px;} }

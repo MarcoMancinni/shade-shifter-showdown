@@ -1828,3 +1828,24 @@
 @keyframes conflict-title-enter { from {opacity:0;transform:translateY(-30px);letter-spacing:.4em} to {opacity:1;transform:translateY(0)} }
 @keyframes conflict-cinema-pulse { from {opacity:.3;transform:scale(.97)} to {opacity:1;transform:scale(1.04)} }
 @media (prefers-reduced-motion:reduce) { .conflict-cinema * { animation:none!important;transition:none!important; } .conflict-cinema-flipping .conflict-cinema-token-inner { transform:rotateY(180deg); } }
+
+/* Pergaminho cartografico translucido na cena cinematografica das fichas. */
+.conflict-cinema {
+  background:
+    radial-gradient(ellipse at 45% 43%,rgba(239,209,144,.86),rgba(188,141,80,.88) 68%,rgba(86,57,33,.90) 100%) !important;
+  color:#4a2b17;
+}
+.conflict-cinema::before {
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.46;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 750'%3E%3Cg fill='none' stroke='%236b4729' stroke-width='3' stroke-linejoin='round' stroke-linecap='round' opacity='.78'%3E%3Cpath d='M-30 95 Q75 18 175 94 L220 172 185 254 263 311 244 399 161 446 102 566 10 585M175 94L245 64 319 126 302 209 363 251 320 336 244 399M330-10L405 75 491 96 530 182 492 269 549 342 515 436 422 487 396 584 455 760M530 182L612 132 690 161 725 249 681 317 735 382 703 462 792 526 745 624 807 760M865-10L820 75 883 143 847 213 912 283 888 362 952 421 936 501 1024 563 995 657 1082 760M1024 563L1115 515 1200 565'/%3E%3Cpath d='M115 182q55-22 91 23t-4 92M410 346q50-40 103 0t-3 90M778 112q50-40 89 4t-9 78M1022 232q60-35 97 20t-6 87M624 541q38-30 72 4t-2 70' stroke-dasharray='8 13' stroke-width='2'/%3E%3Ccircle cx='390' cy='335' r='68' stroke-width='2'/%3E%3Ccircle cx='390' cy='335' r='52' stroke-width='1'/%3E%3Cpath d='M390 246V424M301 335H479M390 260L405 322 465 335 405 349 390 410 376 349 315 335 376 322Z' stroke-width='2'/%3E%3Cpath d='M940 95l20 28-20 28-20-28zM940 72v102M914 123h52'/%3E%3C/g%3E%3Cg fill='%236b4729' font-family='serif' font-style='italic' font-size='28' opacity='.65'%3E%3Ctext x='62' y='650'%3EMare Antiquum%3C/text%3E%3Ctext x='740' y='687'%3ETerra Incognita%3C/text%3E%3Ctext x='955' y='72'%3EN%3C/text%3E%3C/g%3E%3C/svg%3E");
+  background-size:cover;background-position:center;
+  mix-blend-mode:multiply;
+}
+.conflict-cinema::after {
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  opacity:.45;background:repeating-linear-gradient(14deg,rgba(78,49,22,.035) 0 2px,transparent 2px 7px),radial-gradient(ellipse at center,transparent 35%,rgba(57,30,12,.36) 100%);
+}
+.conflict-cinema-vignette { opacity:.32; }
+.conflict-cinema-heading { color:#5a3017;text-shadow:0 1px 0 #f9e4b5,0 0 18px rgba(255,241,185,.7); }
+.conflict-cinema-count { color:#5b311a;text-shadow:0 1px 0 #f5e0b6; }
+.conflict-cinema-horn { color:#922e17;text-shadow:2px 3px #efcc8a,0 0 25px rgba(130,38,10,.3); }

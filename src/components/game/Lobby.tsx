@@ -27,6 +27,7 @@ export function Lobby({ room, players, session, code }: { room: RoomRow; players
 
   return (
     <main className="war-lobby mx-auto max-w-6xl px-4 py-10">
+      <div className="war-lobby-scenery" aria-hidden="true" />
       <header className="war-lobby-header flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="war-lobby-kicker font-display text-sm uppercase tracking-[0.4em] text-gold"><Swords className="inline size-4 align-[-2px] mr-2" /> Conselho de Guerra</p>
@@ -39,6 +40,7 @@ export function Lobby({ room, players, session, code }: { room: RoomRow; players
         </button>
       </header>
 
+      <div className="war-lobby-battle-caption"><span>⚔</span> ÀS VÉSPERAS DA CONQUISTA <span>⚔</span></div>
       <section className="war-lobby-roster panel-stone mt-8 p-5">
         <div className="war-lobby-roster-ornament" aria-hidden="true"><Swords /></div>
         <div className="war-lobby-roster-heading"><div><p className="war-lobby-eyebrow">O CONSELHO SE REÚNE</p><h2 className="text-lg text-gold"><Users className="inline size-5 mr-2 align-[-3px]" /> Comandantes ({players.length}/7)</h2></div><span className="war-lobby-ready">{ready ? "EXÉRCITOS PRONTOS" : "AGUARDANDO COMANDANTES"}</span></div>

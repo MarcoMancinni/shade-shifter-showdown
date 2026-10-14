@@ -2,7 +2,7 @@
 import { civById, type Card, type CostKind, type Resource, type Science } from "./data";
 
 export interface PublicDeck { top: Card | null; count: number }
-export interface PlayerArea { cards: Card[]; stages: number; shields: number; battlePoints?: number; wonderPoints?: number }
+export interface PlayerArea { cards: Card[]; stages: number; shields: number; battlePoints?: number; wonderPoints?: number; progressTokens?: number }
 export interface PublicState {
   civIds?: Record<string, string>;
   seats: string[]; // player ids por assento
@@ -12,6 +12,7 @@ export interface PublicState {
   conflictTokens: number;
   conflictRound?: number;
   lastBattle?: { round: number; results: Record<string, { shields: number; wins: number; points: number }> };
+  lastScience?: { playerId: string; used: string[]; tokenCount: number };
   lastPick?: { playerId: string; source: Source; card: Card | null };
   lastBuild?: { playerId: string; stage: number; used: string[]; points: number; effect?: string } | undefined;
 }
@@ -154,6 +155,35 @@ export function resolveBattle(pub: PublicState): PublicState {
 
 export interface PickResult { pub: PublicState; hidden: HiddenState; nextSeat: number; finished: boolean; card: Card }
 
+/** Retira exatamente 2 simbolos iguais ou 3 diferentes, sem gastar cartas extras. */
+export function scienceCombination(cards: Card[]): string[] | null {
+  const sciences = cards.filter((c) => c.cat === "ciencia" && c.science);
+  for (const kind of ["astro", "engenho", "escrita"] as const) {
+    const pair = sciences.filter((c) => c.science === kind).slice(0, 2);
+    if (pair.length === 2) return pair.map((c) => c.id);
+  }
+  const distinct = (["astro", "engenho", "escrita"] as const)
+    .map((kind) => sciences.find((c) => c.science === kind));
+  return distinct.every((c) => !!c) ? distinct.map((c) => c!.id) : null;
+}
+
+export function claimScienceProgress(area: PlayerArea): { area: PlayerArea; used: string[]; tokenCount: number } | null {
+  const cards = [...area.cards];
+  const used: string[] = [];
+  let count = 0;
+  while (true) {
+    const combination = scienceCombination(cards);
+    if (!combination) break;
+    used.push(...combination);
+    count++;
+    const ids = new Set(combination);
+    for (let i = cards.length - 1; i >= 0; i--) if (ids.has(cards[i]!.id)) cards.splice(i, 1);
+  }
+  if (!used.length) return null;
+  const tokenCount = count;
+  return { area: { ...area, cards, progressTokens: (area.progressTokens ?? 0) + tokenCount }, used, tokenCount };
+}
+
 export function pickCard(
   pub: PublicState, hidden: HiddenState, playerId: string, currentSeat: number, source: Source,
 ): PickResult {
@@ -166,17 +196,20 @@ export function pickCard(
   if (!card) throw new RuleError("Este baralho está vazio.");
 
   const area = pub.areas[playerId]!;
-  const newArea: PlayerArea = {
+  let newArea: PlayerArea = {
     ...area,
     cards: [...area.cards, card],
     shields: area.shields + (card.shields ?? 0),
   };
+  const science = claimScienceProgress(newArea);
+  if (science) newArea = science.area;
   // A evolução é uma ação explícita do jogador, nunca automática na compra.
   const finished = h.central.length === 0 && h.decks.every((d) => d.length === 0);
   const next: PublicState = {
     ...pub,
     areas: { ...pub.areas, [playerId]: newArea },
     lastBuild: undefined,
+    lastScience: science ? { playerId, used: science.used, tokenCount: science.tokenCount } : undefined,
     decks: projectDecks(h),
     central: { count: h.central.length },
     conflictTokens: Math.min(conflictTokenLimit(n), pub.conflictTokens + (card.conflict ?? 0)),

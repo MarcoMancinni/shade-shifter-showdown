@@ -445,10 +445,10 @@ function WonderConstructionCinema({ civ, from, to, onClose }: { civ: Civilizatio
       <div className="wonder-cinema-vignette" />
       <div className="wonder-cinema-rays" aria-hidden="true" />
       <div className="wonder-cinema-scene" aria-hidden="true">
-        {civ.id === "aurelia" ? (
+        {(civ.id === "aurelia" || civ.id === "nihara") ? (
           <>
-            <img className="wonder-cinema-art wonder-cinema-before" src={`/aurelia/etapa-${from}.webp`} alt="" />
-            <img className="wonder-cinema-art wonder-cinema-after" src={`/aurelia/etapa-${to}.webp`} alt="" />
+            <img className="wonder-cinema-art wonder-cinema-before" src={`/${civ.id}/etapa-${from}.webp`} alt="" />
+            <img className="wonder-cinema-art wonder-cinema-after" src={`/${civ.id}/etapa-${to}.webp`} alt="" />
           </>
         ) : (
           <div className="wonder-cinema-other"><Wonder civ={civ} built={to} /></div>

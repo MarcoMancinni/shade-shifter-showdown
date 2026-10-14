@@ -2,7 +2,7 @@
 import { civById, type Card, type CostKind, type Resource, type Science } from "./data";
 
 export interface PublicDeck { top: Card | null; count: number }
-export interface PlayerArea { cards: Card[]; stages: number; shields: number }
+export interface PlayerArea { cards: Card[]; stages: number; shields: number; battlePoints?: number }
 export interface PublicState {
   civIds?: Record<string, string>;
   seats: string[]; // player ids por assento
@@ -10,6 +10,8 @@ export interface PublicState {
   central: { count: number };
   areas: Record<string, PlayerArea>;
   conflictTokens: number;
+  conflictRound?: number;
+  lastBattle?: { round: number; results: Record<string, { shields: number; wins: number; points: number }> };
   lastPick?: { playerId: string; source: Source; card: Card | null };
   lastBuild?: { playerId: string; stage: number; used: string[]; points: number; effect?: string };
 }
@@ -61,7 +63,7 @@ export function setupGame(playerIds: string[], rnd: RandomFn, civIds: Record<str
   const hidden: HiddenState = { decks: hiddenDecks, central };
   const areas: Record<string, PlayerArea> = {};
   for (const id of seats) areas[id] = { cards: [], stages: 0, shields: 0 };
-  return { pub: { seats, civIds, decks: projectDecks(hidden), central: { count: central.length }, areas, conflictTokens: 0 }, hidden };
+  return { pub: { seats, civIds, decks: projectDecks(hidden), central: { count: central.length }, areas, conflictTokens: 0, conflictRound: 0 }, hidden };
 }
 
 function projectDecks(h: HiddenState): PublicDeck[] {
@@ -114,6 +116,41 @@ export function buildAvailableStage(area: PlayerArea, civId?: string) {
   };
 }
 
+/** Resolve o conflito entre vizinhos e descarta soldados com trombeta.
+ * Uma vitória contra um vizinho vale 1 ponto; empate não pontua.
+ * Cada par de jogadores é comparado uma única vez.
+ */
+export function resolveBattle(pub: PublicState): PublicState {
+  const n = pub.seats.length;
+  const results: Record<string, { shields: number; wins: number; points: number }> = {};
+  for (const id of pub.seats) {
+    const area = pub.areas[id]!;
+    results[id] = { shields: area.shields, wins: 0, points: 0 };
+  }
+  for (let i = 0; i < n; i++) {
+    const a = pub.seats[i]!;
+    const b = pub.seats[(i + 1) % n]!;
+    if (n === 2 && i === 1) break; // evitar duelo duplicado com dois jogadores
+    if (results[a]!.shields > results[b]!.shields) results[a]!.wins++;
+    else if (results[b]!.shields > results[a]!.shields) results[b]!.wins++;
+  }
+  const areas: Record<string, PlayerArea> = {};
+  for (const id of pub.seats) {
+    const area = pub.areas[id]!;
+    const discarded = area.cards.filter((card) => card.cat === "militar" && (card.conflict ?? 0) > 0);
+    const removedShields = discarded.reduce((sum, card) => sum + (card.shields ?? 0), 0);
+    const points = results[id]!.wins;
+    results[id]!.points = points;
+    areas[id] = {
+      ...area, cards: area.cards.filter((card) => !discarded.includes(card)),
+      shields: Math.max(0, area.shields - removedShields),
+      battlePoints: (area.battlePoints ?? 0) + points,
+    };
+  }
+  const round = (pub.conflictRound ?? 0) + 1;
+  return { ...pub, areas, conflictTokens: 0, conflictRound: round, lastBattle: { round, results } };
+}
+
 export interface PickResult { pub: PublicState; hidden: HiddenState; nextSeat: number; finished: boolean; card: Card }
 
 export function pickCard(
@@ -144,9 +181,10 @@ export function pickCard(
     conflictTokens: Math.min(conflictTokenLimit(n), pub.conflictTokens + (card.conflict ?? 0)),
     lastPick: { playerId, source, card: source === "centro" ? null : card },
   };
-  return { pub: next, hidden: h, nextSeat: (currentSeat + 1) % n, finished, card };
+  const resolved = next.conflictTokens >= conflictTokenLimit(n) ? resolveBattle(next) : next;
+  return { pub: resolved, hidden: h, nextSeat: (currentSeat + 1) % n, finished, card };
 }
 
 export function publicPoints(area: PlayerArea): number {
-  return area.cards.reduce((s, c) => s + (c.cat === "cultura" ? c.points ?? 0 : 0), 0);
+  return (area.battlePoints ?? 0) + area.cards.reduce((s, c) => s + (c.cat === "cultura" ? c.points ?? 0 : 0), 0);
 }

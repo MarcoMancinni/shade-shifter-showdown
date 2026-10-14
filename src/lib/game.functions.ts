@@ -204,3 +204,25 @@ export const evolveWonder = createServerFn({ method: "POST" })
     if (error || !ok) return { ok: false, error: "A partida mudou. Tente novamente." };
     return { ok: true, stage: result.area.stages };
   });
+
+/** Reabre a mesma sala para uma nova partida, somente pelo anfitriao. */
+export const returnToLobby = createServerFn({ method: "POST" })
+  .inputValidator((d) => auth.extend({ version: z.number().int() }).parse(d))
+  .handler(async ({ data }): Promise<Ok<object> | Err> => {
+    const v = await verify(data);
+    if ("error" in v) return { ok: false, error: v.error! };
+    if (v.room.host_player_id !== v.player.id) return { ok: false, error: "Apenas o anfitrião pode reabrir a sala." };
+    if (v.room.status !== "finished") return { ok: false, error: "A partida ainda não terminou." };
+    if (v.room.version !== data.version) return { ok: false, error: "A sala mudou. Atualize e tente novamente." };
+    const { data: sec, error: secretError } = await v.db.from("room_secrets")
+      .select("hidden_state").eq("room_id", v.room.id).single();
+    if (secretError || !sec) return { ok: false, error: "Não foi possível recuperar a sala." };
+    const { data: ok, error } = await v.db.rpc("commit_room_state", {
+      _room_id: v.room.id, _expected_version: v.room.version, _status: "lobby",
+      _current_seat: 0, _turn_number: 1,
+      _public_state: v.room.public_state as never, _hidden_state: sec.hidden_state as never,
+      _events: [{ type: "retorno_lobby", payload: { playerId: v.player.id } }] as never,
+    });
+    if (error || !ok) return { ok: false, error: "Não foi possível reabrir a sala." };
+    return { ok: true };
+  });

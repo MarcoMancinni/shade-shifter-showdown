@@ -68,7 +68,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   }, [currentCivId, currentStage]);
   useEffect(() => {
     if (!cinematic) return;
-    const timeout = window.setTimeout(() => setCinematic(null), 5200);
+    const timeout = window.setTimeout(() => setCinematic(null), 7600);
     return () => window.clearTimeout(timeout);
   }, [cinematic]);
 
@@ -252,6 +252,10 @@ function WonderConstructionCinema({ civ, from, to, onClose }: { civ: Civilizatio
           <div className="wonder-cinema-other"><Wonder civ={civ} built={to} /></div>
         )}
         <div className="wonder-cinema-scaffold" />
+        <div className="wonder-cinema-crane wonder-cinema-crane-left"><span className="wonder-cinema-rope" /><span className="wonder-cinema-stone" /></div>
+        <div className="wonder-cinema-crane wonder-cinema-crane-right"><span className="wonder-cinema-rope" /><span className="wonder-cinema-stone" /></div>
+        <div className="wonder-cinema-masonry" />
+        <div className="wonder-cinema-foreground" />
         <div className="wonder-cinema-flash" />
         <div className="wonder-cinema-dust" />
         <div className="wonder-cinema-sparks" />

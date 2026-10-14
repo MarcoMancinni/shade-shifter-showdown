@@ -1857,3 +1857,11 @@
 .battle-result-tokens { position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:clamp(12px,3vw,45px); }
 .battle-result-tokens img { display:block;width:clamp(115px,22vw,270px);height:auto;max-height:34vh;object-fit:contain;filter:drop-shadow(0 20px 16px #39200c88); }
 .battle-result-points { position:relative;z-index:2;font:900 clamp(25px,5vw,58px) Georgia,serif;letter-spacing:.08em;color:#6e3517;text-shadow:0 2px #f4d29b; }
+
+/* Crônica da partida */
+.action-feed { position: fixed; top: 4.25rem; right: 1rem; z-index: 30; width: min(280px, 70vw); display: flex; flex-direction: column; gap: .35rem; pointer-events: none; }
+.action-feed-title { font-family: var(--font-display, serif); font-size: .7rem; letter-spacing: .3em; text-transform: uppercase; color: var(--gold, #f5ce75); text-align: right; }
+.action-feed-item { font-size: .8rem; line-height: 1.25; padding: .4rem .65rem; border-radius: .5rem; background: color-mix(in oklab, var(--background) 82%, transparent); border-left: 3px solid var(--gold, #f5ce75); backdrop-filter: blur(4px); box-shadow: 0 4px 12px rgb(0 0 0 / .4); }
+.action-feed-build { border-left-color: oklch(0.78 0.15 85); }
+.action-feed-battle { border-left-color: var(--destructive); }
+@media (max-width: 640px) { .action-feed { display: none; } }

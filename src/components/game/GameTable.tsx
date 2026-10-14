@@ -89,14 +89,19 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   const inspected = inspect && st.areas[inspect] ? { p: byId[inspect], a: st.areas[inspect]! } : null;
   const [cinematic, setCinematic] = useState<{ from: number; to: number } | null>(null);
   const [conflictCinema, setConflictCinema] = useState<{ from: number; to: number; total: number } | null>(null);
-  const lastConflict = useRef<number | null>(null);
+  const lastConflict = useRef<{ tokens: number; round: number } | null>(null);
   useEffect(() => {
     const previous = lastConflict.current;
-    lastConflict.current = st.conflictTokens;
-    if (previous !== null && st.conflictTokens > previous) {
-      setConflictCinema({ from: previous, to: st.conflictTokens, total: conflictTokenLimit(n) });
+    const round = st.conflictRound ?? 0;
+    lastConflict.current = { tokens: st.conflictTokens, round };
+    if (previous === null) return;
+    if (round > previous.round) {
+      // A batalha foi resolvida no servidor e o contador já reiniciou.
+      setConflictCinema({ from: previous.tokens, to: conflictTokenLimit(n), total: conflictTokenLimit(n) });
+    } else if (st.conflictTokens > previous.tokens) {
+      setConflictCinema({ from: previous.tokens, to: st.conflictTokens, total: conflictTokenLimit(n) });
     }
-  }, [st.conflictTokens, n]);
+  }, [st.conflictTokens, st.conflictRound, n]);
   useEffect(() => {
     if (!conflictCinema) return;
     const timer = window.setTimeout(() => setConflictCinema(null), conflictCinema.to === conflictCinema.total ? 5700 : 3200);

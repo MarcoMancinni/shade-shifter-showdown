@@ -1696,3 +1696,83 @@
 @keyframes cinema-foreground { 0% {transform:translateY(15%) scale(1.2)} 50% {transform:translateY(0) scale(1.35)} 100% {transform:translateY(10%) scale(1)} }
 @media (max-width:600px) { .wonder-cinema-crane-left { left:-8%; } .wonder-cinema-crane-right { right:-8%; } .wonder-cinema-masonry { left:6%; right:6%; } }
 @media (prefers-reduced-motion:reduce) { .wonder-cinema-crane,.wonder-cinema-masonry,.wonder-cinema-foreground { display:none; } .wonder-cinema-after { opacity:1;clip-path:none; } }
+
+/* Compact laptop arena (e.g. 13–14 inch MacBook, 1280–1600px wide).
+   Preserve the illustrated desktop composition without overlaps. */
+@media (min-width: 1100px) and (max-width: 1650px) and (max-height: 1000px) {
+  .imperios-arena.arena-v2 { min-height: 100dvh; overflow-x: clip; }
+  .arena-v2 .arena-v2-opponents { padding-top: 0 !important; }
+  .arena-v2 .arena-v2-stage {
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 0 10px 220px !important;
+    align-items: flex-start !important;
+  }
+  .arena-v2 .arena-v2-table {
+    height: auto !important;
+    min-height: 280px !important;
+    padding: 10px 20px !important;
+    gap: 8px !important;
+    justify-content: flex-start !important;
+    transform: none !important;
+  }
+  .arena-v2 .arena-v2-table > p { font-size: 14px !important; line-height: 18px !important; margin: 0 !important; }
+  .arena-v2 .arena-v2-decks { gap: clamp(24px, 3.4vw, 54px) !important; align-items: flex-start !important; }
+  .arena-v2 .arena-v2-decks .arena-deck { gap: 4px !important; }
+  .arena-v2 .arena-v2-decks .arena-deck:not(:nth-child(2)) { transform: translateY(12px) !important; }
+  .arena-v2 .arena-v2-decks .arena-deck > .relative,
+  .arena-v2 .arena-v2-decks .arena-deck .game-card { max-height: 172px !important; max-width: 116px !important; }
+  .arena-v2 .arena-v2-decks .arena-deck > div:first-child { max-height: 172px !important; }
+  .arena-v2 .arena-v2-decks .arena-deck > div:last-child { padding: 3px 8px !important; min-width: 80px !important; }
+  .arena-v2 .arena-v2-decks .arena-deck > div:last-child span { font-size: 11px !important; line-height: 14px !important; }
+  .arena-v2 .arena-corner-wonder {
+    width: clamp(230px, 23vw, 350px) !important;
+    height: clamp(220px, 22vw, 330px) !important;
+    bottom: 26px !important;
+    left: 8px !important;
+  }
+  .arena-v2 .empire-hud-wrap {
+    position: fixed !important;
+    right: clamp(16px, 3vw, 45px) !important;
+    bottom: 12px !important;
+    width: min(850px, calc(100vw - 390px)) !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+  .arena-v2 .empire-hud-wrap .empire-overhead {
+    position: absolute !important;
+    bottom: calc(100% + 8px) !important;
+    left: 22px !important;
+    right: 12px !important;
+    margin: 0 !important;
+    padding: 0 10px !important;
+    align-items: flex-end !important;
+  }
+  .arena-v2 .empire-hud-wrap .empire-overhead-title { font-size: clamp(18px, 2vw, 27px) !important; line-height: 1.05 !important; }
+  .arena-v2 .empire-hud-wrap .empire-overhead-stage,
+  .arena-v2 .empire-hud-wrap .empire-overhead-stats { font-size: 11px !important; }
+  .arena-v2 .empire-hud-wrap .arena-v2-empire {
+    width: 100% !important;
+    min-height: 172px !important;
+    height: auto !important;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, .85fr) !important;
+    gap: 12px !important;
+    padding: 24px 52px 38px 66px !important;
+    margin: 0 !important;
+  }
+  .arena-v2 .empire-hud-wrap .wonder-requirements-header { margin-bottom: 4px !important; }
+  .arena-v2 .empire-hud-wrap .wonder-requirements-header .font-display { font-size: 12px !important; }
+  .arena-v2 .empire-hud-wrap .wonder-cost-label,
+  .arena-v2 .empire-hud-wrap .wonder-resources-caption { font-size: 10px !important; }
+  .arena-v2 .empire-hud-wrap .wonder-progress-row { margin: 5px 0 !important; }
+  .arena-v2 .empire-hud-wrap .wonder-evolve-button { min-height: 35px !important; margin-top: 7px !important; font-size: 12px !important; }
+  .arena-v2 .empire-hud-wrap .empire-hand { max-height: 112px !important; overflow-y: auto !important; }
+}
+@media (min-width: 1100px) and (max-width: 1650px) and (max-height: 760px) {
+  .arena-v2 .arena-v2-stage { padding-bottom: 190px !important; }
+  .arena-v2 .arena-v2-table { min-height: 230px !important; }
+  .arena-v2 .arena-v2-decks .arena-deck > .relative,
+  .arena-v2 .arena-v2-decks .arena-deck .game-card { max-height: 145px !important; max-width: 100px !important; }
+  .arena-v2 .arena-corner-wonder { width: 230px !important; height: 215px !important; }
+  .arena-v2 .empire-hud-wrap .arena-v2-empire { min-height: 158px !important; padding-top: 18px !important; padding-bottom: 34px !important; }
+}

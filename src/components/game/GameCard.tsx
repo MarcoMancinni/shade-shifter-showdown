@@ -45,6 +45,9 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   if (card.cat === "comercio") {
     return <IllustratedResourceCard size={size} resource="moeda" title={cardTitle(card)} />;
   }
+  if (card.cat === "cultura" && card.mascot && card.points === 2) {
+    return <IllustratedResourceCard size={size} resource="conhecimento-gato-2-pontos" title={cardTitle(card)} />;
+  }
   if (card.cat === "cultura" && !card.mascot && card.points === 3) {
     return <IllustratedResourceCard size={size} resource="conhecimento-3-pontos" title={cardTitle(card)} />;
   }
@@ -82,7 +85,7 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   );
 }
 
-function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" | "carta-militar-sem-conflito" | "carta-militar-1-conflito" | "carta-militar-2-conflitos" | "conhecimento-3-pontos" }) {
+function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" | "carta-militar-sem-conflito" | "carta-militar-1-conflito" | "carta-militar-2-conflitos" | "conhecimento-3-pontos" | "conhecimento-gato-2-pontos" }) {
   const [imageFailed, setImageFailed] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [position, setPosition] = useState({ left: 0, top: 0, below: false });

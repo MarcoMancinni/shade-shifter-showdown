@@ -58,4 +58,25 @@ describe("construção automática", () => {
     const area = { cards: [r("p", "pedra"), r("v", "vidro")], stages: 0, shields: 0 };
     expect(buildAvailableStage(area, "draknor").area.shields).toBe(1);
   });
+  const coin = (id: string) => ({ id, cat: "comercio" as const });
+  it("usa uma moeda para completar dois recursos diferentes", () => {
+    const area = { cards: [r("p", "pedra"), coin("c")], stages: 0, shields: 0 };
+    const result = buildAvailableStage(area, "aurelia");
+    expect(result.area.stages).toBe(1);
+    expect(result.build?.used).toEqual(["p", "c"]);
+    expect(result.area.cards).toHaveLength(0);
+  });
+  it("usa uma moeda para completar dois recursos iguais", () => {
+    expect(resourcesForCost([r("p", "pedra"), coin("c")], "2ig")).toEqual(["p", "c"]);
+  });
+  it("duas moedas podem completar requisito de dois materiais", () => {
+    expect(resourcesForCost([coin("c1"), coin("c2")], "2dif")).toEqual(["c1", "c2"]);
+  });
+  it("moeda nao e consumida quando materiais ja sao suficientes", () => {
+    expect(resourcesForCost([r("p", "pedra"), r("v", "vidro"), coin("c")], "2dif")).toEqual(["p", "v"]);
+  });
+  it("moedas insuficientes nao liberam construcao", () => {
+    expect(resourcesForCost([r("p", "pedra"), coin("c")], "3dif")).toBeNull();
+  });
+
 });

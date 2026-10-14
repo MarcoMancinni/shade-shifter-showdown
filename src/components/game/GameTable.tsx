@@ -45,6 +45,33 @@ function ConflictCinematic({ from, to, total, onClose }: { from: number; to: num
   );
 }
 
+function BattleResultCinema({ wins, onClose }: { wins: number; onClose: () => void }) {
+  const reduced = useReducedMotion();
+  const title = wins === 0 ? "DERROTA" : "VITÓRIA";
+  return (
+    <motion.div className={cn("conflict-cinema battle-result-cinema", reduced && "conflict-cinema-reduced")}
+      role="dialog" aria-modal="true" aria-label={wins === 0 ? "Derrota. Retirar tropas." : `Vitória. ${wins} fichas de três pontos.`}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <div className="conflict-cinema-vignette" />
+      <motion.h2 className="battle-result-title" initial={reduced ? {} : { scale: 1.7, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }} transition={{ duration: .75 }}>{title}</motion.h2>
+      {wins === 0 ? <p className="battle-result-subtitle">RETIRAR TROPAS</p> : <>
+        <p className="battle-result-subtitle">{wins === 1 ? "UMA FICHA DE VITÓRIA" : "DUAS FICHAS DE VITÓRIA"}</p>
+        <div className="battle-result-tokens">
+          {Array.from({ length: wins }, (_, i) => (
+            <motion.img key={i} src="/ficha-vitoria-militar-3-pontos.webp" alt="Ficha militar de 3 pontos"
+              initial={reduced ? {} : { opacity: 0, y: -110, rotate: -30, scale: 1.7 }}
+              animate={{ opacity: 1, y: 0, rotate: i === 0 ? -8 : 8, scale: 1 }}
+              transition={{ type: "spring", stiffness: 100, damping: 14, delay: .65 + i * .55 }} />
+          ))}
+        </div>
+        <strong className="battle-result-points">+{wins * 3} PONTOS</strong>
+      </>}
+      <button className="conflict-cinema-skip" onClick={onClose}>Continuar</button>
+    </motion.div>
+  );
+}
+
 export function GameTable({ room, players, session, code }: { room: RoomRow; players: PlayerRow[]; session: Session; code: string }) {
   const take = useServerFn(takeCard);
   const evolve = useServerFn(evolveWonder);
@@ -89,6 +116,9 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   const inspected = inspect && st.areas[inspect] ? { p: byId[inspect], a: st.areas[inspect]! } : null;
   const [cinematic, setCinematic] = useState<{ from: number; to: number } | null>(null);
   const [conflictCinema, setConflictCinema] = useState<{ from: number; to: number; total: number } | null>(null);
+  const [battleResult, setBattleResult] = useState<{ round: number; wins: number } | null>(null);
+  const battleTimer = useRef<number | null>(null);
+  useEffect(() => () => { if (battleTimer.current !== null) window.clearTimeout(battleTimer.current); }, []);
   const lastConflict = useRef<{ tokens: number; round: number } | null>(null);
   useEffect(() => {
     const previous = lastConflict.current;
@@ -98,10 +128,16 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
     if (round > previous.round) {
       // A batalha foi resolvida no servidor e o contador já reiniciou.
       setConflictCinema({ from: previous.tokens, to: conflictTokenLimit(n), total: conflictTokenLimit(n) });
+      if (battleTimer.current !== null) window.clearTimeout(battleTimer.current);
+      const wins = st.lastBattle?.results?.[session.playerId]?.wins ?? 0;
+      battleTimer.current = window.setTimeout(() => {
+        setConflictCinema(null);
+        setBattleResult({ round, wins });
+      }, 5700);
     } else if (st.conflictTokens > previous.tokens) {
       setConflictCinema({ from: previous.tokens, to: st.conflictTokens, total: conflictTokenLimit(n) });
     }
-  }, [st.conflictTokens, st.conflictRound, n]);
+  }, [st.conflictTokens, st.conflictRound, st.lastBattle, n, session.playerId]);
   useEffect(() => {
     if (!conflictCinema) return;
     const timer = window.setTimeout(() => setConflictCinema(null), conflictCinema.to === conflictCinema.total ? 5700 : 3200);
@@ -255,6 +291,9 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
         {conflictCinema && !cinematic && (
           <ConflictCinematic key={`${conflictCinema.from}-${conflictCinema.to}`} {...conflictCinema} onClose={() => setConflictCinema(null)} />
         )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {battleResult && <BattleResultCinema key={battleResult.round} wins={battleResult.wins} onClose={() => setBattleResult(null)} />}
       </AnimatePresence>
       <AnimatePresence>
         {cinematic && myCiv && (

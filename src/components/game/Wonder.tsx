@@ -1,5 +1,5 @@
-import { motion, useReducedMotion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import type { Civilization } from "@/lib/game/data";
 
 /** Monumento 2.5D progressivo. As cinco etapas refletem apenas o estado do servidor. */
@@ -9,6 +9,16 @@ export function Wonder({ civ, built, size = "md" }: { civ: Civilization; built: 
   const completed = Math.max(0, Math.min(civ.stages.length, built));
   const kind = civ.id;
   const [assetFailed, setAssetFailed] = useState(false);
+  const previousStage = useRef(completed);
+  const [celebration, setCelebration] = useState<number | null>(null);
+  useEffect(() => {
+    const previous = previousStage.current;
+    previousStage.current = completed;
+    if (completed <= previous || reducedMotion) return;
+    setCelebration(completed);
+    const timer = window.setTimeout(() => setCelebration(null), 1700);
+    return () => window.clearTimeout(timer);
+  }, [completed, reducedMotion]);
   const useAureliaImage = kind === "aurelia" && !assetFailed;
   const aureliaSrc = `/aurelia/etapa-${completed}.webp`;
   useEffect(() => { setAssetFailed(false); }, [aureliaSrc]);
@@ -22,22 +32,39 @@ export function Wonder({ civ, built, size = "md" }: { civ: Civilization; built: 
     >
       <div className="wonder-aura" aria-hidden="true" />
       {useAureliaImage ? (
-        <motion.img
-          className="wonder-artwork"
-          key={aureliaSrc}
-          src={aureliaSrc}
-          alt=""
-          draggable={false}
-          onError={() => setAssetFailed(true)}
-          initial={reducedMotion ? false : { opacity: 0.65 }}
-          animate={{
-            opacity: 1,
-          }}
-          transition={reducedMotion ? { duration: 0 } : { duration: 0.7, ease: "easeOut" }}
-        />
+        <AnimatePresence initial={false} mode="sync">
+          <motion.img
+            className="wonder-artwork"
+            key={aureliaSrc}
+            src={aureliaSrc}
+            alt=""
+            draggable={false}
+            onError={() => setAssetFailed(true)}
+            initial={reducedMotion ? false : { opacity: 0, scale: 0.94, y: 12, filter: "brightness(1.7) blur(5px)" }}
+            animate={{ opacity: 1, scale: 1, y: 0, filter: "brightness(1) blur(0px)" }}
+            exit={reducedMotion ? undefined : { opacity: 0, scale: 0.98, filter: "brightness(1.4) blur(3px)" }}
+            transition={{ duration: reducedMotion ? 0 : 1.1, ease: [0.22, 1, 0.36, 1] }}
+          />
+        </AnimatePresence>
       ) : (
         <MonumentSilhouette civId={civ.id} built={completed} />
       )}
+      <AnimatePresence>
+        {celebration !== null && (
+          <motion.div
+            key={celebration}
+            className="wonder-construction-effect"
+            aria-hidden="true"
+            initial={{ opacity: 0, scale: 0.65 }}
+            animate={{ opacity: [0, 0.9, 0.5, 0], scale: [0.65, 1, 1.12, 1.25] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.6, times: [0, 0.25, 0.65, 1] }}
+          >
+            <span className="wonder-construction-rays" />
+            <span className="wonder-construction-dust" />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="wonder-ground" aria-hidden="true" />
       <div className="wonder-architecture" aria-hidden="true">
         {civ.stages.map((stage, i) => {

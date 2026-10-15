@@ -2056,3 +2056,59 @@ body:has(.imperial-finale-v2) {overflow:hidden;}
 .imperial-finale-v2-art>div {display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;width:100%!important;}
 .imperial-finale-v2-wonder-image {display:block;width:min(100%,540px);max-width:540px;max-height:430px;height:auto;object-fit:contain;filter:drop-shadow(0 22px 22px #000b) drop-shadow(0 0 26px #f4bd4933);margin:auto;}
 @media(max-width:760px){.imperial-finale-v2-art{min-height:200px!important}.imperial-finale-v2-wonder-image{max-height:280px;width:min(100%,390px)}}
+
+/* ===== Mesa mobile ===== */
+@media (max-width: 767px) {
+  html, body { overflow-x: hidden; }
+  .arena-ambient, .action-feed { display: none !important; }
+  .conflict-cinema-skip { bottom: calc(env(safe-area-inset-bottom) + 16px) !important; min-height: 44px; }
+  .conflict-cinema-heading, .battle-result-title { font-size: clamp(1.4rem, 8vw, 2.4rem) !important; max-width: 92vw; text-align: center; }
+  .wonder-cinema-scene { max-width: 94vw; }
+}
+.m-table { display: flex; min-height: 100dvh; flex-direction: column; padding-top: env(safe-area-inset-top); padding-bottom: calc(76px + env(safe-area-inset-bottom)); max-width: 100vw; overflow-x: hidden; position: relative; z-index: 10; }
+.m-top { position: sticky; top: 0; z-index: 30; background: color-mix(in oklab, var(--background) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid color-mix(in oklab, var(--gold) 30%, transparent); padding: 8px 12px 6px; }
+.m-top-row { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 8px; }
+.m-top-meta { font-size: 12px; color: var(--muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m-top-war { display: flex; align-items: center; gap: 3px; }
+.m-war-dot { width: 9px; height: 9px; border-radius: 999px; border: 1px solid var(--gold); background: transparent; }
+.m-war-dot.is-on { background: var(--cat-militar, var(--destructive)); box-shadow: 0 0 6px var(--destructive); }
+.m-avatars { display: flex; gap: 8px; overflow-x: auto; padding: 8px 2px 2px; scrollbar-width: none; }
+.m-avatars::-webkit-scrollbar { display: none; }
+.m-avatar { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 56px; min-height: 44px; }
+.m-avatar-seal { width: 38px; height: 38px; border-radius: 999px; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; color: var(--background); background: radial-gradient(circle at 35% 30%, oklch(0.85 0.12 calc(var(--civ-hue) * 1deg)), oklch(0.5 0.12 calc(var(--civ-hue) * 1deg))); border: 2px solid color-mix(in oklab, var(--gold) 60%, transparent); }
+.m-avatar.is-me .m-avatar-seal { border-style: dashed; }
+.m-avatar.is-active .m-avatar-seal { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold), 0 0 14px var(--gold); animation: m-pulse 1.6s ease-in-out infinite; }
+.m-avatar-name { font-size: 11px; max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-avatar-pts { font-size: 10px; color: var(--gold); }
+@keyframes m-pulse { 50% { box-shadow: 0 0 0 2px var(--gold), 0 0 4px var(--gold); } }
+.m-center { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 16px 10px; }
+.m-turn { margin: 0 auto 18px; padding: 8px 16px; border-radius: 999px; font-family: var(--font-display); font-size: 15px; text-align: center; border: 1px solid color-mix(in oklab, var(--gold) 30%, transparent); background: color-mix(in oklab, var(--card) 80%, transparent); }
+.m-turn.is-mine { color: var(--background); background: linear-gradient(180deg, var(--gold), color-mix(in oklab, var(--gold) 60%, var(--bronze, var(--gold)))); box-shadow: 0 0 18px color-mix(in oklab, var(--gold) 50%, transparent); }
+.m-decks { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; max-width: 360px; width: 100%; margin: 0 auto; }
+.m-deck { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+.m-deck:disabled { opacity: .45; }
+.m-deck-label { font-family: var(--font-display); font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); }
+.m-deck-card { width: 100%; max-width: 110px; aspect-ratio: 2/3; border-radius: 10px; box-shadow: 0 10px 20px rgb(0 0 0 / .5); transition: transform .15s; }
+.m-deck:active .m-deck-card { transform: scale(.96); }
+.m-deck-count { font-size: 11px; color: var(--muted-foreground); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-card-fit, .m-card-fit-sm { width: 100%; height: 100%; aspect-ratio: 2/3; display: block; }
+.m-card-fit > div, .m-card-fit-sm > div { width: 100% !important; height: 100% !important; }
+.m-dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); background: linear-gradient(180deg, color-mix(in oklab, var(--card) 92%, transparent), var(--background)); border-top: 2px solid color-mix(in oklab, var(--gold) 45%, transparent); }
+.m-dock-btn { display: grid; grid-template-rows: auto auto; grid-template-columns: auto auto; justify-content: center; align-items: center; column-gap: 4px; min-height: 56px; border-radius: 10px; color: var(--foreground); }
+.m-dock-btn:active { background: color-mix(in oklab, var(--gold) 15%, transparent); }
+.m-dock-icon { grid-row: 1; grid-column: 1 / 3; justify-self: center; color: var(--gold); }
+.m-dock-icon svg { width: 22px; height: 22px; }
+.m-dock-label { font-size: 11px; }
+.m-dock-value { font-size: 11px; font-weight: 700; color: var(--gold); }
+.m-dock-btn.is-glow { animation: m-glow 1.4s ease-in-out infinite; }
+@keyframes m-glow { 50% { background: color-mix(in oklab, var(--gold) 28%, transparent); box-shadow: 0 0 14px color-mix(in oklab, var(--gold) 50%, transparent); } }
+.m-drawer { max-height: 80dvh; }
+.m-drawer-body { overflow-y: auto; padding: 0 16px calc(20px + env(safe-area-inset-bottom)); }
+.m-wonder-art { max-width: 260px; width: 100%; display: flex; justify-content: center; }
+.m-stat { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 10px; border: 1px solid color-mix(in oklab, var(--gold) 25%, transparent); background: color-mix(in oklab, var(--card) 80%, transparent); font-size: 15px; }
+.m-zoom { position: fixed; inset: 0; z-index: 9998; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); background: color-mix(in oklab, var(--background) 88%, transparent); backdrop-filter: blur(6px); animation: m-fade .18s ease-out; }
+.m-zoom-card { width: min(68vw, 300px, 52dvh); aspect-ratio: 2/3; filter: drop-shadow(0 18px 40px rgb(0 0 0 / .7)); }
+.m-zoom-title { font-family: var(--font-display); color: var(--gold); font-size: 18px; text-align: center; }
+.m-zoom-take { min-height: 52px; width: min(90vw, 320px); font-size: 16px; }
+.m-zoom-close { position: absolute; top: calc(12px + env(safe-area-inset-top)); right: 12px; width: 44px; height: 44px; display: grid; place-items: center; color: var(--gold); }
+@keyframes m-fade { from { opacity: 0; transform: scale(.97); } }

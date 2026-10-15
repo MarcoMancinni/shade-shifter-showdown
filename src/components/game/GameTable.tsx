@@ -13,6 +13,8 @@ import { GameCard } from "./GameCard";
 import { Wonder } from "./Wonder";
 import { cn } from "@/lib/utils";
 import { ActionFeed, useTurnAlert } from "./ActionFeed";
+import { MobileTable } from "./MobileTable";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const PROGRESS_INFO: Record<string, { name: string; effect: string; symbol: string }> = {
   engenharia: { name: "Engenharia", effect: "Construa etapas com quaisquer recursos, ignorando iguais ou diferentes.", symbol: "⚙" },
@@ -51,10 +53,10 @@ function ProgressBlueprint({ options, onChoose, busy, error }: { options: string
             const hidden = index === 3;
             return <motion.button key={index} type="button" disabled={busy || (!info && !hidden)} onClick={() => onChoose(index)}
               whileHover={{ y: -10, scale: 1.04 }} whileTap={{ scale: .97 }}
-              className="group flex min-h-52 flex-col items-center justify-center rounded-xl border-4 border-[#aa7a32] bg-[#162c2b] px-3 py-5 text-[#f5dfad] shadow-[inset_0_0_0_3px_#e5bd6a,0_14px_22px_#261a1666] transition hover:shadow-[0_0_36px_#f2cc7b99] disabled:opacity-60 sm:min-h-72"
+              className="group flex min-h-36 flex-col sm:min-h-52 items-center justify-center rounded-xl border-4 border-[#aa7a32] bg-[#162c2b] px-3 py-5 text-[#f5dfad] shadow-[inset_0_0_0_3px_#e5bd6a,0_14px_22px_#261a1666] transition hover:shadow-[0_0_36px_#f2cc7b99] disabled:opacity-60 sm:min-h-72"
               style={{ background: hidden ? "repeating-linear-gradient(45deg,#1b2d2d,#1b2d2d 13px,#273d39 14px,#273d39 16px)" : "radial-gradient(circle at 50% 30%,#40625b,#152826 75%)" }}>
               <span className="text-[10px] uppercase tracking-[.2em] text-[#d5b676]">{hidden ? "Ficha oculta" : "Ficha revelada"}</span>
-              <span className="my-4 flex size-20 items-center justify-center rounded-full border-[5px] border-[#c49b50] bg-[#162927] font-display text-5xl text-[#e9ca7b] shadow-[0_0_0_4px_#513e24,0_0_30px_#e0b75c44] sm:size-24">{hidden ? "?" : info?.symbol}</span>
+              <span className="my-2 flex size-14 sm:my-4 sm:size-20 items-center justify-center rounded-full border-[5px] border-[#c49b50] bg-[#162927] font-display text-5xl text-[#e9ca7b] shadow-[0_0_0_4px_#513e24,0_0_30px_#e0b75c44] sm:size-24">{hidden ? "?" : info?.symbol}</span>
               <strong className="font-display text-lg uppercase tracking-wide">{hidden ? "Mistério" : info?.name}</strong>
               <p className="mt-2 text-center text-xs leading-relaxed text-[#e5d9b9]">{hidden ? "Uma ficha surpresa. Descubra seu efeito após escolher." : info?.effect}</p>
               <span className="mt-auto pt-5 text-xs font-bold uppercase tracking-widest text-[#ffdd88]">{busy ? "Aguarde..." : "Escolher ficha"}</span>
@@ -353,6 +355,10 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
     return () => window.clearTimeout(timeout);
   }, [cinematic]);
   useTurnAlert(myTurn);
+  const isMobile = useIsMobile();
+  const nextStage = me && myCiv ? myCiv.stages[me.stages] : undefined;
+  const nextProg = nextStage && me ? requirementProgress(me.cards, nextStage.cost) : null;
+  const wonderReady = !!nextProg && nextProg.current >= nextProg.required && room.status === "playing";
   const names = Object.fromEntries(players.map((p) => [p.id, p.nickname]));
 
   return (
@@ -370,6 +376,14 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
         <span className="arena-ambient-fire arena-ambient-fire-midright" />
         <span className="arena-ambient-fire arena-ambient-fire-right" />
       </div>
+      {isMobile && room.status === "playing" ? (
+        <MobileTable st={st} code={code} turn={room.turn_number} players={players} meId={session.playerId}
+          activeId={activeId} viewSeat={viewSeat} myTurn={myTurn} busy={busy} error={error}
+          leftDeck={leftDeck} rightDeck={rightDeck} me={me} myCiv={myCiv}
+          progressNames={Object.fromEntries(Object.entries(PROGRESS_INFO).map(([k, v]) => [k, v.name]))}
+          wonderReady={wonderReady} onPick={pick} onInspect={setInspect}
+          renderRequirements={() => me && myCiv ? <WonderRequirements civ={myCiv} built={me.stages} cards={me.cards} onEvolve={buildWonder} evolving={evolving} canPlay /> : null} />
+      ) : (<>
       <header className="arena-hud relative z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-3">
         <Link to="/" className="font-display text-gold">Impérios</Link>
         <div className="flex items-center gap-4 text-sm">
@@ -479,6 +493,8 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
         </section>
         </div>
       )}
+      </>)}
+
 
       <AnimatePresence>
         {conflictCinema && !cinematic && (

@@ -77,7 +77,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "Impérios: A Era das Maravilhas" },
       { name: "description", content: "Jogo de tabuleiro online de civilizações e maravilhas para 2 a 7 jogadores." },
       { property: "og:type", content: "website" },

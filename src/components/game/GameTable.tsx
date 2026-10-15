@@ -428,7 +428,7 @@ export function GameTable({ room, players, session, code, connected = true }: { 
           ) : (
             <>
               <p className={cn("font-display text-lg", myTurn ? "text-gold" : "text-foreground")}>
-                {myTurn ? "Sua vez: escolha uma carta" : `Vez de ${(activeId ? byId[activeId]?.nickname : undefined) ?? "…"}`}
+                {myTurn ? (me?.extraPickActive ? "Carta extra: escolha uma carta" : "Sua vez: escolha uma carta") : `Vez de ${(activeId ? byId[activeId]?.nickname : undefined) ?? "…"}`}
               </p>
               <div className="arena-decks arena-v2-decks flex w-full max-w-[760px] items-end justify-center gap-5 sm:gap-9 lg:gap-14">
                 <DeckSlot label="Esquerda" count={leftDeck.count} enabled={myTurn && !busy && leftDeck.count > 0} onClick={() => pick("esquerda")}>

@@ -2,7 +2,7 @@
 import { civById, type Card, type CostKind, type Resource, type Science } from "./data";
 
 export interface PublicDeck { top: Card | null; count: number }
-export interface PlayerArea { cards: Card[]; stages: number; shields: number; battlePoints?: number; wonderPoints?: number; progressTokens?: number; progressChosen?: string[]; extraPicks?: number }
+export interface PlayerArea { cards: Card[]; stages: number; shields: number; battlePoints?: number; wonderPoints?: number; progressTokens?: number; progressChosen?: string[]; extraPicks?: number; extraPickActive?: boolean }
 export interface PublicState {
   civIds?: Record<string, string>;
   seats: string[]; // player ids por assento
@@ -255,10 +255,11 @@ export function pickCard(
     (tokens.includes("manufatura") && card.cat === "recurso" ? 1 : 0) +
     (tokens.includes("joalheria") && (card.cat === "recurso" || card.cat === "comercio") ? 1 : 0) +
     (tokens.includes("propaganda") && card.cat === "militar" && (card.conflict ?? 0) > 0 ? 1 : 0);
-  const extraPicks = Math.max(0, (area.extraPicks ?? 0) - 1) + bonus;
+  const extraPicks = Math.max(0, (area.extraPicks ?? 0) - (area.extraPickActive ? 1 : 0)) + bonus;
   let newArea: PlayerArea = {
     ...area,
     extraPicks,
+    extraPickActive: extraPicks > 0,
     cards: [...area.cards, card],
     shields: area.shields + (card.shields ?? 0),
   };

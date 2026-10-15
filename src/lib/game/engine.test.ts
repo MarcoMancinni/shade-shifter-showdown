@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { setupGame, pickCard, RuleError, buildDeck, resourcesForCost, buildAvailableStage, scienceCombination, claimScienceProgress, scoreBreakdown } from "./engine";
+import { setupGame, pickCard, RuleError, buildDeck, resourcesForCost, buildAvailableStage, scienceCombination, claimScienceProgress, scoreBreakdown, resolveBattle, type Card } from "./engine";
 
 const rnd = (m: number) => Math.floor(Math.random() * m);
 
@@ -145,5 +145,55 @@ describe("efeitos de fichas de progresso", () => {
   it("educação dá 2 pontos por ficha de progresso", () => {
     const area = { cards: [], stages: 0, shields: 0, progressChosen: ["educacao", "cultura"] };
     expect(scoreBreakdown(area).progress).toBe(4); // educacao (2*2); cultura has no defined scoring rule.
+  });
+});
+
+describe("extra card effects and finalization", () => {
+  const resource: Card = { id: "extra-r", cat: "recurso", resource: "pedra" };
+  const coin: Card = { id: "extra-c", cat: "comercio" };
+  const green: Card = { id: "extra-g", cat: "ciencia", science: "astro" };
+  const soldier: Card = { id: "extra-m", cat: "militar", shields: 1, conflict: 1 };
+  it.each([
+    ["urbanismo", resource], ["manufatura", resource], ["joalheria", resource],
+    ["joalheria", coin], ["ciencia", green], ["propaganda", soldier],
+  ] as const)("%s grants a chosen extra pick only for its matching card", (token, card) => {
+    const { pub, hidden } = setupGame(["a", "b"], () => 0);
+    const id = pub.seats[0];
+    if (!id || !pub.areas[id]) throw new Error("Missing fixture");
+    pub.areas[id].progressChosen = [token];
+    hidden.decks[0] = [card, { id: "blue", cat: "cultura", points: 3 }];
+    const first = pickCard(pub, hidden, id, 0, "esquerda");
+    expect(first.nextSeat).toBe(0);
+    expect(first.pub.areas[id]?.extraPicks).toBe(1);
+    const second = pickCard(first.pub, first.hidden, id, 0, "esquerda");
+    expect(second.nextSeat).toBe(1);
+    expect(second.pub.areas[id]?.extraPicks).toBe(0);
+  });
+  it("architecture queues a pick after building without losing the regular pick", () => {
+    const { pub, hidden } = setupGame(["a", "b"], () => 0);
+    const id = pub.seats[0];
+    if (!id || !pub.areas[id]) throw new Error("Missing fixture");
+    pub.areas[id] = buildAvailableStage({ cards: [resource, { id: "wood", cat: "recurso", resource: "madeira" }], stages: 0, shields: 0, progressChosen: ["arquitetura"] }, "aurelia").area;
+    hidden.decks[0] = [coin, { ...coin, id: "second" }];
+    const first = pickCard(pub, hidden, id, 0, "esquerda");
+    expect(first.nextSeat).toBe(0);
+    expect(pickCard(first.pub, first.hidden, id, 0, "esquerda").nextSeat).toBe(1);
+  });
+  it("extra effects never keep an exhausted game open", () => {
+    const { pub, hidden } = setupGame(["a", "b"], () => 0);
+    const id = pub.seats[0];
+    if (!id || !pub.areas[id]) throw new Error("Missing fixture");
+    pub.areas[id].progressChosen = ["urbanismo"];
+    hidden.decks = [[resource], []]; hidden.central = [];
+    expect(pickCard(pub, hidden, id, 0, "esquerda").finished).toBe(true);
+  });
+  it("battle awards three points per victory and preserves permanent shields", () => {
+    const { pub } = setupGame(["a", "b"], () => 0);
+    pub.areas["a"] = { cards: [soldier], stages: 0, shields: 3, progressChosen: ["tatica"] };
+    pub.areas["b"] = { cards: [], stages: 0, shields: 0 };
+    const battle = resolveBattle(pub);
+    expect(battle.areas["a"]?.battlePoints).toBe(3);
+    expect(battle.areas["a"]?.shields).toBe(2);
+    expect(battle.areas["a"]?.cards).toHaveLength(0);
   });
 });

@@ -13,6 +13,8 @@ import { GameCard } from "./GameCard";
 import { Wonder } from "./Wonder";
 import { cn } from "@/lib/utils";
 import { ActionFeed, useTurnAlert } from "./ActionFeed";
+import { MobileTable } from "./MobileTable";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const PROGRESS_INFO: Record<string, { name: string; effect: string; symbol: string }> = {
   engenharia: { name: "Engenharia", effect: "Construa etapas com quaisquer recursos, ignorando iguais ou diferentes.", symbol: "⚙" },
@@ -353,6 +355,10 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
     return () => window.clearTimeout(timeout);
   }, [cinematic]);
   useTurnAlert(myTurn);
+  const isMobile = useIsMobile();
+  const nextStage = me && myCiv ? myCiv.stages[me.stages] : undefined;
+  const nextProg = nextStage && me ? requirementProgress(me.cards, nextStage.cost) : null;
+  const wonderReady = !!nextProg && nextProg.current >= nextProg.required && room.status === "playing";
   const names = Object.fromEntries(players.map((p) => [p.id, p.nickname]));
 
   return (
@@ -370,6 +376,14 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
         <span className="arena-ambient-fire arena-ambient-fire-midright" />
         <span className="arena-ambient-fire arena-ambient-fire-right" />
       </div>
+      {isMobile && room.status === "playing" ? (
+        <MobileTable st={st} code={code} turn={room.turn_number} players={players} meId={session.playerId}
+          activeId={activeId} viewSeat={viewSeat} myTurn={myTurn} busy={busy} error={error}
+          leftDeck={leftDeck} rightDeck={rightDeck} me={me} myCiv={myCiv}
+          progressNames={Object.fromEntries(Object.entries(PROGRESS_INFO).map(([k, v]) => [k, v.name]))}
+          wonderReady={wonderReady} onPick={pick} onInspect={setInspect}
+          renderRequirements={() => me && myCiv ? <WonderRequirements civ={myCiv} built={me.stages} cards={me.cards} onEvolve={buildWonder} evolving={evolving} canPlay /> : null} />
+      ) : (<>
       <header className="arena-hud relative z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-3">
         <Link to="/" className="font-display text-gold">Impérios</Link>
         <div className="flex items-center gap-4 text-sm">
@@ -479,6 +493,8 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
         </section>
         </div>
       )}
+      </>)}
+
 
       <AnimatePresence>
         {conflictCinema && !cinematic && (

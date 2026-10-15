@@ -183,7 +183,7 @@ export function MobileTable(p: MobileTableProps) {
             )}
             {tab === "pontos" && score && (
               <div className="space-y-2">
-                {([["Maravilha", score.wonder], ["Cultura", score.culture], ["Batalha", score.military]] as const).map(([l, v]) => (
+                {([["Maravilha", score.wonder], ["Cultura", score.culture], ["Batalha", score.military], ["Progresso", score.progress]] as const).map(([l, v]) => (
                   <div key={l} className="m-stat justify-between"><span>{l}</span><strong>{v}</strong></div>
                 ))}
                 <div className="m-stat justify-between border-gold text-gold"><span><Star className="inline size-4" /> Total</span><strong>{score.total}</strong></div>

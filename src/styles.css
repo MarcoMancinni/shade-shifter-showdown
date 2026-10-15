@@ -2146,7 +2146,7 @@ body:has(.imperial-finale-v2) {overflow:hidden;}
   .m-avatar-seal { width: 26px; height: 26px; }
   .m-center { padding-block: 8px; }
   .m-turn { margin-bottom: 8px; padding: 4px 12px; }
-  .m-decks { max-width: min(100%, max(180px, calc((100dvh - 255px) * 2))); }
+  .m-decks { max-width: min(100%, max(180px, calc((100dvh - 290px) * 2))); }
   .m-deck-from, .m-deck-count { font-size: 10px; line-height: 12px; }
   .m-deck { gap: 3px; }
   .m-wonder-art .wonder-scene { width: 150px; height: 100px; }

@@ -1,4 +1,9 @@
 # Roadmap
+## Correções finais e PWA — solicitação de 15/10/2026
+- [ ] Auditar regras, pontuação, controles mobile e multiplayer; corrigir defeitos reproduzidos sem alterar regras.
+- [ ] Adicionar instalação Android/iOS, ícones, manifesto, cache estático seguro e atualização sem recarga automática.
+- [ ] Implementar aviso offline, bloqueio de ações e recuperação após reconexão/segundo plano.
+- [ ] Executar testes automatizados e fluxos reais disponíveis; entregar relatório com limites e publicação.
 ## Auditoria mobile aprovada
 - [x] Entrega 1 — auditoria, cabeçalho/baralhos/menu/painéis/detecção e validação estrutural concluídos; relatório entregue.
 - [ ] Entrega 2 — interações e seleção de Progresso; bloqueada até aprovação do usuário.

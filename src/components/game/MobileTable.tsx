@@ -108,7 +108,7 @@ export function MobileTable(p: MobileTableProps) {
 
       <section className="m-center">
         <div className={cn("m-turn", p.myTurn && "is-mine")} role="status">
-          {p.myTurn ? "★ Sua vez — toque numa carta" : `Vez de ${activeName ?? "…"}`}
+          {p.myTurn ? (me?.extraPicks ? "★ Carta extra — escolha uma carta" : "★ Sua vez — toque numa carta") : `Vez de ${activeName ?? "…"}`}
         </div>
         <div className="m-decks">
           {decks.map((d) => (

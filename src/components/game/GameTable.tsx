@@ -63,7 +63,6 @@ function ProgressBlueprint({ options, onChoose, busy, error }: { options: string
             </motion.button>;
           })}
         </div>
-        <p className="relative mt-6 text-center text-xs font-semibold text-[#6d4324]">As fichas são registradas no servidor. Efeitos especiais ainda estão sendo integrados às regras.</p>
         {error && <p role="alert" className="relative mt-2 text-center font-bold text-red-800">{error}</p>}
       </motion.section>
     </motion.div>, document.body

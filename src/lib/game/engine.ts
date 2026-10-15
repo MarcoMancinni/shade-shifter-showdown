@@ -2,7 +2,7 @@
 import { civById, type Card, type CostKind, type Resource, type Science } from "./data";
 
 export interface PublicDeck { top: Card | null; count: number }
-export interface PlayerArea { cards: Card[]; stages: number; shields: number; battlePoints?: number; wonderPoints?: number; progressTokens?: number; progressChosen?: string[] }
+export interface PlayerArea { cards: Card[]; stages: number; shields: number; battlePoints?: number; wonderPoints?: number; progressTokens?: number; progressChosen?: string[]; extraPicks?: number }
 export interface PublicState {
   civIds?: Record<string, string>;
   seats: string[]; // player ids por assento
@@ -162,6 +162,7 @@ export function buildAvailableStage(area: PlayerArea, civId?: string) {
   const ids = new Set(used);
   return {
     area: { ...area, stages: area.stages + 1, cards: area.cards.filter((c) => !ids.has(c.id)),
+      extraPicks: (area.extraPicks ?? 0) + (tokens.includes("arquitetura") ? 1 : 0),
       shields: area.shields + (stage.effect === "+1 escudo" ? 1 : stage.effect === "+2 escudos" ? 2 : 0),
       wonderPoints: (area.wonderPoints ?? civ.stages.slice(0, area.stages).reduce((sum, stage) => sum + stage.points, 0)) + stage.points },
     build: { stage: area.stages + 1, used, points: stage.points, ...(stage.effect ? { effect: stage.effect } : {}) },
@@ -248,8 +249,16 @@ export function pickCard(
   if (!card) throw new RuleError("Este baralho está vazio.");
 
   const area = pub.areas[playerId]!;
+  const tokens = area.progressChosen ?? [];
+  const bonus = (tokens.includes("ciencia") && card.cat === "ciencia" ? 1 : 0) +
+    (tokens.includes("urbanismo") && card.cat === "recurso" ? 1 : 0) +
+    (tokens.includes("manufatura") && card.cat === "recurso" ? 1 : 0) +
+    (tokens.includes("joalheria") && (card.cat === "recurso" || card.cat === "comercio") ? 1 : 0) +
+    (tokens.includes("propaganda") && card.cat === "militar" && (card.conflict ?? 0) > 0 ? 1 : 0);
+  const extraPicks = Math.max(0, (area.extraPicks ?? 0) - 1) + bonus;
   let newArea: PlayerArea = {
     ...area,
+    extraPicks,
     cards: [...area.cards, card],
     shields: area.shields + (card.shields ?? 0),
   };
@@ -268,7 +277,7 @@ export function pickCard(
     lastPick: { playerId, source, card: source === "centro" ? null : card },
   };
   const resolved = next.conflictTokens >= conflictTokenLimit(n) ? resolveBattle(next) : next;
-  return { pub: resolved, hidden: h, nextSeat: (currentSeat + 1) % n, finished, card };
+  return { pub: resolved, hidden: h, nextSeat: extraPicks > 0 && !finished ? currentSeat : (currentSeat + 1) % n, finished, card };
 }
 
 export function scoreBreakdown(area: PlayerArea, civId?: string) {

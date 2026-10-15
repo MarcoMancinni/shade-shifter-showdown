@@ -228,8 +228,8 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
                 transition={{ delay: reduced ? 0 : 2.8 + i * .12 }}>
                 <td>{entry.rank === 1 ? "♛ 1º" : `${entry.rank}º`}</td>
                 <td><strong>{entry.name}{entry.id === meId ? " (você)" : ""}</strong><small>{entry.civ?.name ?? "Civilização"}</small></td>
-                <td>{entry.score.wonder}</td><td>{entry.score.culture}</td><td>{entry.score.military}</td><td>{entry.score.progress}</td>
-                <td><strong>{entry.score.total}</strong></td>
+                <td data-label="Maravilha">{entry.score.wonder}</td><td data-label="Cultura">{entry.score.culture}</td><td data-label="Batalhas">{entry.score.military}</td><td data-label="Progresso">{entry.score.progress}</td>
+                <td data-label="Total"><strong>{entry.score.total}</strong></td>
               </motion.tr>
             ))}</tbody>
           </table>

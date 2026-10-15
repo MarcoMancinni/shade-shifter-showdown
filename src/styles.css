@@ -2059,7 +2059,7 @@ body:has(.imperial-finale-v2) {overflow:hidden;}
 @media(max-width:760px){.imperial-finale-v2-art{min-height:200px!important}.imperial-finale-v2-wonder-image{max-height:280px;width:min(100%,390px)}}
 
 /* ===== Mesa mobile ===== */
-.pwa-connection { position: fixed; top: env(safe-area-inset-top); left: 0; right: 0; z-index: 100001; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; background: var(--background); color: var(--gold); border-bottom: 1px solid var(--bronze); font-size: 14px; }
+.pwa-connection { position: fixed; top: env(safe-area-inset-top); left: 0; right: 0; z-index: 100001; pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; background: var(--background); color: var(--gold); border-bottom: 1px solid var(--bronze); font-size: 14px; }
 .pwa-tools { position: fixed; right: 12px; bottom: calc(90px + env(safe-area-inset-bottom)); z-index: 100000; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; max-width: calc(100vw - 24px); }
 .pwa-tools button { min-height: 44px; border-color: var(--bronze); background: var(--background); color: var(--gold); }
 @media (max-width: 767px) {

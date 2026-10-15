@@ -250,7 +250,7 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
   );
 }
 
-export function GameTable({ room, players, session, code }: { room: RoomRow; players: PlayerRow[]; session: Session; code: string }) {
+export function GameTable({ room, players, session, code, connected = true }: { room: RoomRow; players: PlayerRow[]; session: Session; code: string; connected?: boolean }) {
   const take = useServerFn(takeCard);
   const selectProgress = useServerFn(chooseProgress);
   const [progressBusy, setProgressBusy] = useState(false);
@@ -266,13 +266,13 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   const activeId = st.seats[room.current_seat];
   const nextId = st.seats[(room.current_seat + 1) % n];
   const EMPTY = { top: null, count: 0 };
-  const myTurn = activeId === session.playerId && room.status === "playing";
+  const myTurn = activeId === session.playerId && room.status === "playing" && connected;
   const viewSeat = mySeat >= 0 ? mySeat : room.current_seat;
   const leftDeck = st.decks[deckIndexFor(viewSeat, n, "esquerda")] ?? EMPTY;
   const rightDeck = st.decks[deckIndexFor(viewSeat, n, "direita")] ?? EMPTY;
 
   async function pick(source: Source) {
-    if (!myTurn || busy) return;
+    if (!myTurn || busy || !connected || !navigator.onLine) return;
     setBusy(true); setError(null);
     try {
       const r = await take({ data: { code, ...session, source, turn: room.turn_number } });
@@ -281,7 +281,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   }
 
   async function buildWonder() {
-    if (evolving || room.status !== "playing") return;
+    if (evolving || room.status !== "playing" || !connected || !navigator.onLine) return;
     setEvolving(true); setError(null);
     try {
       const result = await evolve({ data: { code, ...session, version: room.version } });
@@ -298,7 +298,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   const progressOffset = (me?.progressChosen?.length ?? 0) % Math.max(1, progressAvailable.length);
   const progressOptions = [...progressAvailable.slice(progressOffset), ...progressAvailable.slice(0, progressOffset)].slice(0, 4);
   async function chooseProgressOption(index: number) {
-    if (progressBusy) return;
+    if (progressBusy || !connected || !navigator.onLine) return;
     setProgressBusy(true); setError(null);
     try {
       const result = await selectProgress({ data: { code, ...session, version: room.version, choice: index } });
@@ -366,7 +366,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   return (
     <main className="imperios-arena arena-v2 flex min-h-screen flex-col">
       <ActionFeed st={st} turn={room.turn_number} names={names} meId={session.playerId} />
-      {pendingProgress > 0 && progressOptions.length > 0 && <ProgressBlueprint options={progressOptions} onChoose={chooseProgressOption} busy={progressBusy} error={error} />}
+      {pendingProgress > 0 && progressOptions.length > 0 && <ProgressBlueprint options={progressOptions} onChoose={chooseProgressOption} busy={progressBusy || !connected} error={error} />}
       {/* Ambientação visual: sobreposições leves sobre as bandeiras e os braseiros do cenário. */}
       <div className="arena-ambient" aria-hidden="true">
         <span className="arena-ambient-banner arena-ambient-banner-left" />
@@ -385,7 +385,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
           progressNames={Object.fromEntries(Object.entries(PROGRESS_INFO).map(([k, v]) => [k, v.name]))}
           progressInfo={PROGRESS_INFO}
           wonderReady={wonderReady} onPick={pick} onInspect={setInspect}
-          renderRequirements={() => me && myCiv ? <WonderRequirements civ={myCiv} built={me.stages} cards={me.cards} onEvolve={buildWonder} evolving={evolving} canPlay /> : null} />
+          renderRequirements={() => me && myCiv ? <WonderRequirements civ={myCiv} built={me.stages} cards={me.cards} onEvolve={buildWonder} evolving={evolving} canPlay={connected} /> : null} />
       ) : (<>
       <header className="arena-hud relative z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-3">
         <Link to="/" className="font-display text-gold">Impérios</Link>
@@ -477,7 +477,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
           <section className="arena-my-empire arena-v2-empire panel-stone relative z-20 mx-4 mb-4 grid grid-cols-1 items-center gap-5 p-5 md:grid-cols-[minmax(0,1.6fr)_minmax(0,0.85fr)]" aria-label="Evolução e inventário">
             <div className="min-w-0">
           <WonderRequirements civ={myCiv} built={me.stages} cards={me.cards}
-            onEvolve={buildWonder} evolving={evolving} canPlay={room.status === "playing"} />
+            onEvolve={buildWonder} evolving={evolving} canPlay={connected && room.status === "playing"} />
           </div>
           <div className="empire-hand min-w-0 border-t border-gold/20 pt-4 md:border-l md:border-t-0 md:pl-4 md:pt-0">
             <div className="empire-hand-title">INVENTÁRIO <span>{me.cards.length} cartas</span></div>

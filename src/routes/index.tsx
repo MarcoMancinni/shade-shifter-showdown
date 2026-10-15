@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import hero from "@/assets/hero.jpg";
 import { createRoom } from "@/lib/game.functions";
 import { saveSession } from "@/lib/session";
+import { useOnline } from "@/hooks/use-online";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,10 +30,11 @@ function Home() {
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const online = useOnline();
 
   async function onCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (busy) return;
+    if (busy || !online) return;
     setBusy(true); setError(null);
     try {
       const r = await create({ data: { nickname } });
@@ -70,7 +73,7 @@ function Home() {
               <label className="text-left text-sm text-muted-foreground" htmlFor="nick">Seu apelido</label>
               <input id="nick" autoFocus maxLength={20} value={nickname} onChange={(e) => setNickname(e.target.value)}
                 className="rounded-md border border-input bg-background/60 px-3 py-2 text-foreground outline-none focus:ring-2 focus:ring-ring" />
-              <button disabled={busy || !nickname.trim()} className="btn-gold py-3">{busy ? "Criando…" : "Fundar império"}</button>
+              <Button disabled={!online || busy || !nickname.trim()} className="btn-gold py-3">{busy ? "Criando…" : "Fundar império"}</Button>
               <button type="button" className="text-sm text-muted-foreground hover:text-foreground" onClick={() => setMode("menu")}>Voltar</button>
             </form>
           )}

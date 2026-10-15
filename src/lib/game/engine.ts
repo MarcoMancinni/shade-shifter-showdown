@@ -78,14 +78,44 @@ export function deckIndexFor(seat: number, nSeats: number, source: "esquerda" | 
 
 export class RuleError extends Error {}
 
-
 /** Cada carta de comércio (moeda) substitui exatamente um recurso na construção.
  * O servidor escolhe primeiro materiais reais e só consome moedas quando necessário.
+ * Ficha 'engenharia' permite ignorar restrição de 'iguais' ou 'diferentes'.
+ * Ficha 'economia' faz cada carta amarela valer 2 moedas.
  */
-export function resourcesForCost(cards: Card[], cost: CostKind): string[] | null {
+export function resourcesForCost(cards: Card[], cost: CostKind, tokens: string[] = []): string[] | null {
   const materials = cards.filter((c) => c.cat === "recurso" && c.resource);
-  const coins = cards.filter((c) => c.cat === "comercio");
+  const yellowCards = cards.filter((c) => c.cat === "comercio");
+  const hasEngenharia = tokens.includes("engenharia");
+  const hasEconomia = tokens.includes("economia");
+  
   const amount = Number(cost[0]);
+  
+  // Se tem engenharia, qualquer conjunto de (amount) cartas resolve.
+  if (hasEngenharia) {
+    const totalPower = yellowCards.length * (hasEconomia ? 2 : 1) + materials.length;
+    if (totalPower < amount) return null;
+    
+    // Simplesmente consome o que for necessário, priorizando materiais
+    const used: string[] = [];
+    let needed = amount;
+    for (const m of materials) {
+      if (needed <= 0) break;
+      used.push(m.id);
+      needed--;
+    }
+    for (const y of yellowCards) {
+      if (needed <= 0) break;
+      used.push(y.id);
+      needed -= (hasEconomia ? 2 : 1);
+    }
+    return used;
+  }
+
+  // Lógica padrão
+  const coinValue = hasEconomia ? 2 : 1;
+  const totalCoins = yellowCards.length * coinValue;
+
   if (cost.endsWith("ig")) {
     let best: Card[] = [];
     for (const resource of RES) {
@@ -94,20 +124,40 @@ export function resourcesForCost(cards: Card[], cost: CostKind): string[] | null
       if (matching.length >= amount) return matching.slice(0, amount).map((c) => c.id);
     }
     const missing = amount - best.length;
-    if (coins.length < missing) return null;
-    return [...best.map((c) => c.id), ...coins.slice(0, missing).map((c) => c.id)];
+    if (totalCoins < missing) return null;
+    // Retorna os IDs das cartas. Nota: se hasEconomia, uma carta pode cobrir 2 'missing'.
+    const usedCoins: string[] = [];
+    let covered = 0;
+    for (const y of yellowCards) {
+      if (covered >= missing) break;
+      usedCoins.push(y.id);
+      covered += coinValue;
+    }
+    return [...best.map((c) => c.id), ...usedCoins];
   }
+  
   const distinct = RES.map((resource) => materials.find((c) => c.resource === resource))
     .filter((c): c is Card => !!c);
   const missing = amount - distinct.length;
-  if (missing > coins.length) return null;
-  return [...distinct.slice(0, amount).map((c) => c.id), ...coins.slice(0, Math.max(0, missing)).map((c) => c.id)];
+  if (missing > totalCoins) return null;
+  
+  const usedCoins: string[] = [];
+  let covered = 0;
+  for (const y of yellowCards) {
+    if (covered >= missing) break;
+    usedCoins.push(y.id);
+    covered += coinValue;
+  }
+  
+  return [...distinct.slice(0, amount).map((c) => c.id), ...usedCoins];
 }
+
 export function buildAvailableStage(area: PlayerArea, civId?: string) {
   const civ = civById(civId);
   if (!civ || area.stages >= civ.stages.length) return { area };
   const stage = civ.stages[area.stages]!;
-  const used = resourcesForCost(area.cards, stage.cost);
+  const tokens = area.progressChosen ?? [];
+  const used = resourcesForCost(area.cards, stage.cost, tokens);
   if (!used) return { area };
   const ids = new Set(used);
   return {
@@ -118,7 +168,9 @@ export function buildAvailableStage(area: PlayerArea, civId?: string) {
   };
 }
 
-/** Cada jogador enfrenta apenas seus vizinhos imediatos (esquerda e direita).\n * Em mesas de 2 jogadores, ambos os lados apontam para o mesmo rival: um unico duelo.\n * Resolve o conflito entre vizinhos e descarta soldados com trombeta.
+/** Cada jogador enfrenta apenas seus vizinhos imediatos (esquerda e direita).
+ * Em mesas de 2 jogadores, ambos os lados apontam para o mesmo rival: um unico duelo.
+ * Resolve o conflito entre vizinhos e descarta soldados com trombeta.
  * Uma vitória contra um vizinho concede uma ficha de vitória de 3 pontos; empate não pontua.
  * Cada par de jogadores é comparado uma única vez.
  */
@@ -224,7 +276,19 @@ export function scoreBreakdown(area: PlayerArea, civId?: string) {
   const wonder = area.wonderPoints ?? (civ ? civ.stages.slice(0, area.stages).reduce((sum, stage) => sum + stage.points, 0) : 0);
   const culture = area.cards.reduce((sum, card) => sum + (card.cat === "cultura" ? card.points ?? 0 : 0), 0);
   const military = area.battlePoints ?? 0;
-  return { wonder, culture, military, total: wonder + culture + military };
+  
+  // Pontos de fichas de progresso
+  const tokens = area.progressChosen ?? [];
+  let progress = 0;
+  for (const token of tokens) {
+    if (token === "decoracao") progress += (area.stages >= 5 ? 6 : 4);
+    if (token === "politica") progress += area.cards.filter(c => c.cat === "cultura" && c.mascot).length;
+    if (token === "estrategia") progress += (area.battlePoints ?? 0) / 3;
+    if (token === "educacao") progress += tokens.length * 2;
+    if (token === "cultura") progress += 4;
+  }
+
+  return { wonder, culture, military, progress, total: wonder + culture + military + progress };
 }
 
 export function publicPoints(area: PlayerArea, civId?: string): number {

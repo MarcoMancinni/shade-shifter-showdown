@@ -12,7 +12,7 @@ export interface PublicState {
   conflictTokens: number;
   conflictRound?: number;
   lastBattle?: { round: number; results: Record<string, { shields: number; wins: number; points: number }> };
-  lastScience?: { playerId: string; used: string[]; tokenCount: number };
+  lastScience?: { playerId: string; used: string[]; tokenCount: number } | undefined;
   lastPick?: { playerId: string; source: Source; card: Card | null };
   lastBuild?: { playerId: string; stage: number; used: string[]; points: number; effect?: string } | undefined;
 }

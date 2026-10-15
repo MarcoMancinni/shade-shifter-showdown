@@ -49,9 +49,9 @@ export function MobileTable(p: MobileTableProps) {
   const me = p.me;
   const score = me ? scoreBreakdown(me, p.myCiv?.id) : null;
 
-  const decks: { source: Source; label: string; deck: Deck; from?: string }[] = [
+  const decks: { source: Source; label: string; deck: Deck; from?: string | undefined }[] = [
     { source: "esquerda", label: "Esquerda", deck: p.leftDeck, from: leftId !== meId ? byId[leftId ?? ""]?.nickname : undefined },
-    { source: "centro", label: "Centro", deck: st.central },
+    { source: "centro", label: "Centro", deck: { top: null, count: st.central.count } },
     { source: "direita", label: "Direita", deck: p.rightDeck, from: n > 2 && rightId !== meId ? byId[rightId ?? ""]?.nickname : undefined },
   ];
 

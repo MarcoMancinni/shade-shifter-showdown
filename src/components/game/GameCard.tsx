@@ -55,10 +55,10 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
     return <IllustratedResourceCard size={size} resource="moeda" title={cardTitle(card)} />;
   }
   if (card.cat === "cultura" && card.mascot && card.points === 2) {
-    return <IllustratedResourceCard size={size} resource="conhecimento-gato-2-pontos" title={cardTitle(card)} />;
+    return <IllustratedResourceCard size={size} resource="carta-azul-conhecimento-gato-2-pontos" title={cardTitle(card)} />;
   }
   if (card.cat === "cultura" && !card.mascot && card.points === 3) {
-    return <IllustratedResourceCard size={size} resource="conhecimento-3-pontos" title={cardTitle(card)} />;
+    return <IllustratedResourceCard size={size} resource="carta-azul-conhecimento-3-pontos" title={cardTitle(card)} />;
   }
   if (card.cat === "recurso" && (card.resource === "pedra" || card.resource === "argila" || card.resource === "madeira" || card.resource === "vidro")) {
     return <IllustratedResourceCard size={size} resource={card.resource} title={cardTitle(card)} />;
@@ -94,7 +94,7 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   );
 }
 
-function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" | "carta-militar-sem-conflito" | "carta-militar-1-conflito" | "carta-militar-2-conflitos" | "conhecimento-3-pontos" | "conhecimento-gato-2-pontos" | "carta-verde-astrolabio" | "carta-verde-engrenagem" | "carta-verde-escrita" }) {
+function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" | "carta-militar-sem-conflito" | "carta-militar-1-conflito" | "carta-militar-2-conflitos" | "carta-azul-conhecimento-3-pontos" | "carta-azul-conhecimento-gato-2-pontos" | "carta-verde-astrolabio" | "carta-verde-engrenagem" | "carta-verde-escrita" }) {
   const [imageFailed, setImageFailed] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [position, setPosition] = useState({ left: 0, top: 0, below: false });

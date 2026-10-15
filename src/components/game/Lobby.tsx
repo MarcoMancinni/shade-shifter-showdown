@@ -9,7 +9,7 @@ import type { PlayerRow, RoomRow } from "@/hooks/use-room";
 import { Wonder } from "./Wonder";
 import { cn } from "@/lib/utils";
 
-export function Lobby({ room, players, session, code }: { room: RoomRow; players: PlayerRow[]; session: Session; code: string }) {
+export function Lobby({ room, players, session, code, connected = true }: { room: RoomRow; players: PlayerRow[]; session: Session; code: string; connected?: boolean }) {
   const choose = useServerFn(chooseCiv);
   const start = useServerFn(startGame);
   const [busy, setBusy] = useState(false);
@@ -21,7 +21,7 @@ export function Lobby({ room, players, session, code }: { room: RoomRow; players
   const ready = players.length >= 2 && players.every((p) => p.civ_id);
 
   async function run(fn: () => Promise<{ ok: boolean; error?: string }>) {
-    if (busy) return; setBusy(true); setError(null);
+    if (busy || !connected || !navigator.onLine) return; setBusy(true); setError(null);
     try { const r = await fn(); if (!r.ok) setError(r.error ?? "Erro."); } catch { setError("Falha de conexão."); } finally { setBusy(false); }
   }
 
@@ -61,7 +61,7 @@ export function Lobby({ room, players, session, code }: { room: RoomRow; players
         </div>
         <div className="war-lobby-launch">
           {isHost ? (
-            <button className="war-lobby-start btn-gold" disabled={!ready || busy} onClick={() => run(() => start({ data: { code, ...session } }))}>
+            <button className="war-lobby-start btn-gold" disabled={!connected || !ready || busy} onClick={() => run(() => start({ data: { code, ...session } }))}>
               <Swords className="size-5" /> {busy ? "Preparando..." : "INICIAR PARTIDA"}
             </button>
           ) : <div className="war-lobby-await"><Shield className="size-5" /> Aguardando o anfitrião iniciar a partida</div>}
@@ -79,7 +79,7 @@ export function Lobby({ room, players, session, code }: { room: RoomRow; players
             const mine = owner?.id === session.playerId;
             const taken = !!owner && !mine;
             return (
-              <button key={civ.id} disabled={taken || busy}
+              <button key={civ.id} disabled={!connected || taken || busy}
                 onClick={() => run(() => choose({ data: { code, ...session, civId: mine ? null : civ.id } }))}
                 className={cn("war-lobby-civ group relative flex w-full min-w-0 flex-col items-center gap-2 rounded-xl border border-transparent bg-transparent px-2 py-3 text-left transition-all duration-200", mine && "border-gold/70 bg-gold/5", taken ? "opacity-40" : "hover:-translate-y-0.5 hover:bg-gold/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold")}>
                 {(civ.id === "aurelia" || civ.id === "nihara" || civ.id === "thalassa") && !brokenBandejas[civ.id] ? (

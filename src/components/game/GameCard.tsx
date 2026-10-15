@@ -31,7 +31,7 @@ export function cardTitle(card: Card) {
   return `${card.shields} escudo${(card.shields ?? 0) > 1 ? "s" : ""}${card.conflict ? ` · ${card.conflict} ⚔` : ""}`;
 }
 
-export function GameCard({ card, size = "md", hidden }: { card: Card | null; size?: "sm" | "md" | "lg"; hidden?: boolean }) {
+export function GameCard({ card, size = "md", hidden, preview = true }: { card: Card | null; size?: "sm" | "md" | "lg"; hidden?: boolean; preview?: boolean }) {
   const dims = size === "lg" ? "w-36 h-52" : size === "md" ? "w-24 h-36" : "w-10 h-14";
   if (!card || hidden) {
     return (
@@ -43,34 +43,34 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   }
   // Recursos ilustrados usam suas artes próprias, com alternativa caso a imagem falhe.
   if (card.cat === "ciencia" && card.science === "escrita") {
-    return <IllustratedResourceCard size={size} resource="carta-verde-escrita" title={cardTitle(card)} />;
+    return <IllustratedResourceCard preview={preview} size={size} resource="carta-verde-escrita" title={cardTitle(card)} />;
   }
   if (card.cat === "ciencia" && card.science === "engenho") {
-    return <IllustratedResourceCard size={size} resource="carta-verde-engrenagem" title={cardTitle(card)} />;
+    return <IllustratedResourceCard preview={preview} size={size} resource="carta-verde-engrenagem" title={cardTitle(card)} />;
   }
   if (card.cat === "ciencia" && card.science === "astro") {
-    return <IllustratedResourceCard size={size} resource="carta-verde-astrolabio" title={cardTitle(card)} />;
+    return <IllustratedResourceCard preview={preview} size={size} resource="carta-verde-astrolabio" title={cardTitle(card)} />;
   }
   if (card.cat === "comercio") {
-    return <IllustratedResourceCard size={size} resource="moeda" title={cardTitle(card)} />;
+    return <IllustratedResourceCard preview={preview} size={size} resource="moeda" title={cardTitle(card)} />;
   }
   if (card.cat === "cultura" && card.mascot && card.points === 2) {
-    return <IllustratedResourceCard size={size} resource="carta-azul-conhecimento-gato-2-pontos" title={cardTitle(card)} />;
+    return <IllustratedResourceCard preview={preview} size={size} resource="carta-azul-conhecimento-gato-2-pontos" title={cardTitle(card)} />;
   }
   if (card.cat === "cultura" && !card.mascot && card.points === 3) {
-    return <IllustratedResourceCard size={size} resource="carta-azul-conhecimento-3-pontos" title={cardTitle(card)} />;
+    return <IllustratedResourceCard preview={preview} size={size} resource="carta-azul-conhecimento-3-pontos" title={cardTitle(card)} />;
   }
   if (card.cat === "recurso" && (card.resource === "pedra" || card.resource === "argila" || card.resource === "madeira" || card.resource === "vidro")) {
-    return <IllustratedResourceCard size={size} resource={card.resource} title={cardTitle(card)} />;
+    return <IllustratedResourceCard preview={preview} size={size} resource={card.resource} title={cardTitle(card)} />;
   }
   if (card.cat === "militar" && (card.shields ?? 0) === 1 && card.conflict === 2) {
-    return <IllustratedResourceCard size={size} resource="carta-militar-2-conflitos" title={cardTitle(card)} />;
+    return <IllustratedResourceCard preview={preview} size={size} resource="carta-militar-2-conflitos" title={cardTitle(card)} />;
   }
   if (card.cat === "militar" && (card.shields ?? 0) === 1 && card.conflict === 1) {
-    return <IllustratedResourceCard size={size} resource="carta-militar-1-conflito" title={cardTitle(card)} />;
+    return <IllustratedResourceCard preview={preview} size={size} resource="carta-militar-1-conflito" title={cardTitle(card)} />;
   }
   if (card.cat === "militar" && (card.shields ?? 0) === 1 && !card.conflict) {
-    return <IllustratedResourceCard size={size} resource="carta-militar-sem-conflito" title={cardTitle(card)} />;
+    return <IllustratedResourceCard preview={preview} size={size} resource="carta-militar-sem-conflito" title={cardTitle(card)} />;
   }
   if (size === "sm") {
     return (
@@ -94,7 +94,7 @@ export function GameCard({ card, size = "md", hidden }: { card: Card | null; siz
   );
 }
 
-function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" | "lg"; title: string; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" | "carta-militar-sem-conflito" | "carta-militar-1-conflito" | "carta-militar-2-conflitos" | "carta-azul-conhecimento-3-pontos" | "carta-azul-conhecimento-gato-2-pontos" | "carta-verde-astrolabio" | "carta-verde-engrenagem" | "carta-verde-escrita" }) {
+function IllustratedResourceCard({ size, title, resource, preview }: { size: "sm" | "md" | "lg"; title: string; preview: boolean; resource: "pedra" | "argila" | "madeira" | "vidro" | "moeda" | "carta-militar-sem-conflito" | "carta-militar-1-conflito" | "carta-militar-2-conflitos" | "carta-azul-conhecimento-3-pontos" | "carta-azul-conhecimento-gato-2-pontos" | "carta-verde-astrolabio" | "carta-verde-engrenagem" | "carta-verde-escrita" }) {
   const [imageFailed, setImageFailed] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [position, setPosition] = useState({ left: 0, top: 0, below: false });
@@ -102,6 +102,7 @@ function IllustratedResourceCard({ size, title, resource }: { size: "sm" | "md" 
   const dims = size === "lg" ? "w-36 h-52" : size === "md" ? "w-24 h-36" : "w-10 h-14";
 
   const showPreview = (element: HTMLElement) => {
+    if (!preview) return;
     const rect = element.getBoundingClientRect();
     const previewWidth = size === "sm" ? 112 : size === "lg" ? 210 : 165;
     const previewHeight = previewWidth * (3 / 2);

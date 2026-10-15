@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { setupGame, pickCard, RuleError, buildDeck, resourcesForCost, buildAvailableStage, scienceCombination, claimScienceProgress } from "./engine";
+import { setupGame, pickCard, RuleError, buildDeck, resourcesForCost, buildAvailableStage, scienceCombination, claimScienceProgress, scoreBreakdown } from "./engine";
 
 const rnd = (m: number) => Math.floor(Math.random() * m);
 
@@ -106,5 +106,44 @@ describe("cartas verdes e fichas de progresso", () => {
     expect(r?.tokenCount).toBe(2);
     expect(r?.area.progressTokens).toBe(4);
     expect(r?.area.cards).toHaveLength(0);
+  });
+});
+
+describe("efeitos de fichas de progresso", () => {
+  const r = (id: string, resource: "pedra" | "argila" | "madeira" | "vidro") => ({ id, cat: "recurso" as const, resource });
+  const coin = (id: string) => ({ id, cat: "comercio" as const });
+  const blue = (id: string, mascot = false) => ({ id, cat: "cultura" as const, points: 2, mascot });
+
+  it("engenharia permite usar recursos diferentes para requisitos de iguais", () => {
+    const cards = [r("p", "pedra"), r("a", "argila")];
+    expect(resourcesForCost(cards, "2ig", ["engenharia"])).not.toBeNull();
+  });
+
+  it("economia faz cartas amarelas valerem 2 moedas", () => {
+    const cards = [coin("c")];
+    expect(resourcesForCost(cards, "2ig", ["economia"])).toEqual(["c"]);
+    expect(resourcesForCost(cards, "2ig", [])).toBeNull();
+  });
+
+  it("decoração dá 4 pontos básicos ou 6 se maravilha completa", () => {
+    const area = { cards: [], stages: 4, shields: 0, progressChosen: ["decoracao"] };
+    expect(scoreBreakdown(area).progress).toBe(4);
+    const area2 = { cards: [], stages: 5, shields: 0, progressChosen: ["decoracao"] };
+    expect(scoreBreakdown(area2).progress).toBe(6);
+  });
+
+  it("política dá pontos por mascotes azuis", () => {
+    const area = { cards: [blue("b1", true), blue("b2", false), blue("b3", true)], stages: 0, shields: 0, progressChosen: ["politica"] };
+    expect(scoreBreakdown(area).progress).toBe(2);
+  });
+
+  it("estratégia dá 1 ponto extra por ficha de vitória militar", () => {
+    const area = { cards: [], stages: 0, shields: 0, battlePoints: 6, progressChosen: ["estrategia"] };
+    expect(scoreBreakdown(area).progress).toBe(2); // 6 pts = 2 fichas
+  });
+
+  it("educação dá 2 pontos por ficha de progresso", () => {
+    const area = { cards: [], stages: 0, shields: 0, progressChosen: ["educacao", "cultura"] };
+    expect(scoreBreakdown(area).progress).toBe(4); // educacao (2*2); cultura has no defined scoring rule.
   });
 });

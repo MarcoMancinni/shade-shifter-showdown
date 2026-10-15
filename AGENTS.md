@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Game architecture
+- PWA uses vite-plugin-pwa generateSW and a single preview-guarded Workbox registrar; only static assets are cached, SSR navigations use network-first with no reusable HTML, and application tabs reload only after explicit confirmation to protect multiplayer sessions.
 - Rules engine lives in `src/lib/game/engine.ts` as pure TS; server functions in `src/lib/game.functions.ts` load state, call it, and commit via the `commit_room_state` RPC (version-checked) — keeps the server authoritative and the engine testable.
 - Players have no accounts: identity is a random token (only its SHA-256 stored in `player_secrets`), kept in localStorage per room — prevents seat takeover by link.
 - Hidden cards live only in `room_secrets` (no client grants); `rooms.public_state` holds only what everyone may see.

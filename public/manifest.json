@@ -1,0 +1,16 @@
+{
+  "name": "Impérios: A Era das Maravilhas",
+  "short_name": "Impérios",
+  "description": "Jogo de tabuleiro online de civilizações e maravilhas.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080b0b",
+  "theme_color": "#d7a652",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    }
+  ]
+}

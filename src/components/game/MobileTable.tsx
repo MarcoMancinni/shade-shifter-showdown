@@ -108,7 +108,7 @@ export function MobileTable(p: MobileTableProps) {
 
       <section className="m-center">
         <div className={cn("m-turn", p.myTurn && "is-mine")} role="status">
-          {p.myTurn ? "★ Sua vez — toque numa carta" : `Vez de ${activeName ?? "…"}`}
+          {p.myTurn ? (me?.extraPicks ? "★ Carta extra — escolha uma carta" : "★ Sua vez — toque numa carta") : `Vez de ${activeName ?? "…"}`}
         </div>
         <div className="m-decks">
           {decks.map((d) => (
@@ -119,7 +119,7 @@ export function MobileTable(p: MobileTableProps) {
               <div className="m-deck-card">
                 {d.source === "centro"
                   ? <img src="/cartas/verso-centro.webp" alt="Verso do baralho central" className="h-full w-full rounded-lg object-fill" draggable={false} />
-                  : <div className="m-card-fit"><GameCard card={d.deck.top} size="md" /></div>}
+                   : <div className="m-card-fit"><GameCard card={d.deck.top} size="md" preview={false} /></div>}
               </div>
               <span className="m-deck-from" title={d.from}>{d.from ?? (d.source === "centro" ? "Oculto" : "Compartilhado")}</span>
               <span className="m-deck-count">{d.deck.count} cartas</span>
@@ -163,7 +163,7 @@ export function MobileTable(p: MobileTableProps) {
                     <div className="m-inventory-grid">
                       {cs.map((c) => (
                         <Button variant="ghost" key={c.id} className="m-card-fit-sm" onClick={() => setZoom({ source: null, card: c })} aria-label={cardTitle(c)}>
-                          <GameCard card={c} size="md" />
+                           <GameCard card={c} size="md" preview={false} />
                         </Button>
                       ))}
                     </div>
@@ -183,7 +183,7 @@ export function MobileTable(p: MobileTableProps) {
             )}
             {tab === "pontos" && score && (
               <div className="space-y-2">
-                {([["Maravilha", score.wonder], ["Cultura", score.culture], ["Batalha", score.military]] as const).map(([l, v]) => (
+                {([["Maravilha", score.wonder], ["Cultura", score.culture], ["Batalha", score.military], ["Progresso", score.progress]] as const).map(([l, v]) => (
                   <div key={l} className="m-stat justify-between"><span>{l}</span><strong>{v}</strong></div>
                 ))}
                 <div className="m-stat justify-between border-gold text-gold"><span><Star className="inline size-4" /> Total</span><strong>{score.total}</strong></div>
@@ -199,7 +199,7 @@ export function MobileTable(p: MobileTableProps) {
           <div className="m-zoom-card" onClick={(e) => e.stopPropagation()}>
             {zoom.source === "centro"
               ? <img src="/cartas/verso-centro.webp" alt="Carta oculta do centro" className="h-full w-full rounded-xl object-fill" />
-              : <div className="m-card-fit"><GameCard card={zoom.card} size="lg" /></div>}
+               : <div className="m-card-fit"><GameCard card={zoom.card} size="lg" preview={false} /></div>}
           </div>
           <p className="m-zoom-title">{zoom.source === "centro" ? "Carta oculta do centro" : zoom.card ? cardTitle(zoom.card) : ""}</p>
           {zoom.source && (

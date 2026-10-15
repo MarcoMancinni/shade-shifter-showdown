@@ -63,7 +63,6 @@ function ProgressBlueprint({ options, onChoose, busy, error }: { options: string
             </motion.button>;
           })}
         </div>
-        <p className="relative mt-6 text-center text-xs font-semibold text-[#6d4324]">As fichas são registradas no servidor. Efeitos especiais ainda estão sendo integrados às regras.</p>
         {error && <p role="alert" className="relative mt-2 text-center font-bold text-red-800">{error}</p>}
       </motion.section>
     </motion.div>, document.body
@@ -215,27 +214,27 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
               <strong className="imperial-finale-v2-podium-name">{entry.name}{entry.id === meId ? " (você)" : ""}</strong>
               <span className="imperial-finale-v2-podium-civ">{entry.civ?.name ?? "Civilização"}</span>
               <strong className="imperial-finale-v2-podium-score">{entry.score.total} <small>PTS</small></strong>
-              <span className="imperial-finale-v2-podium-detail">Maravilha {entry.score.wonder} · Cultura {entry.score.culture} · Batalha {entry.score.military}</span>
+              <span className="imperial-finale-v2-podium-detail">Maravilha {entry.score.wonder} · Cultura {entry.score.culture} · Batalha {entry.score.military} · Progresso {entry.score.progress}</span>
             </motion.div>
           ))}
         </div>
         <div className="imperial-finale-v2-table-head"><span>PLACAR FINAL</span><span>{ranked.length} IMPÉRIOS</span></div>
         <div className="imperial-finale-table-wrap">
           <table className="imperial-finale-table">
-            <thead><tr><th>Posição</th><th>Jogador / Civilização</th><th>Maravilhas</th><th>Cultura</th><th>Batalhas</th><th>Total</th></tr></thead>
+            <thead><tr><th>Posição</th><th>Jogador / Civilização</th><th>Maravilhas</th><th>Cultura</th><th>Batalhas</th><th>Progresso</th><th>Total</th></tr></thead>
             <tbody>{ranked.map((entry, i) => (
               <motion.tr key={entry.id} className={cn(entry.rank === 1 && "is-champion", entry.id === meId && "is-me")}
                 initial={reduced ? false : { opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: reduced ? 0 : 2.8 + i * .12 }}>
                 <td>{entry.rank === 1 ? "♛ 1º" : `${entry.rank}º`}</td>
                 <td><strong>{entry.name}{entry.id === meId ? " (você)" : ""}</strong><small>{entry.civ?.name ?? "Civilização"}</small></td>
-                <td>{entry.score.wonder}</td><td>{entry.score.culture}</td><td>{entry.score.military}</td>
+                <td>{entry.score.wonder}</td><td>{entry.score.culture}</td><td>{entry.score.military}</td><td>{entry.score.progress}</td>
                 <td><strong>{entry.score.total}</strong></td>
               </motion.tr>
             ))}</tbody>
           </table>
         </div>
-        <p className="imperial-finale-note">Maravilhas construídas + cartas culturais + vitórias militares (3 pontos por ficha). Empates compartilham a posição.</p>
+        <p className="imperial-finale-note">Maravilhas + cultura + batalhas (3 pontos por vitória) + bônus de Progresso. Empates compartilham a posição.</p>
         <div className="imperial-finale-actions">
           {isHost && <button type="button" className="btn-gold px-6 py-3" disabled={reopening} onClick={newMatch}>
             {reopening ? "Reabrindo sala..." : "Nova partida nesta sala"}
@@ -250,7 +249,7 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
   );
 }
 
-export function GameTable({ room, players, session, code }: { room: RoomRow; players: PlayerRow[]; session: Session; code: string }) {
+export function GameTable({ room, players, session, code, connected = true }: { room: RoomRow; players: PlayerRow[]; session: Session; code: string; connected?: boolean }) {
   const take = useServerFn(takeCard);
   const selectProgress = useServerFn(chooseProgress);
   const [progressBusy, setProgressBusy] = useState(false);
@@ -266,13 +265,13 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   const activeId = st.seats[room.current_seat];
   const nextId = st.seats[(room.current_seat + 1) % n];
   const EMPTY = { top: null, count: 0 };
-  const myTurn = activeId === session.playerId && room.status === "playing";
+  const myTurn = activeId === session.playerId && room.status === "playing" && connected;
   const viewSeat = mySeat >= 0 ? mySeat : room.current_seat;
   const leftDeck = st.decks[deckIndexFor(viewSeat, n, "esquerda")] ?? EMPTY;
   const rightDeck = st.decks[deckIndexFor(viewSeat, n, "direita")] ?? EMPTY;
 
   async function pick(source: Source) {
-    if (!myTurn || busy) return;
+    if (!myTurn || busy || !connected || !navigator.onLine) return;
     setBusy(true); setError(null);
     try {
       const r = await take({ data: { code, ...session, source, turn: room.turn_number } });
@@ -281,7 +280,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   }
 
   async function buildWonder() {
-    if (evolving || room.status !== "playing") return;
+    if (evolving || room.status !== "playing" || !connected || !navigator.onLine) return;
     setEvolving(true); setError(null);
     try {
       const result = await evolve({ data: { code, ...session, version: room.version } });
@@ -298,7 +297,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   const progressOffset = (me?.progressChosen?.length ?? 0) % Math.max(1, progressAvailable.length);
   const progressOptions = [...progressAvailable.slice(progressOffset), ...progressAvailable.slice(0, progressOffset)].slice(0, 4);
   async function chooseProgressOption(index: number) {
-    if (progressBusy) return;
+    if (progressBusy || !connected || !navigator.onLine) return;
     setProgressBusy(true); setError(null);
     try {
       const result = await selectProgress({ data: { code, ...session, version: room.version, choice: index } });
@@ -357,7 +356,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   useTurnAlert(myTurn);
   const isMobile = useMobileLayout();
   const nextStage = me && myCiv ? myCiv.stages[me.stages] : undefined;
-  const nextProg = nextStage && me ? requirementProgress(me.cards, nextStage.cost) : null;
+    const nextProg = nextStage && me ? requirementProgress(me.cards, nextStage.cost, me.progressChosen) : null;
   const wonderReady = !!nextProg && nextProg.current >= nextProg.required && room.status === "playing";
   const names = Object.fromEntries(players.map((p) => [p.id, p.nickname]));
 
@@ -366,7 +365,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
   return (
     <main className="imperios-arena arena-v2 flex min-h-screen flex-col">
       <ActionFeed st={st} turn={room.turn_number} names={names} meId={session.playerId} />
-      {pendingProgress > 0 && progressOptions.length > 0 && <ProgressBlueprint options={progressOptions} onChoose={chooseProgressOption} busy={progressBusy} error={error} />}
+      {pendingProgress > 0 && progressOptions.length > 0 && <ProgressBlueprint options={progressOptions} onChoose={chooseProgressOption} busy={progressBusy || !connected} error={error} />}
       {/* Ambientação visual: sobreposições leves sobre as bandeiras e os braseiros do cenário. */}
       <div className="arena-ambient" aria-hidden="true">
         <span className="arena-ambient-banner arena-ambient-banner-left" />
@@ -385,7 +384,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
           progressNames={Object.fromEntries(Object.entries(PROGRESS_INFO).map(([k, v]) => [k, v.name]))}
           progressInfo={PROGRESS_INFO}
           wonderReady={wonderReady} onPick={pick} onInspect={setInspect}
-          renderRequirements={() => me && myCiv ? <WonderRequirements civ={myCiv} built={me.stages} cards={me.cards} onEvolve={buildWonder} evolving={evolving} canPlay /> : null} />
+          renderRequirements={() => me && myCiv ? <WonderRequirements civ={myCiv} built={me.stages} cards={me.cards} tokens={me.progressChosen} onEvolve={buildWonder} evolving={evolving} canPlay={connected} /> : null} />
       ) : (<>
       <header className="arena-hud relative z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-3">
         <Link to="/" className="font-display text-gold">Impérios</Link>
@@ -477,7 +476,7 @@ export function GameTable({ room, players, session, code }: { room: RoomRow; pla
           <section className="arena-my-empire arena-v2-empire panel-stone relative z-20 mx-4 mb-4 grid grid-cols-1 items-center gap-5 p-5 md:grid-cols-[minmax(0,1.6fr)_minmax(0,0.85fr)]" aria-label="Evolução e inventário">
             <div className="min-w-0">
           <WonderRequirements civ={myCiv} built={me.stages} cards={me.cards}
-            onEvolve={buildWonder} evolving={evolving} canPlay={room.status === "playing"} />
+            tokens={me.progressChosen} onEvolve={buildWonder} evolving={evolving} canPlay={connected && room.status === "playing"} />
           </div>
           <div className="empire-hand min-w-0 border-t border-gold/20 pt-4 md:border-l md:border-t-0 md:pl-4 md:pt-0">
             <div className="empire-hand-title">INVENTÁRIO <span>{me.cards.length} cartas</span></div>
@@ -607,7 +606,7 @@ function DeckSlot({ label, count, enabled, onClick, children }: { label: string;
 
 const RESOURCE_ORDER: Resource[] = ["pedra", "argila", "madeira", "vidro"];
 
-function requirementProgress(cards: Card[], cost: CostKind): { current: number; required: number; resources: Resource[]; coins: number } {
+function requirementProgress(cards: Card[], cost: CostKind, tokens: string[] = []): { current: number; required: number; resources: Resource[]; coins: number } {
   const required = Number(cost[0]);
   const available = cards.filter((card) => card.cat === "recurso" && card.resource);
   const coinCards = cards.filter((card) => card.cat === "comercio");
@@ -615,26 +614,28 @@ function requirementProgress(cards: Card[], cost: CostKind): { current: number; 
     resource,
     count: available.filter((card) => card.resource === resource).length,
   }));
-  const used = resourcesForCost(cards, cost);
+  const used = resourcesForCost(cards, cost, tokens);
   if (used) {
     return {
       current: required, required,
-      resources: available.filter((card) => used.includes(card.id)).map((card) => card.resource!),
+      resources: available.filter((card) => used.includes(card.id)).flatMap((card) => card.resource ? [card.resource] : []),
       coins: coinCards.filter((card) => used.includes(card.id)).length,
     };
   }
+  const coinPower = coinCards.length * (tokens.includes("economia") ? 2 : 1);
+  if (tokens.includes("engenharia")) return { current: Math.min(available.length + coinPower, required), required, resources: available.flatMap((card) => card.resource ? [card.resource] : []), coins: coinCards.length };
   if (cost.endsWith("ig")) {
     const best = counts.reduce((a, b) => b.count > a.count ? b : a);
-    return { current: Math.min(best.count + coinCards.length, required), required, resources: best.count ? [best.resource] : [], coins: Math.min(coinCards.length, Math.max(0, required - best.count)) };
+    return { current: Math.min(best.count + coinPower, required), required, resources: best.count ? [best.resource] : [], coins: Math.min(coinCards.length, Math.max(0, required - best.count)) };
   }
   const distinct = counts.filter((item) => item.count > 0).map((item) => item.resource);
-  return { current: Math.min(distinct.length + coinCards.length, required), required, resources: distinct, coins: Math.min(coinCards.length, Math.max(0, required - distinct.length)) };
+  return { current: Math.min(distinct.length + coinPower, required), required, resources: distinct, coins: Math.min(coinCards.length, Math.max(0, required - distinct.length)) };
 }
 
-function WonderRequirements({ civ, built, cards, onEvolve, evolving, canPlay }: { civ: Civilization; built: number; cards: Card[]; onEvolve: () => void; evolving: boolean; canPlay: boolean }) {
+function WonderRequirements({ civ, built, cards, tokens, onEvolve, evolving, canPlay }: { civ: Civilization; built: number; cards: Card[]; tokens?: string[] | undefined; onEvolve: () => void; evolving: boolean; canPlay: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const next = civ.stages[built];
-  const progress = next ? requirementProgress(cards, next.cost) : null;
+  const progress = next ? requirementProgress(cards, next.cost, tokens) : null;
   const ready = !!progress && progress.current >= progress.required && canPlay;
   return (
     <div className="wonder-requirements">

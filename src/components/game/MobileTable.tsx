@@ -1,7 +1,8 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
-import { Shield, Star, Swords, Landmark, Layers, Sparkles, Trophy, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Shield, Star, Swords, Landmark, Layers, Sparkles, Trophy, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { civById, CATEGORY_LABEL, type Card, type Category, type Civilization } from "@/lib/game/data";
 import { conflictTokenLimit, publicPoints, scoreBreakdown, type PublicState, type Source, type PlayerArea } from "@/lib/game/engine";
@@ -29,6 +30,7 @@ export interface MobileTableProps {
   me: PlayerArea | undefined;
   myCiv: Civilization | undefined;
   progressNames: Record<string, string>;
+  progressInfo: Record<string, { name: string; effect: string; symbol: string }>;
   wonderReady: boolean;
   renderRequirements: () => ReactNode;
   onPick: (s: Source) => void;
@@ -41,6 +43,18 @@ export function MobileTable(p: MobileTableProps) {
   const { st, players, meId, activeId, viewSeat } = p;
   const [tab, setTab] = useState<Tab | null>(null);
   const [zoom, setZoom] = useState<{ source: Source | null; card: Card | null } | null>(null);
+  const avatarsRef = useRef<HTMLDivElement>(null);
+  const [scrollEdges, setScrollEdges] = useState({ left: false, right: false });
+  useEffect(() => {
+    const list = avatarsRef.current;
+    if (!list) return;
+    const update = () => setScrollEdges({ left: list.scrollLeft > 2, right: list.scrollLeft + list.clientWidth < list.scrollWidth - 2 });
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(list);
+    list.addEventListener("scroll", update, { passive: true });
+    return () => { observer.disconnect(); list.removeEventListener("scroll", update); };
+  }, [st.seats.length]);
   const n = st.seats.length;
   const byId = Object.fromEntries(players.map((x) => [x.id, x]));
   const leftId = st.seats[(viewSeat + n - 1) % n];
@@ -59,8 +73,8 @@ export function MobileTable(p: MobileTableProps) {
     <div className="m-table">
       <header className="m-top">
         <div className="m-top-row">
-          <Link to="/" className="font-display text-gold">Impérios</Link>
-          <span className="m-top-meta">Sala {p.code} · T{p.turn}</span>
+          <div className="m-top-identity min-w-0"><Link to="/" className="font-display text-gold">Impérios</Link>
+          <span className="m-top-meta">Sala {p.code} · Turno {p.turn}</span></div>
           <span className="m-top-war" aria-label={`${st.conflictTokens} de ${conflictTokenLimit(n)} fichas de batalha`}>
             <Swords className="size-3.5 text-cat-militar" />
             {Array.from({ length: conflictTokenLimit(n) }, (_, i) => (
@@ -68,30 +82,38 @@ export function MobileTable(p: MobileTableProps) {
             ))}
           </span>
         </div>
-        <div className="m-avatars" role="list">
+        <div className="m-avatars-wrap">
+        <div ref={avatarsRef} className="m-avatars" aria-label="Jogadores e pontuações">
           {st.seats.map((id) => {
-            const pl = byId[id]; const civ = civById(pl?.civ_id); const a = st.areas[id]!;
+            const pl = byId[id]; const civ = civById(pl?.civ_id); const a = st.areas[id];
+            if (!a) return null;
             return (
-              <button key={id} role="listitem" onClick={() => id !== meId && p.onInspect(id)}
+              <Button variant="ghost" key={id} onClick={() => id === meId ? setTab("pontos") : p.onInspect(id)}
+                aria-label={`${id === meId ? "Você" : pl?.nickname ?? "Jogador"}, ${publicPoints(a, civ?.id)} pontos${id === activeId ? ", jogando agora" : ""}`}
+                aria-current={id === activeId ? "true" : undefined}
                 className={cn("m-avatar", id === activeId && "is-active", id === meId && "is-me")}>
                 <span className="m-avatar-seal" style={{ ["--civ-hue" as string]: civ?.hue ?? 40 }}>{civ?.name.charAt(0) ?? "?"}</span>
                 <span className="m-avatar-name">{id === meId ? "Você" : pl?.nickname ?? "?"}</span>
                 <span className="m-avatar-pts">
-                  {id === leftId && id !== meId && "← "}{publicPoints(a)}★{id === rightId && id !== meId && n > 2 && " →"}
+                  {id === leftId && id !== meId && "← "}{publicPoints(a, civ?.id)}★{id === rightId && id !== meId && n > 2 && " →"}
                 </span>
-              </button>
+              </Button>
             );
           })}
+        </div>
+        {scrollEdges.left && <Button variant="ghost" size="icon" className="m-avatars-more is-left" aria-label="Jogadores anteriores" onClick={() => avatarsRef.current?.scrollBy({ left: -180, behavior: "smooth" })}><ChevronLeft /></Button>}
+        {scrollEdges.right && <Button variant="ghost" size="icon" className="m-avatars-more" aria-label="Mais jogadores" onClick={() => avatarsRef.current?.scrollBy({ left: 180, behavior: "smooth" })}><ChevronRight /></Button>}
         </div>
       </header>
 
       <section className="m-center">
-        <div className={cn("m-turn", p.myTurn && "is-mine")}>
+        <div className={cn("m-turn", p.myTurn && "is-mine")} role="status">
           {p.myTurn ? "★ Sua vez — toque numa carta" : `Vez de ${activeName ?? "…"}`}
         </div>
         <div className="m-decks">
           {decks.map((d) => (
-            <button key={d.source} className="m-deck" disabled={d.deck.count === 0}
+            <Button variant="ghost" key={d.source} className="m-deck" disabled={d.deck.count === 0}
+              aria-label={`Consultar baralho ${d.label.toLowerCase()}, ${d.deck.count} cartas`}
               onClick={() => setZoom({ source: d.source, card: d.source === "centro" ? null : d.deck.top })}>
               <span className="m-deck-label">{d.label}</span>
               <div className="m-deck-card">
@@ -99,8 +121,9 @@ export function MobileTable(p: MobileTableProps) {
                   ? <img src="/cartas/verso-centro.webp" alt="Verso do baralho central" className="h-full w-full rounded-lg object-fill" draggable={false} />
                   : <div className="m-card-fit"><GameCard card={d.deck.top} size="md" /></div>}
               </div>
-              <span className="m-deck-count">{d.from ? `${d.from} · ` : ""}{d.deck.count}</span>
-            </button>
+              <span className="m-deck-from" title={d.from}>{d.from ?? (d.source === "centro" ? "Oculto" : "Compartilhado")}</span>
+              <span className="m-deck-count">{d.deck.count} cartas</span>
+            </Button>
           ))}
         </div>
         {p.error && <p role="alert" className="mt-3 text-center text-sm text-destructive">{p.error}</p>}
@@ -113,12 +136,13 @@ export function MobileTable(p: MobileTableProps) {
         <DockBtn icon={<Trophy />} label="Pontos" value={String(score?.total ?? 0)} onClick={() => setTab("pontos")} />
       </nav>
 
-      <Drawer open={tab !== null} onOpenChange={(o) => !o && setTab(null)}>
-        <DrawerContent className="m-drawer">
-          <DrawerHeader className="pb-1">
+      <Drawer shouldScaleBackground={false} open={tab !== null} onOpenChange={(o) => !o && setTab(null)}>
+        <DrawerContent className="m-drawer" aria-describedby={undefined}>
+          <DrawerHeader className="m-drawer-heading">
             <DrawerTitle className="font-display text-gold">
               {tab === "maravilha" ? p.myCiv?.wonder ?? "Maravilha" : tab === "cartas" ? "Suas cartas" : tab === "fichas" ? "Fichas e escudos" : "Pontuação"}
             </DrawerTitle>
+            <Button variant="ghost" size="icon" className="m-drawer-close" aria-label="Fechar painel" onClick={() => setTab(null)}><X /></Button>
           </DrawerHeader>
           <div className="m-drawer-body">
             {tab === "maravilha" && p.myCiv && me && (
@@ -136,11 +160,11 @@ export function MobileTable(p: MobileTableProps) {
                 return (
                   <div key={cat} className="mb-4">
                     <h3 className="mb-2 font-display text-sm uppercase tracking-wider text-gold">{CATEGORY_LABEL[cat]} · {cs.length}</h3>
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="m-inventory-grid">
                       {cs.map((c) => (
-                        <button key={c.id} className="m-card-fit-sm" onClick={() => setZoom({ source: null, card: c })} aria-label={cardTitle(c)}>
+                        <Button variant="ghost" key={c.id} className="m-card-fit-sm" onClick={() => setZoom({ source: null, card: c })} aria-label={cardTitle(c)}>
                           <GameCard card={c} size="md" />
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </div>
@@ -151,9 +175,10 @@ export function MobileTable(p: MobileTableProps) {
               <div className="space-y-3">
                 <div className="m-stat"><Shield className="size-5 text-cat-militar" /> {me.shields} escudos</div>
                 <div className="m-stat"><Sparkles className="size-5 text-gold" /> {me.progressTokens ?? 0} fichas de Progresso</div>
-                <ul className="space-y-1 pl-2 text-sm">
-                  {(me.progressChosen ?? []).map((id) => <li key={id}>✦ {p.progressNames[id] ?? id}</li>)}
+                <ul className="m-progress-list">
+                  {(me.progressChosen ?? []).map((id) => <li key={id}><span aria-hidden="true">{p.progressInfo[id]?.symbol ?? "✦"}</span><div><strong>{p.progressNames[id] ?? id}</strong><p>{p.progressInfo[id]?.effect ?? "Efeito não disponível."}</p></div></li>)}
                 </ul>
+                {!me.progressChosen?.length && <p className="text-sm text-muted-foreground">Nenhuma ficha escolhida ainda.</p>}
               </div>
             )}
             {tab === "pontos" && score && (
@@ -170,7 +195,7 @@ export function MobileTable(p: MobileTableProps) {
 
       {zoom && typeof document !== "undefined" && createPortal(
         <div className="m-zoom" role="dialog" aria-modal="true" onClick={() => setZoom(null)}>
-          <button className="m-zoom-close" aria-label="Fechar" onClick={() => setZoom(null)}><X /></button>
+          <Button variant="ghost" className="m-zoom-close" aria-label="Fechar" onClick={() => setZoom(null)}><X /></Button>
           <div className="m-zoom-card" onClick={(e) => e.stopPropagation()}>
             {zoom.source === "centro"
               ? <img src="/cartas/verso-centro.webp" alt="Carta oculta do centro" className="h-full w-full rounded-xl object-fill" />
@@ -178,10 +203,10 @@ export function MobileTable(p: MobileTableProps) {
           </div>
           <p className="m-zoom-title">{zoom.source === "centro" ? "Carta oculta do centro" : zoom.card ? cardTitle(zoom.card) : ""}</p>
           {zoom.source && (
-            <button className="btn-gold m-zoom-take" disabled={!p.myTurn || p.busy}
-              onClick={(e) => { e.stopPropagation(); p.onPick(zoom.source!); setZoom(null); }}>
+            <Button variant="ghost" className="btn-gold m-zoom-take" disabled={!p.myTurn || p.busy}
+              onClick={(e) => { e.stopPropagation(); if (zoom.source) p.onPick(zoom.source); setZoom(null); }}>
               {p.myTurn ? (p.busy ? "Aguarde…" : "Pegar esta carta") : "Aguarde sua vez"}
-            </button>
+            </Button>
           )}
         </div>,
         document.body,
@@ -192,10 +217,10 @@ export function MobileTable(p: MobileTableProps) {
 
 function DockBtn({ icon, label, value, glow, onClick }: { icon: ReactNode; label: string; value: string; glow?: boolean; onClick: () => void }) {
   return (
-    <button className={cn("m-dock-btn", glow && "is-glow")} onClick={onClick}>
+    <Button variant="ghost" className={cn("m-dock-btn", glow && "is-glow")} onClick={onClick}>
       <span className="m-dock-icon">{icon}</span>
       <span className="m-dock-label">{label}</span>
       <span className="m-dock-value">{value}</span>
-    </button>
+    </Button>
   );
 }

@@ -285,7 +285,6 @@ export function scoreBreakdown(area: PlayerArea, civId?: string) {
     if (token === "politica") progress += area.cards.filter(c => c.cat === "cultura" && c.mascot).length;
     if (token === "estrategia") progress += (area.battlePoints ?? 0) / 3;
     if (token === "educacao") progress += tokens.length * 2;
-    if (token === "cultura") progress += 4;
   }
 
   return { wonder, culture, military, progress, total: wonder + culture + military + progress };

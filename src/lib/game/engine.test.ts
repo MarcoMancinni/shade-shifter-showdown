@@ -144,6 +144,6 @@ describe("efeitos de fichas de progresso", () => {
 
   it("educação dá 2 pontos por ficha de progresso", () => {
     const area = { cards: [], stages: 0, shields: 0, progressChosen: ["educacao", "cultura"] };
-    expect(scoreBreakdown(area).progress).toBe(4 + 4); // educacao (2*2) + cultura (4)
+    expect(scoreBreakdown(area).progress).toBe(4); // educacao (2*2); cultura has no defined scoring rule.
   });
 });

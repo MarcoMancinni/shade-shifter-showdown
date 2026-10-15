@@ -1,4 +1,10 @@
 # Roadmap
+## Auditoria mobile aprovada
+- [x] Entrega 1 — auditoria, cabeçalho/baralhos/menu/painéis/detecção e validação estrutural concluídos; relatório entregue.
+- [ ] Entrega 2 — interações e seleção de Progresso; bloqueada até aprovação do usuário.
+- [ ] Entrega 3 — acabamento/desempenho/cinemáticas; bloqueada até aprovação do usuário.
+- [ ] Entrega 4 — validação completa de jogabilidade; bloqueada até aprovação do usuário.
+
 - [x] Fase 1 — lobby, convite, civilizações, baralhos, turnos, sincronização
 - [ ] Fase 2 — recursos, construção obrigatória, ciência/fichas, conflitos, mascote, pontuação, fim
 - [ ] Fase 3 — visual completo (mesa, cartas ilustradas, maravilhas isométricas)

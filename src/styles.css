@@ -2059,6 +2059,15 @@ body:has(.imperial-finale-v2) {overflow:hidden;}
 @media(max-width:760px){.imperial-finale-v2-art{min-height:200px!important}.imperial-finale-v2-wonder-image{max-height:280px;width:min(100%,390px)}}
 
 /* ===== Mesa mobile ===== */
+@media (max-width: 767px) {
+  .imperial-finale-v2 .imperial-finale-table { min-width: 0; }
+  .imperial-finale-v2 .imperial-finale-table thead { display: none; }
+  .imperial-finale-v2 .imperial-finale-table tbody { display: grid; gap: 12px; padding: 12px; }
+  .imperial-finale-v2 .imperial-finale-table tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid var(--bronze); border-radius: 8px; padding: 10px; }
+  .imperial-finale-v2 .imperial-finale-table td { min-width: 0; border: 0; padding: 8px; overflow-wrap: anywhere; }
+  .imperial-finale-v2 .imperial-finale-table td:nth-child(2) { text-align: center; }
+  .imperial-finale-v2 .imperial-finale-table td[data-label]::before { content: attr(data-label); display: block; color: var(--muted-foreground); font-size: 12px; margin-bottom: 4px; }
+}
 .pwa-connection { position: fixed; top: env(safe-area-inset-top); left: 0; right: 0; z-index: 100001; pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; background: var(--background); color: var(--gold); border-bottom: 1px solid var(--bronze); font-size: 14px; }
 .pwa-tools { position: fixed; right: 12px; bottom: calc(90px + env(safe-area-inset-bottom)); z-index: 100000; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; max-width: calc(100vw - 24px); }
 .pwa-tools button { min-height: 44px; border-color: var(--bronze); background: var(--background); color: var(--gold); }

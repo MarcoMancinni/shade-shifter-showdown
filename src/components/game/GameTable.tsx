@@ -228,8 +228,8 @@ function ImperialFinale({ st, players, meId, code, session, version, isHost }: {
                 transition={{ delay: reduced ? 0 : 2.8 + i * .12 }}>
                 <td>{entry.rank === 1 ? "♛ 1º" : `${entry.rank}º`}</td>
                 <td><strong>{entry.name}{entry.id === meId ? " (você)" : ""}</strong><small>{entry.civ?.name ?? "Civilização"}</small></td>
-                <td>{entry.score.wonder}</td><td>{entry.score.culture}</td><td>{entry.score.military}</td><td>{entry.score.progress}</td>
-                <td><strong>{entry.score.total}</strong></td>
+                <td data-label="Maravilha">{entry.score.wonder}</td><td data-label="Cultura">{entry.score.culture}</td><td data-label="Batalhas">{entry.score.military}</td><td data-label="Progresso">{entry.score.progress}</td>
+                <td data-label="Total"><strong>{entry.score.total}</strong></td>
               </motion.tr>
             ))}</tbody>
           </table>
@@ -428,7 +428,7 @@ export function GameTable({ room, players, session, code, connected = true }: { 
           ) : (
             <>
               <p className={cn("font-display text-lg", myTurn ? "text-gold" : "text-foreground")}>
-                {myTurn ? "Sua vez: escolha uma carta" : `Vez de ${(activeId ? byId[activeId]?.nickname : undefined) ?? "…"}`}
+                {myTurn ? (me?.extraPickActive ? "Carta extra: escolha uma carta" : "Sua vez: escolha uma carta") : `Vez de ${(activeId ? byId[activeId]?.nickname : undefined) ?? "…"}`}
               </p>
               <div className="arena-decks arena-v2-decks flex w-full max-w-[760px] items-end justify-center gap-5 sm:gap-9 lg:gap-14">
                 <DeckSlot label="Esquerda" count={leftDeck.count} enabled={myTurn && !busy && leftDeck.count > 0} onClick={() => pick("esquerda")}>

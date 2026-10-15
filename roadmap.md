@@ -1,14 +1,15 @@
 # Roadmap
 ## Correções finais e PWA — solicitação de 15/10/2026
-- [ ] Auditar regras, pontuação, controles mobile e multiplayer; corrigir defeitos reproduzidos sem alterar regras.
-- [ ] Adicionar instalação Android/iOS, ícones, manifesto, cache estático seguro e atualização sem recarga automática.
-- [ ] Implementar aviso offline, bloqueio de ações e recuperação após reconexão/segundo plano.
-- [ ] Executar testes automatizados e fluxos reais disponíveis; entregar relatório com limites e publicação.
+- [x] Auditar regras e corrigir efeitos definidos das fichas, pontuação compartilhada e ampliação mobile; Cultura continua sem bônus inventado por não possuir regra definida.
+- [x] Adicionar instalação Android/iOS, ícones, manifesto, cache estático seguro e atualização com confirmação.
+- [x] Implementar aviso offline, bloqueio de ações e recuperação após reconexão/segundo plano.
+- [x] Testes automatizados e fluxo real desktop/mobile até placar final; relatório entregue.
+- [ ] Validar instalação física Android/iPhone e atualização do worker publicado — depende de publicação autorizada e dispositivos físicos.
 ## Auditoria mobile aprovada
 - [x] Entrega 1 — auditoria, cabeçalho/baralhos/menu/painéis/detecção e validação estrutural concluídos; relatório entregue.
-- [ ] Entrega 2 — interações e seleção de Progresso; bloqueada até aprovação do usuário.
-- [ ] Entrega 3 — acabamento/desempenho/cinemáticas; bloqueada até aprovação do usuário.
-- [ ] Entrega 4 — validação completa de jogabilidade; bloqueada até aprovação do usuário.
+- [x] Entrega 2 — ampliação mobile isolada e testes de seleção/efeitos de Progresso.
+- [ ] Entrega 3 — auditoria exaustiva de todas as artes e cinemáticas em aparelhos físicos — depende de dispositivos físicos.
+- [ ] Entrega 4 — validação física completa Android/iPhone — depende de dispositivos físicos e publicação.
 
 - [x] Fase 1 — lobby, convite, civilizações, baralhos, turnos, sincronização
 - [ ] Fase 2 — recursos, construção obrigatória, ciência/fichas, conflitos, mascote, pontuação, fim
@@ -18,7 +19,7 @@
 
 ## Imersão (prioridade atual)
 - [x] 1. Crônica da partida + alerta sonoro/aba de "sua vez"
-- [ ] 2. Placar final e tela de vitória (fim de jogo hoje só diz "baralhos esgotados")
+- [x] 2. Placar final e tela de vitória existentes; pontuação de Progresso incluída e placar mobile sem rolagem horizontal.
 - [ ] 3. Destaque dos vizinhos (de onde vem cada carta lateral)
 - [ ] 4. Efeitos sonoros de carta, construção e batalha
 - [ ] 5. Arte das etapas das outras 6 maravilhas

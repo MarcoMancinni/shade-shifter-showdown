@@ -20,7 +20,7 @@ export default defineConfig({
       includeAssets: ["offline.html", "icons/*.png"],
       workbox: {
         globDirectory: "dist/client",
-        globPatterns: ["offline.html", "icons/*.png"],
+        globPatterns: ["offline.html", "icons/*.png", "assets/*.{js,css,woff,woff2}"],
         navigateFallback: null,
         cleanupOutdatedCaches: false,
         runtimeCaching: [

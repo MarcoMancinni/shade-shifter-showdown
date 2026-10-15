@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { setupGame, pickCard, RuleError, buildDeck, resourcesForCost, buildAvailableStage, scienceCombination, claimScienceProgress, scoreBreakdown, resolveBattle, type Card } from "./engine";
+import { setupGame, pickCard, RuleError, buildDeck, resourcesForCost, buildAvailableStage, scienceCombination, claimScienceProgress, scoreBreakdown, resolveBattle } from "./engine";
+import type { Card } from "./data";
 
 const rnd = (m: number) => Math.floor(Math.random() * m);
 

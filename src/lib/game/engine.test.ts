@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { setupGame, pickCard, RuleError, buildDeck, resourcesForCost, buildAvailableStage, scienceCombination, claimScienceProgress } from "./engine";
+import { setupGame, pickCard, RuleError, buildDeck, resourcesForCost, buildAvailableStage, scienceCombination, claimScienceProgress, scoreBreakdown } from "./engine";
 
 const rnd = (m: number) => Math.floor(Math.random() * m);
 
